@@ -12,7 +12,12 @@ public class ClothControls {
 	private List<ClothData> cloths=Lists.newArrayList();
 	
 	private Mesh sphere;//TODO multiple
+	private int ballSize=100;
 	
+	public int getBallSize() {
+		return ballSize;
+	}
+
 	public ClothControls(Mesh sphere) {
 		super();
 		this.sphere = sphere;
@@ -58,6 +63,15 @@ public class ClothControls {
 		}
 	}
 	
+	//temporaly
+	//TODO supoort multi ball
+	public void updateBallSize(int ballSize){
+		
+		for(ClothData data:cloths){
+			Cloth2 cloth=data.getCloth();
+			cloth.ballSize=ballSize;
+		}
+	}
 	public void renderCloth(){
 		for(ClothData data:cloths){
 			Cloth2 cloth=data.getCloth();

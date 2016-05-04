@@ -169,8 +169,9 @@ public class Cloth2 {
 	
 	public void initPins(){//this is initialized based on Cloth's xSegs TODO link
 		int center=w/2+1;
+		
+		//0
 		pins= new int[]{center};
-
 		pinsFormation.add( pins );
 
 		//default all first line 
@@ -178,7 +179,6 @@ public class Cloth2 {
 		for(int i=0;i<=w;i++){
 			pins[i]=i;
 		}
-		
 		pinsFormation.add( pins );
 
 		pins = new int[]{ 0 };
@@ -195,6 +195,9 @@ public class Cloth2 {
 	
 	public void setPinAll(){
 		pins=pinsFormation.get(1);
+	}
+	public void setPinTwo(){
+		pins=pinsFormation.get(4);
 	}
 	
 	//compatible

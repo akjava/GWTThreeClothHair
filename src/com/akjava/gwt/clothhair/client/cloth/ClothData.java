@@ -1,7 +1,9 @@
 package com.akjava.gwt.clothhair.client.cloth;
 
+import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Geometry;
+import com.akjava.gwt.three.client.js.math.Vector2;
 
 public class ClothData {
 private Cloth2 cloth;
