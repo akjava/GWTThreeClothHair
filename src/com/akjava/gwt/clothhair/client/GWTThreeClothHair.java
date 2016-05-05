@@ -3,17 +3,24 @@ package com.akjava.gwt.clothhair.client;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Map;
+
 import com.akjava.gwt.clothhair.client.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.cloth.ClothControls;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
 import com.akjava.gwt.clothhair.client.texture.TexturePanel;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
+import com.akjava.gwt.lib.client.StorageException;
+import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
+import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
 import com.akjava.gwt.three.client.examples.js.THREEExp;
 import com.akjava.gwt.three.client.examples.js.controls.OrbitControls;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
 import com.akjava.gwt.three.client.gwt.core.BoundingBox;
 import com.akjava.gwt.three.client.gwt.core.Intersect;
+import com.akjava.gwt.three.client.gwt.renderers.WebGLRendererParameter;
+import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.cameras.PerspectiveCamera;
@@ -35,7 +42,15 @@ import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.LineSegments;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
+import com.akjava.lib.common.utils.CSVUtils;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -44,8 +59,12 @@ import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 
@@ -55,6 +74,9 @@ import com.google.gwt.user.client.ui.Label;
  */
 public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 
+	 interface Driver extends SimpleBeanEditorDriver< HairData,  HairDataEditor> {}
+	 Driver driver = GWT.create(Driver.class);
+	
 	double cameraY=700;
 	private OrbitControls controls;
 
@@ -65,11 +87,16 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 	
 	
 	@Override
+	public WebGLRendererParameter createRendererParameter() {
+		return GWTParamUtils.WebGLRenderer().preserveDrawingBuffer(true).logarithmicDepthBuffer(false);
+	}
+	
+	@Override
 	public void animate(double timestamp) {
 		if(clothControls!=null){
 			clothControls.update(timestamp);
 		}
-		
+		//logarithmicDepthBuffer
 		renderer.render(scene, camera);//render last,very important
 	}
 	@Override
@@ -91,7 +118,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			}
 		});
 		
-		LogUtils.log(camera);
+		
 		controls = THREEExp.OrbitControls(camera,rendererContainer.getElement() );
 		controls.setTarget(THREE.Vector3( 0, cameraY, 0 ));
 		controls.update();
@@ -229,7 +256,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		Vector3 vertex;
 		if(hairPin.getVertexOfFaceIndex()==0){
 			vertex=mesh.getGeometry().getVertices().get(face.getA());
-		}else if(hairPin.getVertexOfFaceIndex()==0){
+		}else if(hairPin.getVertexOfFaceIndex()==1){
 			vertex=mesh.getGeometry().getVertices().get(face.getB());
 		}else{
 			vertex=mesh.getGeometry().getVertices().get(face.getC());
@@ -333,6 +360,18 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 	 * must call after sphere initialized;
 	 */
 	private void createControler() {
+		controlerRootPanel.add(new Label("Camera"));
+		LabeledInputRangeWidget2 near=new LabeledInputRangeWidget2("near", 0.1, 100, 0.1);
+		controlerRootPanel.add(near);
+		near.addtRangeListener(new ValueChangeHandler<Number>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Number> event) {
+				camera.setNear(event.getValue().doubleValue());
+				camera.updateProjectionMatrix();
+			}
+		});
+		near.setValue(camera.getNear());
+		
 		//vertex
 		controlerRootPanel.add(new Label("Vertex"));
 		HorizontalPanel h0=new HorizontalPanel();
@@ -352,14 +391,98 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		
 		controlerRootPanel.add(sphereInfoPanel);
 		
-		createClothPanel();
+		
+		
 		
 		//texture panel;
 		controlerRootPanel.add(new Label("Texture"));
 		controlerRootPanel.add(new TexturePanel(hairMaterial));
+		
+		controlerRootPanel.add(new HTML("<h4>Hair Editor</h4>"));
+		//editor
+		HairDataEditor editor=new HairDataEditor();
+		driver.initialize(editor);
+		controlerRootPanel.add(editor);
+		createClothPanel();
+		
+		driver.edit(new HairData());//new data
+		
+		
+		SimpleCellTable<HairCellObjectData> table=new SimpleCellTable<HairCellObjectData>() {
+			@Override
+			public void addColumns(CellTable<HairCellObjectData> table) {
+				TextColumn<HairCellObjectData> nameColumn=new TextColumn<HairCellObjectData>() {
+					@Override
+					public String getValue(HairCellObjectData object) {
+						return hairDataConverter.convert(object.getHairData());
+					}
+				};
+				table.addColumn(nameColumn);
+			}
+		};
+		controlerRootPanel.add(table);
+		
+		HorizontalPanel editPanel=new HorizontalPanel();
+		controlerRootPanel.add(editPanel);
+		
+		
+		Button edit=new Button("remove & edit",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				HairCellObjectData data=cellObjects.getSelection();
+				if(data!=null){
+					removeHairData(data);
+					driver.edit(data.getHairData());
+					firstSelection=data.getHairData().getHairPins().get(0);
+					secondSelection=data.getHairData().getHairPins().get(1);
+					//LogUtils.log(hairDataConverter.convert(data.getHairData()));
+				}
+			}
+		});
+		editPanel.add(edit);
+		
+		Button remove=new Button("remove",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				HairCellObjectData data=cellObjects.getSelection();
+				if(data!=null){
+					removeHairData(data);
+				}
+			}
+		});
+		editPanel.add(remove);
+		
+		
+		cellObjects = new EasyCellTableObjects<HairCellObjectData>(table){
+			@Override
+			public void onSelect(HairCellObjectData selection) {
+				// TODO Auto-generated method stub
+				//editor edit
+			}};
+			
+			
+		//
+		 String text=storageControler.getValue(HairStorageKeys.temp_hairset, null);
+		 if(text!=null && !text.isEmpty()){
+			 Iterable<HairData> hairDatas=hairDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+			 for(HairData hairData:hairDatas){
+				 addCloth(hairData);
+			 }
+		 }
 	}
 	
 	
+	protected void removeHairData(HairCellObjectData data) {
+		checkNotNull(data,"removeHairData:data is null");
+		scene.remove(data.getMesh());
+		clothControls.removeClothData(data.getClothData());
+		cellObjects.removeItem(data);
+		
+		storeDatas();
+	}
+
+
+	private HairDataConverter hairDataConverter=new HairDataConverter();
 	
 	
 	private HairPin currentSelection;
@@ -367,7 +490,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 	private HairPin secondSelection;
 	
 	private void createClothPanel(){
-		controlerRootPanel.add(new Label("Cloth"));
+		
 		//tmp
 		HorizontalPanel h=new HorizontalPanel();
 		controlerRootPanel.add(h);
@@ -395,9 +518,42 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			}
 		});
 		h.add(addCloth);
+		
 	}
 
+	
+	private class HairCellObjectData{
+		private HairData hairData;
+		public HairCellObjectData(HairData hairData, ClothData clothData, Mesh mesh) {
+			super();
+			this.hairData = hairData;
+			this.clothData = clothData;
+			this.mesh = mesh;
+		}
+		public HairData getHairData() {
+			return hairData;
+		}
+		public void setHairData(HairData hairData) {
+			this.hairData = hairData;
+		}
+		public ClothData getClothData() {
+			return clothData;
+		}
+		public void setClothData(ClothData clothData) {
+			this.clothData = clothData;
+		}
+		public Mesh getMesh() {
+			return mesh;
+		}
+		public void setMesh(Mesh mesh) {
+			this.mesh = mesh;
+		}
+		private ClothData clothData;
+		private Mesh mesh;
+	}
+	
 	protected void addCloth() {
+		
 		if(firstSelection==null || secondSelection==null){
 			LogUtils.log("need first & second");
 			return;
@@ -413,9 +569,19 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			return;
 		}
 		
-		LogUtils.log("distance:"+distance);
-		int cw=8;
-		ClothData data=new ClothData(cw, 8, distance, distance);
+		HairData hairData=driver.flush();
+		
+		driver.edit(new HairData());//add another one.
+		
+		
+		hairData.getHairPins().clear();
+		hairData.getHairPins().add(firstSelection);
+		hairData.getHairPins().add(secondSelection);
+		addCloth(hairData);
+	}
+	protected void addCloth(HairData hairData) {
+		
+		ClothData data=new ClothData(hairData,mesh);
 		clothControls.addClothData(data);
 		
 		data.getCloth().setPinAll();
@@ -429,6 +595,20 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		
 		scene.add( object );
 		
+		
+		cellObjects.addItem(new HairCellObjectData(hairData,data,object));
+		
+		
+		
+		//temporaly
+		
+		Vector3 v1=hairPinToVertex(mesh,hairData.getHairPins().get(0),true);
+		Vector3 v2=hairPinToVertex(mesh,hairData.getHairPins().get(1),true);
+		
+		//TODO move and fix
+		int cw=hairData.getSizeOfU();
+		int ch=hairData.getSizeOfV();
+		
 		data.getCloth().particles.get(0).getOriginal().copy(v1);
 		data.getCloth().particles.get(cw).getOriginal().copy(v2);
 		
@@ -441,7 +621,42 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		for(int i=cw+1;i<data.getCloth().particles.size();i++){
 			data.getCloth().particles.get(i).getOriginal().copy(v1);
 		}
+		
+		storeDatas();
 	}
+	
+	
+	
+	 
+	private void storeDatas() {
+		if(cellObjects.getDatas().size()==0){
+			storageControler.removeValue(HairStorageKeys.temp_hairset);
+			return;
+		}
+		
+		String text=
+		Joiner.on("\r\n").join(hairDataConverter.convertAll(FluentIterable.from(cellObjects.getDatas()).transform(new Function<HairCellObjectData, HairData>() {
+			@Override
+			public HairData apply(HairCellObjectData input) {
+				return input.getHairData();
+			}
+		})));
+		
+		try {
+			storageControler.setValue(HairStorageKeys.temp_hairset, text);
+		} catch (StorageException e) {
+			Window.alert(e.getMessage());
+		}
+		
+	}
+
+
+	private EasyCellTableObjects<HairCellObjectData> cellObjects;
+
+
+
+	
+
 
 	
 	

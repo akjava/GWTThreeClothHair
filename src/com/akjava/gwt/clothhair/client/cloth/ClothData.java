@@ -1,16 +1,16 @@
 package com.akjava.gwt.clothhair.client.cloth;
 
-import com.akjava.gwt.three.client.java.ThreeLog;
+import com.akjava.gwt.clothhair.client.HairData;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Geometry;
-import com.akjava.gwt.three.client.js.math.Vector2;
+import com.akjava.gwt.three.client.js.objects.Mesh;
 
 public class ClothData {
-private Cloth2 cloth;
-public Cloth2 getCloth() {
+private HairCloth cloth;
+public HairCloth getCloth() {
 	return cloth;
 }
-public void setCloth(Cloth2 cloth) {
+public void setCloth(HairCloth cloth) {
 	this.cloth = cloth;
 }
 public Geometry getClothGeometry() {
@@ -21,8 +21,8 @@ public void setClothGeometry(Geometry clothGeometry) {
 }
 private Geometry clothGeometry;
 
-public ClothData(int sliceX,int sliceY,double geometryW,double geometryH){
-	cloth=new Cloth2(sliceX,sliceY,geometryW, geometryH);
+public ClothData(HairData hairData,Mesh mesh){
+	cloth=new HairCloth(hairData,mesh);
 	cloth.wind=false;
 	cloth.pins=cloth.pinsFormation.get(4);//first and last
 	

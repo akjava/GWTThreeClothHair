@@ -3,6 +3,8 @@ package com.akjava.gwt.clothhair.client.cloth;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.akjava.gwt.clothhair.client.HairData;
+import com.akjava.gwt.clothhair.client.HairDataUtils;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
@@ -16,7 +18,7 @@ import com.google.gwt.core.client.JsArray;
 
 
 
-public class Cloth2 {
+public class HairCloth {
 	/*
 	 * Cloth Simulation using a relaxed constrains solver
 	 */
@@ -159,10 +161,11 @@ public class Cloth2 {
 	private List<Constrain> constrains=new ArrayList<Constrain>();
 	public List<Particle> particles=new ArrayList<Particle>();
 	
-	
+	/*
 	public Cloth2(){
 		this(xSegs,ySegs);
 	}
+	*/
 	
 	List<int[]> pinsFormation=new ArrayList<int[]>();
 	
@@ -201,21 +204,32 @@ public class Cloth2 {
 	}
 	
 	//compatible
+	/*
 	public Cloth2(int w,int h){
 		this(w,h,25 * xSegs, 25 * ySegs);
 	}
+	*/
 	
 	
-	public Cloth2(int w,int h,double width,double height){
-			this.w = w;
-			this.h = h;
+	public HairCloth(HairData hairData,Mesh mesh){
+			
+		
+			this.w = hairData.getSizeOfU();
+			this.h = hairData.getSizeOfV();
+			
+			double width=HairDataUtils.getTotalPinDistance(hairData, mesh);
+			
+			width*=hairData.getScaleOfU();
+			
+			double height=HairDataUtils.getTotalVDistance(width, w, h);
+			
 
 			clothFunction=plane(width,height);
 			restDistance=width/(w);
 			
 			initPins();
 			
-			LogUtils.log("restDistance:"+restDistance);
+			//LogUtils.log("restDistance:"+restDistance);
 			
 			// Create particles
 			for (int v=0;v<=h;v++) {
@@ -235,36 +249,72 @@ public class Cloth2 {
 				particle exists v<=h & u<=w
 			*/
 			
+			
+			double distance=restDistance;
 			for (int v=0;v<h;v++) {
 				for (int u=0;u<w;u++) {
 					
 					constrains.add(
-							new Constrain(particles.get(index(u,v)), particles.get(index(u,v+1)), restDistance)
+							new Constrain(particles.get(index(u,v)), particles.get(index(u,v+1)), distance)
 							);
 					
+					if(!hairData.isCutU() || v<hairData.getStartCutUIndexV()){
 					constrains.add(
-							new Constrain(particles.get(index(u,v)), particles.get(index(u+1,v)), restDistance)
+							new Constrain(particles.get(index(u,v)), particles.get(index(u+1,v)), distance)
 							);
+					}
+					
 
+				}
+				
+				//narrow mode
+				if(hairData.isDoNarrow()){
+					distance*=hairData.getNarrowScale();
+				}
+				
+			}
+			
+			//TODO effect cut
+			for (int u=w, v=0;v<h;v++) {
+				
+				constrains.add(
+						new Constrain(particles.get(index(u,v)), particles.get(index(u,v+1)), distance)
+						);
+			}
+			
+			
+			
+			for (int v=h, u=0;u<w;u++) {
+				if(!hairData.isCutU() || v<hairData.getStartCutUIndexV()){
+				constrains.add(
+						new Constrain(particles.get(index(u,v)), particles.get(index(u+1,v)), distance)
+						);
+				}
+			}
+
+			
+			//trying last one edging
+			if(hairData.getEdgeMode()!=0){
+				int targetIndex=0;//1
+				if(hairData.getEdgeMode()==2){
+				targetIndex=w/2;
+				}else if(hairData.getEdgeMode()==3){//3
+				targetIndex=w;
+				}
+				
+				//LogUtils.log(targetIndex);
+				
+				Particle centerParticle=particles.get(index(targetIndex,h));
+
+				for(Constrain constrain:constrains){
+					if(constrain.p1==centerParticle || constrain.p2==centerParticle){
+						constrain.distance=constrain.distance*hairData.getEdgeModeScale();
+					}
 				}
 			}
 			
 			
-			for (int u=w, v=0;v<h;v++) {
-				
-				constrains.add(
-						new Constrain(particles.get(index(u,v)), particles.get(index(u,v+1)), restDistance)
-						);
-			}
 			
-			for (int v=h, u=0;u<w;u++) {
-				
-				constrains.add(
-						new Constrain(particles.get(index(u,v)), particles.get(index(u+1,v)), restDistance)
-						);
-			}
-
-
 		
 	}
 	private int index(int u,int v){

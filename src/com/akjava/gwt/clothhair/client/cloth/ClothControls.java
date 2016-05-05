@@ -27,6 +27,9 @@ public class ClothControls {
 		data.getCloth().wind=wind;
 		cloths.add(data);
 	}
+	public void removeClothData(ClothData data){
+		cloths.remove(data);
+	}
 	
 	public void update(double time){
 		animateCloth(time);
@@ -46,7 +49,7 @@ public class ClothControls {
 		
 		Vector3 windForce=THREE.Vector3().set(Math.sin( time / 2000 ), Math.cos( time / 3000 ), Math.sin( time / 1000 ) ).normalize().multiplyScalar( windStrength );
 		for(ClothData data:cloths){
-			Cloth2 cloth=data.getCloth();
+			HairCloth cloth=data.getCloth();
 			//cloth.wind=true;
 			Geometry clothGeometry=data.getClothGeometry();
 			
@@ -68,22 +71,32 @@ public class ClothControls {
 	public void updateBallSize(int ballSize){
 		
 		for(ClothData data:cloths){
-			Cloth2 cloth=data.getCloth();
+			HairCloth cloth=data.getCloth();
 			cloth.ballSize=ballSize;
 		}
 	}
 	public void renderCloth(){
 		for(ClothData data:cloths){
-			Cloth2 cloth=data.getCloth();
+			HairCloth cloth=data.getCloth();
 			Geometry clothGeometry=data.getClothGeometry();
 			
-			List<Cloth2.Particle> p = cloth.particles;
+			List<HairCloth.Particle> p = cloth.particles;
 
 			for ( int i = 0, il = p.size(); i < il; i ++ ) {
 
 				clothGeometry.getVertices().get(i).copy( p.get(i).position);
 
 			}
+			
+			//try edging,not so good than expected
+			
+			/*
+			int endCenter=p.size()-cloth.w/2;
+			for(int i=p.size()-cloth.w-1;i<p.size();i++){
+				clothGeometry.getVertices().get(i).copy( p.get(endCenter).position);
+			}
+			*/
+			
 
 			clothGeometry.computeFaceNormals();
 			clothGeometry.computeVertexNormals();
