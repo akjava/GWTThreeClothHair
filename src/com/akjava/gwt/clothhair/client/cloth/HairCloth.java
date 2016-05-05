@@ -125,6 +125,12 @@ public class HairCloth {
 			tmp2=THREE.Vector3(0, 0, 0);
 		}
 		
+		public void setAllPosition(Vector3 vec){
+			position.copy(vec);
+			previous.copy(vec);
+			original.copy(vec);
+		}
+		
 		public void addForce(Vector3 force){
 			this.a.add(
 					this.tmp2.copy(force).multiplyScalar(this.invMass)

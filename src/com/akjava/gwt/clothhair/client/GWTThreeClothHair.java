@@ -3,12 +3,18 @@ package com.akjava.gwt.clothhair.client;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Map;
+import java.util.List;
 
 import com.akjava.gwt.clothhair.client.HairData.HairPin;
+import com.akjava.gwt.clothhair.client.HairDataFunctions.HairPinToVertex;
 import com.akjava.gwt.clothhair.client.cloth.ClothControls;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
 import com.akjava.gwt.clothhair.client.texture.TexturePanel;
+import com.akjava.gwt.html5.client.download.HTML5Download;
+import com.akjava.gwt.html5.client.file.File;
+import com.akjava.gwt.html5.client.file.FileUploadForm;
+import com.akjava.gwt.html5.client.file.FileUtils;
+import com.akjava.gwt.html5.client.file.FileUtils.DataURLListener;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
@@ -47,7 +53,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
@@ -62,6 +67,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
@@ -317,7 +323,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			}
 			
 			//make lines
-			double size=3.2;
+			double size=4.8;
 			Matrix3 normalMatrix=THREE.Matrix3();
 			Vector3 v1 = THREE.Vector3();
 			Vector3 v2 = THREE.Vector3();
@@ -352,6 +358,62 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		}
 	}
 	LineSegments selectedLine;
+	
+	LineSegments hairDataLine;
+	
+	private void updateHairDataLine(){
+		
+		if(firstSelection==null && secondSelection==null){
+			return;
+		}
+		
+		//TODO support multiple
+		List<HairPin> pins=Lists.newArrayList();
+		if(firstSelection!=null){
+			pins.add(firstSelection);
+		}
+		
+		if(secondSelection!=null){
+			pins.add(secondSelection);
+		}
+		HairPinToVertex hairPinToVertex=new HairPinToVertex(mesh,true);
+		Matrix3 normalMatrix=THREE.Matrix3();
+		normalMatrix.getNormalMatrix( mesh.getMatrixWorld());
+		
+		
+		BufferGeometry geometry = THREE.BufferGeometry();
+
+		BufferAttribute positions = THREE.Float32Attribute( 2*3 * pins.size(), 3 );
+		geometry.addAttribute( "position", positions );
+		
+		
+		
+		
+		
+		double size=3.2;
+		for(int i=0;i<pins.size();i++){
+			HairPin pin=pins.get(i);
+			
+			Vector3 v2 = THREE.Vector3();
+			Vector3 v1=hairPinToVertex.apply(pin);
+			
+			Face3 face=mesh.getGeometry().getFaces().get(pin.getFaceIndex());
+			Vector3 normal = face.getVertexNormals().get(pin.getVertexOfFaceIndex());
+			v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( size ).add( v1 );
+			
+			positions.setXYZ(2*i+ 0, v1.getX(), v1.getY(), v1.getZ() );
+			positions.setXYZ(2*i+ 1, v2.getX(), v2.getY(), v2.getZ() );
+		}
+		
+		if(hairDataLine!=null){
+			scene.remove(hairDataLine);
+		}
+		
+		hairDataLine=THREE.LineSegments(geometry.gwtCastGeometry(), THREE.LineBasicMaterial(GWTParamUtils.LineBasicMaterial().color(0x0000ff).linewidth(2)));
+		scene.add(hairDataLine);
+		
+	}
+	
 	
 	
 	
@@ -436,6 +498,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 					firstSelection=data.getHairData().getHairPins().get(0);
 					secondSelection=data.getHairData().getHairPins().get(1);
 					//LogUtils.log(hairDataConverter.convert(data.getHairData()));
+					updateHairDataLine();
 				}
 			}
 		});
@@ -469,6 +532,40 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 				 addCloth(hairData);
 			 }
 		 }
+		
+		 
+		 FileUploadForm upload=FileUtils.createSingleTextFileUploadForm(new DataURLListener() {
+			
+			@Override
+			public void uploaded(File file, String text) {
+				clearAllHairData();
+				//todo check validate
+				 Iterable<HairData> hairDatas=hairDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+				 for(HairData hairData:hairDatas){
+					 addCloth(hairData);
+				 }
+				
+			}
+		}, true, "UTF-8");
+		 upload.setAccept(".csv");
+		 controlerRootPanel.add(upload);
+		 
+		 HorizontalPanel downloadPanels=new HorizontalPanel();
+		 controlerRootPanel.add(downloadPanels);
+		 final HorizontalPanel download=new HorizontalPanel();
+		 
+		 Button downloadBt=new Button("download",new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				download.clear();
+				String text=toStoreText();
+				Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair.csv", "click to download");
+				download.add(a);
+			}
+		});
+		 downloadPanels.add(downloadBt);
+		 downloadPanels.add(download);
 	}
 	
 	
@@ -479,6 +576,12 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		cellObjects.removeItem(data);
 		
 		storeDatas();
+	}
+	
+	private void clearAllHairData(){
+		for(HairCellObjectData data:cellObjects.getDatas()){
+			removeHairData(data);
+		}
 	}
 
 
@@ -498,6 +601,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			@Override
 			public void onClick(ClickEvent event) {
 				firstSelection=currentSelection;
+				updateHairDataLine();
 			}
 		});
 		h.add(first);
@@ -507,6 +611,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			@Override
 			public void onClick(ClickEvent event) {
 				secondSelection=currentSelection;
+				updateHairDataLine();
 			}
 		});
 		h.add(second);
@@ -609,18 +714,20 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		int cw=hairData.getSizeOfU();
 		int ch=hairData.getSizeOfV();
 		
-		data.getCloth().particles.get(0).getOriginal().copy(v1);
-		data.getCloth().particles.get(cw).getOriginal().copy(v2);
+		data.getCloth().particles.get(0).setAllPosition(v1);
+		data.getCloth().particles.get(cw).setAllPosition(v2);
+		
 		
 		Vector3 sub=v2.clone().sub(v1).divideScalar(cw+1);
 		for(int i=1;i<cw;i++){
 			Vector3 v=sub.clone().multiplyScalar(i).add(v1);
-			data.getCloth().particles.get(i).getOriginal().copy(v);
+			data.getCloth().particles.get(i).setAllPosition(v);
 		}
 		
 		for(int i=cw+1;i<data.getCloth().particles.size();i++){
-			data.getCloth().particles.get(i).getOriginal().copy(v1);
+			data.getCloth().particles.get(i).setAllPosition(v1);
 		}
+		
 		
 		storeDatas();
 	}
@@ -628,6 +735,16 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 	
 	
 	 
+	private String toStoreText(){
+		String text=
+				Joiner.on("\r\n").join(hairDataConverter.convertAll(FluentIterable.from(cellObjects.getDatas()).transform(new Function<HairCellObjectData, HairData>() {
+					@Override
+					public HairData apply(HairCellObjectData input) {
+						return input.getHairData();
+					}
+				})));
+		return text;
+	}
 	private void storeDatas() {
 		if(cellObjects.getDatas().size()==0){
 			storageControler.removeValue(HairStorageKeys.temp_hairset);
@@ -635,12 +752,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		}
 		
 		String text=
-		Joiner.on("\r\n").join(hairDataConverter.convertAll(FluentIterable.from(cellObjects.getDatas()).transform(new Function<HairCellObjectData, HairData>() {
-			@Override
-			public HairData apply(HairCellObjectData input) {
-				return input.getHairData();
-			}
-		})));
+				toStoreText();
 		
 		try {
 			storageControler.setValue(HairStorageKeys.temp_hairset, text);
