@@ -559,6 +559,18 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		});
 		editPanel.add(remove);
 		
+		Button copy=new Button("Copy",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				HairCellObjectData data=cellObjects.getSelection();
+				if(data!=null){
+					HairData copied=data.getHairData().clone();
+					driver.edit(copied);
+				}
+			}
+		});
+		editPanel.add(copy);
+		
 		
 		cellObjects = new EasyCellTableObjects<HairCellObjectData>(table){
 			@Override

@@ -131,6 +131,14 @@ private double edgeModeScale=1.5;
 	public List<HairPin> getHairPins() {
 	return hairPins;
 }
+	
+	
+//still format fixed
+public HairData clone(){
+	HairDataConverter converter=new HairDataConverter();
+	String line=converter.convert(this);
+	return converter.reverse().convert(line);
+}
 
 public void setHairPins(List<HairPin> hairPins) {
 	this.hairPins = hairPins;
