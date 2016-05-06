@@ -220,7 +220,8 @@ public class HairCloth {
 	public HairCloth(HairData hairData,Mesh mesh){
 			
 		
-			this.w = hairData.getSizeOfU();
+			this.w = (hairData.getHairPins().size()-1)*hairData.getSizeOfU();
+			LogUtils.log("w:"+w);
 			this.h = hairData.getSizeOfV();
 			
 			double width=HairDataUtils.getTotalPinDistance(hairData, mesh);
