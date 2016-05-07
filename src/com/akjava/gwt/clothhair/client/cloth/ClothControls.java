@@ -2,6 +2,7 @@ package com.akjava.gwt.clothhair.client.cloth;
 
 import java.util.List;
 
+import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.math.Vector3;
@@ -11,16 +12,20 @@ import com.google.common.collect.Lists;
 public class ClothControls {
 	private List<ClothData> cloths=Lists.newArrayList();
 	
-	private Mesh sphere;//TODO multiple
-	private int ballSize=100;
+	List<SphereData> sphereDatas=Lists.newArrayList();
 	
-	public int getBallSize() {
-		return ballSize;
+	//List<Mesh> spheres=Lists.newArrayList();
+	
+	//private Mesh sphere;//TODO multiple
+	
+	
+	public void addSphereData(SphereData data){
+		sphereDatas.add(data);
 	}
-
-	public ClothControls(Mesh sphere) {
+	
+	
+	public ClothControls() {
 		super();
-		this.sphere = sphere;
 	}
 
 	public void addClothData(ClothData data){
@@ -44,6 +49,9 @@ public class ClothControls {
 		}
 	}
 	
+	
+	
+	
 	public void animateCloth(double time){
 		double windStrength= Math.cos( time / 7000 ) * 20 + 40;;
 		
@@ -62,12 +70,14 @@ public class ClothControls {
 			//arrow.setDirection( cloth.windForce );
 			
 			
-			cloth.simulate(time,clothGeometry,sphere);//set otherwhere?
+			cloth.simulate(time,clothGeometry,sphereDatas);//set otherwhere?
 		}
 	}
 	
 	//temporaly
 	//TODO supoort multi ball
+	
+	/*
 	public void updateBallSize(int ballSize){
 		
 		for(ClothData data:cloths){
@@ -75,6 +85,8 @@ public class ClothControls {
 			cloth.ballSize=ballSize;
 		}
 	}
+	*/
+	
 	public void renderCloth(){
 		for(ClothData data:cloths){
 			HairCloth cloth=data.getCloth();
@@ -106,5 +118,9 @@ public class ClothControls {
 
 			//sphere.getPosition().copy( cloth.ballPosition );//sphere.position.copy( ballPosition );
 		}
+	}
+
+	public void removeSphereData(SphereData data) {
+		sphereDatas.remove(data);
 	}
 }

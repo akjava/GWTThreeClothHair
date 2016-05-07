@@ -18,6 +18,11 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+/**
+ * @deprecated
+ * @author aki
+ *
+ */
 public class SphereInfoPanel extends VerticalPanel{
 	private StorageControler storageControler;
 	public SphereInfoPanel(final StorageControler storageControler,final Mesh sphere,final ClothControls clothControls){
@@ -95,7 +100,7 @@ public class SphereInfoPanel extends VerticalPanel{
 					public void onValueChange(ValueChangeEvent<Number> event) {
 						sphere.getScale().setScalar(event.getValue().doubleValue());
 						
-						clothControls.updateBallSize(event.getValue().intValue());
+						//clothControls.updateBallSize(event.getValue().intValue());
 						tmpStoreSphereInfo();
 					}
 				});
@@ -111,16 +116,17 @@ public class SphereInfoPanel extends VerticalPanel{
 				
 				double[] values;
 				if(storedVaues==null){
-					values=new double[]{0,sphere.getPosition().getY(),0,clothControls.getBallSize()};
+					//values=new double[]{0,sphere.getPosition().getY(),0,clothControls.getBallSize()};
 				}else{
 					values=sphereInfoConverter.reverse().convert(storedVaues);
 				}
-				
+				/*
 				//too much over write
 				xRange.setValue(values[0],true);
 				yRange.setValue(values[1],true);
 				zRange.setValue(values[2],true);
 				scaleRange.setValue(values[3],true);
+				*/
 	}
 	
 	private void tmpStoreSphereInfo(){
@@ -145,4 +151,60 @@ public class SphereInfoPanel extends VerticalPanel{
 	private LabeledInputRangeWidget2 zRange;
 	private LabeledInputRangeWidget2 yRange;
 	private LabeledInputRangeWidget2 xRange;
+	
+	/*
+	 interface Driver extends SimpleBeanEditorDriver< SphereData,  SphereDataEditor> {}
+	 Driver driver = GWT.create(Driver.class);
+
+	public void onModuleLoad() {
+		SphereDataEditor editor=new SphereDataEditor();    
+		driver.initialize(editor);
+		
+		VerticalPanel editorPanel=new VerticalPanel();
+		driver.edit(new SphereData());
+		editorPanel.add(editor);
+		
+	    	Button updateBt=new Button("Update",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				SphereData data=driver.flush();
+				//TODO
+				System.out.println(data);
+			}
+		});
+	    editorPanel.add(updateBt);
+
+	VerticalPanel panel=new VerticalPanel();
+	
+	//create easy cell tables
+	SimpleCellTable<SphereData> table=new SimpleCellTable<SphereData>() {
+		@Override
+		public void addColumns(CellTable<SphereData> table) {
+			TextColumn<SphereData> nameColumn=new TextColumn<SphereData>() {
+				@Override
+				public String getValue(SphereData object) {
+					return object.getName();
+				}
+			};
+			table.addColumn(nameColumn);
+		}
+	};
+	
+	cellObjects = new EasyCellTableObjects<SphereData>(table){
+		@Override
+		public void onSelect(SphereData selection) {
+			// TODO Auto-generated method stub
+			
+		}};
+	panel.add(table);
+	
+	
+}
+
+	public class SphereData{
+		
+	}
+	*/
+	
+
 }

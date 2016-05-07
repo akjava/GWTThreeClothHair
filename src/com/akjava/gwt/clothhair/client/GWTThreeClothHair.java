@@ -4,11 +4,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
+import java.util.Map;
 
 import com.akjava.gwt.clothhair.client.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.HairDataFunctions.HairPinToVertex;
 import com.akjava.gwt.clothhair.client.cloth.ClothControls;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
+import com.akjava.gwt.clothhair.client.sphere.SphereData;
+import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
+import com.akjava.gwt.clothhair.client.sphere.SphereDataPanel;
+import com.akjava.gwt.clothhair.client.sphere.SphereDataPanel.SphereDataControler;
 import com.akjava.gwt.clothhair.client.texture.TexturePanel;
 import com.akjava.gwt.html5.client.download.HTML5Download;
 import com.akjava.gwt.html5.client.file.File;
@@ -53,6 +58,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
@@ -73,12 +79,15 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TabPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
+public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements SphereDataControler{
 
 	 interface Driver extends SimpleBeanEditorDriver< HairData,  HairDataEditor> {}
 	 Driver driver = GWT.create(Driver.class);
@@ -87,9 +96,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 	private OrbitControls controls;
 
 
-	private SkinnedMesh mesh;
+	private SkinnedMesh characterMesh;
 	private VertexNormalsHelper vertexHelper;
-	private Mesh sphere;
+	
+	//private Mesh sphere;
 	
 	
 	@Override
@@ -101,10 +111,17 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 	public void animate(double timestamp) {
 		if(clothControls!=null){
 			clothControls.update(timestamp);
+			
+			updateSphereMeshs();
 		}
 		//logarithmicDepthBuffer
 		renderer.render(scene, camera);//render last,very important
 	}
+	
+	private MeshPhongMaterial hairHeadMaterial;
+	private SphereGeometry ballGeo;
+	
+	
 	@Override
 	public void onInitializedThree() {
 		super.onInitializedThree();
@@ -146,7 +163,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 
 			
 
-			private MeshPhongMaterial hairHeadMaterial;
+			
 
 			@Override
 			public void loaded(Geometry geometry,JsArray<Material> materials) {
@@ -185,31 +202,29 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 				MultiMaterial mat=THREE.MultiMaterial(materials );//var mat=THREE.MultiMaterial( materials);//MultiMaterial mat=THREE.MultiMaterial( materials);//var mat=new THREE.MultiMaterial( materials);
 
 
-				mesh = THREE.SkinnedMesh( geometry, mat );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = new THREE.SkinnedMesh( geometry, mat );
-				mesh.setName("model");//mesh.setName("model");//mesh.setName("model");//mesh.name = "model";
+				characterMesh = THREE.SkinnedMesh( geometry, mat );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = new THREE.SkinnedMesh( geometry, mat );
+				characterMesh.setName("model");//mesh.setName("model");//mesh.setName("model");//mesh.name = "model";
 				//mesh.getPosition().set( x, y - bb.getMin().getY() * s, z );//mesh.getPosition().set( x, y - bb.getMin().y * s, z );//mesh.getPosition().set( x, y - bb.getMin().y * s, z );//mesh.position.set( x, y - bb.min.y * s, z );
-				mesh.getPosition().set(x, y, z);
-				mesh.getScale().set( s, s, s );//mesh.getScale().set( s, s, s );//mesh.getScale().set( s, s, s );//mesh.scale.set( s, s, s );
-				scene.add( mesh );
+				characterMesh.getPosition().set(x, y, z);
+				characterMesh.getScale().set( s, s, s );//mesh.getScale().set( s, s, s );//mesh.getScale().set( s, s, s );//mesh.scale.set( s, s, s );
+				scene.add( characterMesh );
 				
 				
-				vertexHelper = THREE.VertexNormalsHelper(mesh, 1.6, 0x008800, 2);
+				vertexHelper = THREE.VertexNormalsHelper(characterMesh, 1.6, 0x008800, 2);
 				scene.add(vertexHelper);
 				//scene.add(THREE.VertexNormalsHelper(mesh, 0.2, 0x0000ff, 3));//can overwrite
 			
 				
-				SphereGeometry ballGeo = THREE.SphereGeometry( 1, 20, 20 );//var ballGeo = new THREE.SphereGeometry( ballSize, 20, 20 );
+				ballGeo = THREE.SphereGeometry( 1, 20, 20 );
 				
-				MeshPhongMaterial ballMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0x888888).side(THREE.DoubleSide).wireframe(true));//		var ballMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff } );
-
-				sphere = THREE.Mesh( ballGeo, ballMaterial );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
-				scene.add( sphere );
 				
-				clothControls=new ClothControls(sphere);
 				
-				sphere.getScale().setScalar(clothControls.getBallSize());
 				
-				sphere.getPosition().setY(bb.getMax().getY()/2*s-100);
+				clothControls=new ClothControls();
+				
+				
+				
+				//sphere.getScale().setScalar(clothControls.getBallSize());
 				
 				
 				
@@ -241,6 +256,45 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		
 		
 	}
+	
+	
+
+	
+	
+	Map<SphereData,Mesh> sphereMeshMap=Maps.newHashMap();
+	
+	@Override
+	public void removeSphereData(SphereData data){
+		clothControls.removeSphereData(data);
+		Mesh sphere=sphereMeshMap.get(data);
+		scene.remove(sphere);
+	}
+	@Override
+	public void addSphereData(SphereData data){
+		MeshPhongMaterial ballMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0x888888).side(THREE.DoubleSide).wireframe(true));
+		
+		Mesh sphere = THREE.Mesh( ballGeo, ballMaterial );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
+		scene.add( sphere );
+		
+		sphere.getScale().setScalar(data.getSize());
+		
+		clothControls.addSphereData(data);
+		
+		
+		sphereMeshMap.put(data, sphere);
+	}
+	
+	public void updateSphereMeshs(){
+		for(SphereData data:sphereMeshMap.keySet()){
+			Mesh sphere=sphereMeshMap.get(data);
+			
+			sphere.getScale().setScalar(data.getSize());
+			sphere.getPosition().copy(data.getPosition());
+		}
+	}
+	
+	
+	
 	@Override
 	public PerspectiveCamera createCamera(){
 		
@@ -256,7 +310,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 
 	
 	protected Vector3 matrixedPoint(Vector3 vec){
-		return vec.clone().applyMatrix4(mesh.getMatrixWorld());
+		return vec.clone().applyMatrix4(characterMesh.getMatrixWorld());
 	}
 	
 	
@@ -293,7 +347,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		screenPosition.unproject(camera);
 		Raycaster ray=THREE.Raycaster(camera.getPosition(), screenPosition.sub( camera.getPosition() ).normalize());
 	
-		JsArray<Intersect> intersects=ray.intersectObject(mesh);
+		JsArray<Intersect> intersects=ray.intersectObject(characterMesh);
 		
 		//find nearlist vertex
 		
@@ -308,25 +362,25 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			//ThreeLog.log("point:",point);
 			
 			int vertexOfFaceIndex=0;
-			Vector3 selection=mesh.getGeometry().getVertices().get(face.getA());
+			Vector3 selection=characterMesh.getGeometry().getVertices().get(face.getA());
 		
 			//ThreeLog.log("vertex1:",mesh.getGeometry().getVertices().get(face.getA()));
-			double distance=point.distanceTo(matrixedPoint(mesh.getGeometry().getVertices().get(face.getA())));
+			double distance=point.distanceTo(matrixedPoint(characterMesh.getGeometry().getVertices().get(face.getA())));
 			
 			//ThreeLog.log("vertex2:",mesh.getGeometry().getVertices().get(face.getB()));
-			double distance2=point.distanceTo(matrixedPoint(mesh.getGeometry().getVertices().get(face.getB())));
+			double distance2=point.distanceTo(matrixedPoint(characterMesh.getGeometry().getVertices().get(face.getB())));
 			if(distance2<distance){
 				vertexOfFaceIndex=1;
 				distance=distance2;
-				selection=mesh.getGeometry().getVertices().get(face.getB());
+				selection=characterMesh.getGeometry().getVertices().get(face.getB());
 			}
 			//ThreeLog.log("vertex3:",mesh.getGeometry().getVertices().get(face.getC()));
 			
-			double distance3=point.distanceTo(matrixedPoint(mesh.getGeometry().getVertices().get(face.getC())));
+			double distance3=point.distanceTo(matrixedPoint(characterMesh.getGeometry().getVertices().get(face.getC())));
 			if(distance3<distance){
 				vertexOfFaceIndex=2;
 				distance=distance3;
-				selection=mesh.getGeometry().getVertices().get(face.getC());
+				selection=characterMesh.getGeometry().getVertices().get(face.getC());
 			}
 			
 			//make lines
@@ -335,11 +389,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			Vector3 v1 = THREE.Vector3();
 			Vector3 v2 = THREE.Vector3();
 			
-			normalMatrix.getNormalMatrix( mesh.getMatrixWorld());
+			normalMatrix.getNormalMatrix( characterMesh.getMatrixWorld());
 			
 			Vector3 normal = face.getVertexNormals().get(vertexOfFaceIndex);
 
-			v1.copy( selection ).applyMatrix4( mesh.getMatrixWorld() );
+			v1.copy( selection ).applyMatrix4( characterMesh.getMatrixWorld() );
 
 			v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( size ).add( v1 );
 			
@@ -387,9 +441,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		if(thirdSelection!=null){
 			pins.add(thirdSelection);
 		}
-		HairPinToVertex hairPinToVertex=new HairPinToVertex(mesh,true);
+		HairPinToVertex hairPinToVertex=new HairPinToVertex(characterMesh,true);
 		Matrix3 normalMatrix=THREE.Matrix3();
-		normalMatrix.getNormalMatrix( mesh.getMatrixWorld());
+		normalMatrix.getNormalMatrix( characterMesh.getMatrixWorld());
 		
 		
 		BufferGeometry geometry = THREE.BufferGeometry();
@@ -408,7 +462,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			Vector3 v2 = THREE.Vector3();
 			Vector3 v1=hairPinToVertex.apply(pin);
 			
-			Face3 face=mesh.getGeometry().getFaces().get(pin.getFaceIndex());
+			Face3 face=characterMesh.getGeometry().getFaces().get(pin.getFaceIndex());
 			Vector3 normal = face.getVertexNormals().get(pin.getVertexOfFaceIndex());
 			v2.copy( normal ).applyMatrix3( normalMatrix ).normalize().multiplyScalar( size ).add( v1 );
 			
@@ -433,7 +487,16 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 	 * must call after sphere initialized;
 	 */
 	private void createControler() {
-		controlerRootPanel.add(new Label("Wind"));
+		TabPanel tab=new TabPanel();
+		
+		tab.add(createSpherePanel(), "spheres");
+		controlerRootPanel.add(tab);
+		tab.selectTab(0);
+		
+		VerticalPanel basicPanel=new VerticalPanel();
+		tab.add(basicPanel,"basic");
+		
+		basicPanel.add(new Label("Wind"));
 		CheckBox windCheck=new CheckBox();
 		windCheck.setValue(true);
 		windCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -443,11 +506,14 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 				clothControls.setWind(event.getValue());
 			}
 		});
-		controlerRootPanel.add(windCheck);
+		basicPanel.add(windCheck);
 		
-		controlerRootPanel.add(new Label("Camera"));
+		basicPanel.add(new Label("Camera"));
 		LabeledInputRangeWidget2 near=new LabeledInputRangeWidget2("near", 0.1, 100, 0.1);
-		controlerRootPanel.add(near);
+		
+		
+		
+		basicPanel.add(near);
 		near.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Number> event) {
@@ -458,7 +524,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		near.setValue(camera.getNear());
 		
 		//vertex
-		controlerRootPanel.add(new Label("Vertex"));
+		basicPanel.add(new Label("Vertex"));
 		HorizontalPanel h0=new HorizontalPanel();
 		CheckBox visibleVertexCheck=new CheckBox("visible");
 		visibleVertexCheck.setValue(true);
@@ -469,26 +535,26 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			}
 		});
 		h0.add(visibleVertexCheck);
-		controlerRootPanel.add(h0);
+		basicPanel.add(h0);
 		
 		
+		/*
 		SphereInfoPanel sphereInfoPanel=new SphereInfoPanel(storageControler,sphere,clothControls);
-		
 		controlerRootPanel.add(sphereInfoPanel);
-		
+		*/
 		
 		
 		
 		//texture panel;
-		controlerRootPanel.add(new Label("Texture"));
-		controlerRootPanel.add(new TexturePanel(hairMaterial));
+		basicPanel.add(new Label("Texture"));
+		basicPanel.add(new TexturePanel(hairMaterial));
 		
 		
-		controlerRootPanel.add(new HTML("<h4>Hair Editor</h4>"));
+		basicPanel.add(new HTML("<h4>Hair Editor</h4>"));
 		
 		
 		HorizontalPanel hairPanel=new HorizontalPanel();
-		controlerRootPanel.add(hairPanel);
+		basicPanel.add(hairPanel);
 		CheckBox showHair=new CheckBox("show hairs");
 		showHair.setValue(true);
 		hairPanel.add(showHair);
@@ -505,7 +571,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		//editor
 		HairDataEditor editor=new HairDataEditor();
 		driver.initialize(editor);
-		controlerRootPanel.add(editor);
+		basicPanel.add(editor);
 		createClothPanel();
 		
 		driver.edit(new HairData());//new data
@@ -523,10 +589,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 				table.addColumn(nameColumn);
 			}
 		};
-		controlerRootPanel.add(table);
+		basicPanel.add(table);
 		
 		HorizontalPanel editPanel=new HorizontalPanel();
-		controlerRootPanel.add(editPanel);
+		basicPanel.add(editPanel);
 		
 		
 		Button edit=new Button("remove & edit",new ClickHandler() {
@@ -604,10 +670,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			}
 		}, true, "UTF-8");
 		 upload.setAccept(".csv");
-		 controlerRootPanel.add(upload);
+		 basicPanel.add(upload);
 		 
 		 HorizontalPanel downloadPanels=new HorizontalPanel();
-		 controlerRootPanel.add(downloadPanels);
+		 basicPanel.add(downloadPanels);
 		 final HorizontalPanel download=new HorizontalPanel();
 		 
 		 Button downloadBt=new Button("download",new ClickHandler() {
@@ -625,6 +691,53 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 	}
 	
 	
+	private Widget createSpherePanel() {
+		VerticalPanel  panel=new VerticalPanel();
+		
+		int ballSize=100;
+		
+		//double s=characterMesh.getScale().getX();
+		//initial data
+		
+		SphereData firstOne=new SphereData(0, characterMesh.getPosition().getY()*-1-100, 0, ballSize, true);
+		//addSphereData(firstOne);
+		
+		HorizontalPanel controler=new HorizontalPanel();
+		panel.add(controler);
+		CheckBox visibleAllCheck=new CheckBox("visible all");
+		visibleAllCheck.setValue(true);
+		visibleAllCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				for(Mesh mesh:sphereMeshMap.values()){
+					mesh.setVisible(event.getValue());
+				}
+			}
+			
+		});
+		controler.add(visibleAllCheck);
+	
+		SphereDataPanel dataPanel=new SphereDataPanel(this, firstOne);
+	
+		String lines=storageControler.getValue(HairStorageKeys.KEY_SPHERES, null);
+		if(lines!=null){
+			Iterable<SphereData> datas=new SphereDataConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(lines));
+			for(SphereData data:datas){
+				dataPanel.addSpereData(data);
+			}
+		}else{
+			//if empty
+			dataPanel.addSpereData(firstOne.clone());
+		}
+		panel.add(dataPanel);
+		
+		
+		
+		// TODO Auto-generated method stub
+		return panel;
+	}
+
 	protected void removeHairData(HairCellObjectData data) {
 		checkNotNull(data,"removeHairData:data is null");
 		scene.remove(data.getMesh());
@@ -744,8 +857,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 			return;
 		}
 		
-		Vector3 v1=hairPinToVertex(mesh,firstSelection,true);
-		Vector3 v2=hairPinToVertex(mesh,secondSelection,true);
+		Vector3 v1=hairPinToVertex(characterMesh,firstSelection,true);
+		Vector3 v2=hairPinToVertex(characterMesh,secondSelection,true);
 		
 		double distance=v1.distanceTo(v2);
 		
@@ -769,12 +882,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 	}
 	protected void addCloth(HairData hairData) {
 		
-		ClothData data=new ClothData(hairData,mesh);
+		ClothData data=new ClothData(hairData,characterMesh);
 		clothControls.addClothData(data);
 		
 		data.getCloth().setPinAll();
 		
-		data.getCloth().ballSize=clothControls.getBallSize();
+		
+		//data.getCloth().ballSize=clothControls.getBallSize();
 		
 	
 		
@@ -791,8 +905,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		//temporaly
 		
 		if(hairData.getHairPins().size()<3){
-		Vector3 v1=hairPinToVertex(mesh,hairData.getHairPins().get(0),true);
-		Vector3 v2=hairPinToVertex(mesh,hairData.getHairPins().get(1),true);
+		Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
+		Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
 		
 		//TODO move and fix
 		int cw=hairData.getSizeOfU();
@@ -815,7 +929,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 		}else{
 			int cw=hairData.getSizeOfU();
 			for(int i=0;i<hairData.getHairPins().size();i++){
-				Vector3 v1=hairPinToVertex(mesh,hairData.getHairPins().get(i),true);
+				Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(i),true);
 				int index=hairData.getSizeOfU()*i;
 				data.getCloth().particles.get(index).setAllPosition(v1);
 				
@@ -824,7 +938,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 				
 				if(i!=hairData.getHairPins().size()-1){
 					//has next;
-					Vector3 v2=hairPinToVertex(mesh,hairData.getHairPins().get(i+1),true);
+					Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(i+1),true);
 					Vector3 sub=v2.clone().sub(v1).divideScalar(cw);
 					
 					for(int j=1;j<cw;j++){
@@ -907,5 +1021,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler{
 	protected void onDocumentMouseMove(MouseMoveEvent event) {
 		mouseX = ( event.getClientX() - windowHalfX );
 		mouseY = ( event.getClientY() - windowHalfY )*2;
+	}
+
+	@Override
+	public void onSelectSphere(SphereData data) {
+		//TODO change material for selection
+		
 	}
 }

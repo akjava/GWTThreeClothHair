@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.akjava.gwt.clothhair.client.HairData;
 import com.akjava.gwt.clothhair.client.HairDataUtils;
+import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
@@ -59,8 +60,9 @@ public class HairCloth {
 	double windStrength = 2;
 	Vector3 windForce = THREE.Vector3(0,0,0);
 
-	Vector3 ballPosition = THREE.Vector3(0, -45, 0);
-	public double ballSize = 60; //40
+	//Vector3 ballPosition = THREE.Vector3(0, -45, 0);
+	
+	//public double ballSize = 60; //40
 
 	Vector3 tmpForce = THREE.Vector3();
 
@@ -329,12 +331,11 @@ public class HairCloth {
 	}
 	
 	
-	public void simulate(double time,Geometry clothGeometry,Mesh sphereMesh) {
+	public void simulate(double time,Geometry clothGeometry,List<SphereData> sphereDatas) {
 		if (lastTime==null) {
 			lastTime = time;
 			return;
 		}
-		ballPosition.copy(sphereMesh.getPosition());
 		//var i, il, particles, particle, pt, constrains, constrain;
 
 		// Aerodynamics forces
@@ -388,12 +389,23 @@ public class HairCloth {
 		for (int i=0;i<particles.size();i++) {
 			Particle particle = particles.get(i);
 			Vector3 pos = particle.position;
-			diff.subVectors(pos, ballPosition);
-			if (diff.length() < ballSize) {
-				// collided
-				diff.normalize().multiplyScalar(ballSize);
-				pos.copy(ballPosition).add(diff);
+			
+			for(SphereData data:sphereDatas){
+				if(!data.isEnabled()){
+					continue;
+				}
+				
+				diff.subVectors(pos, data.getPosition());
+				if (diff.length() < data.getSize()) {
+					// collided
+					diff.normalize().multiplyScalar(data.getSize());
+					pos.copy(data.getPosition()).add(diff);
+					//break;//?
+				}
+				
 			}
+			
+			
 		}
 		
 		/*

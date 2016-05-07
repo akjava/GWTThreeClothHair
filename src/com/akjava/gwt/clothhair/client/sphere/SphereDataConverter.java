@@ -1,4 +1,4 @@
-package com.akjava.gwt.clothhair.client;
+package com.akjava.gwt.clothhair.client.sphere;
 
 import java.util.List;
 
@@ -9,19 +9,21 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
 
-public class TmpSphereInfoConverter extends Converter<double[],String>{
+public class SphereDataConverter extends Converter<SphereData,String>{
 
-	public TmpSphereInfoConverter() {
+	public SphereDataConverter() {
 		
 	}
 
 	@Override
-	protected String doForward(double[] value) {
-		return Joiner.on(",").join(Doubles.asList(value));
+	protected String doForward(SphereData value) {
+		return Joiner.on(",").join(Doubles.asList(new double[]{value.getX(),value.getY(),value.getZ(),value.getSize()
+		,value.isEnabled()?1.0:0		
+		}));
 	}
 
 	@Override
-	protected double[] doBackward(String value) {
+	protected SphereData doBackward(String value) {
 		//never null
 		
 		List<String> v=Lists.newArrayList(Splitter.on(",").split(value));
@@ -29,8 +31,11 @@ public class TmpSphereInfoConverter extends Converter<double[],String>{
 		for(int i=0;i<v.size();i++){
 			values[i]=ValuesUtils.toDouble(v.get(i), 0);
 		}
-		return values;
 		
+		SphereData data=new SphereData(values[0],values[1],values[2],values[3],
+				values[4]==1?true:false
+				);
+		return data;
 	}
 
 }
