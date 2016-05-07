@@ -92,10 +92,21 @@ public class SphereDataPanel extends VerticalPanel{
 				public void onClick(ClickEvent event) {
 					SphereData newData=defaultValue.clone();
 					addSpereData(newData);
+					cellObjects.setSelected(newData, true);
 					
 				}
 			});
 			buttons.add(addBt);
+			Button removeBt=new Button("remove",new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					
+					removeSpereData(cellObjects.getSelection());
+					
+				}
+			});
+			buttons.add(removeBt);
 			//make controls
 			
 			
@@ -117,10 +128,15 @@ public class SphereDataPanel extends VerticalPanel{
 	 public void addSpereData(SphereData data){
 		 cellObjects.addItem(data);
 		 controler.addSphereData(data);
+		 onFlushed();
 	 }
 	 public void removeSpereData(SphereData data){
+		 if(data==null){
+			 return;
+		 }
 		 cellObjects.removeItem(data);
 		 controler.removeSphereData(data);
+		 onFlushed();
 	 }
 	 
 	 

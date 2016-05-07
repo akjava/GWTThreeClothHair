@@ -1023,9 +1023,24 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		mouseY = ( event.getClientY() - windowHalfY )*2;
 	}
 
+	private SphereData selectedSphere;
+
 	@Override
 	public void onSelectSphere(SphereData data) {
-		//TODO change material for selection
-		
+		if(selectedSphere!=null){
+			unselectShpere(selectedSphere);
+		}
+		selectedSphere=data;
+		selectShpere(selectedSphere);
+	}
+
+	private void selectShpere(SphereData selectedSphere) {
+		MeshPhongMaterial material=sphereMeshMap.get(selectedSphere).getMaterial().gwtCastMeshPhongMaterial();
+		material.getColor().setHex(0x0000ff);
+	}
+	
+	private void unselectShpere(SphereData selectedSphere) {
+		MeshPhongMaterial material=sphereMeshMap.get(selectedSphere).getMaterial().gwtCastMeshPhongMaterial();
+		material.getColor().setHex(0x888888);
 	}
 }
