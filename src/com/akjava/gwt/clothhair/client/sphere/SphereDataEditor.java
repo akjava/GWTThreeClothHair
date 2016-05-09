@@ -29,7 +29,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		this.panel=panel;
 		HorizontalPanel h1=new HorizontalPanel();
 		this.add(h1);
-		xRange = new LabeledInputRangeWidget2("x", -200, 200, 1);
+		xRange = new LabeledInputRangeWidget2("x", -.2, 2, .001);
 		this.add(xRange);
 		xRange.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
@@ -41,7 +41,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		xRange.getRange().setWidth("220px");
 		
 		
-		yRange = new LabeledInputRangeWidget2("y", defaultValue.getY()-200,  defaultValue.getY()+200, 1);
+		yRange = new LabeledInputRangeWidget2("y", defaultValue.getY()-.2,  defaultValue.getY()+.2, .001);
 		this.add(yRange);
 		yRange.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
@@ -52,7 +52,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		yRange.getLabel().setWidth("40px");
 		yRange.getRange().setWidth("220px");
 		
-		zRange = new LabeledInputRangeWidget2("z", -200, 200, 1);
+		zRange = new LabeledInputRangeWidget2("z", -.2, .2, .001);
 		this.add(zRange);
 		zRange.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
@@ -67,16 +67,16 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				xRange.setValue(0,false);
+				xRange.setValue(defaultValue.getX(),false);
 				yRange.setValue( defaultValue.getY(),false);
-				zRange.setValue(0,false);
-				scaleRange.setValue(100,true);//call flush here
+				zRange.setValue(defaultValue.getZ(),false);
+				scaleRange.setValue(defaultValue.getSize(),true);//call flush here
 			}
 		});
 		
 		h1.add(reset);
 		
-		scaleRange = new LabeledInputRangeWidget2("scale", 1, 200, 1);
+		scaleRange = new LabeledInputRangeWidget2("scale", .001, 0.2, .001);
 		scaleRange.getLabel().setWidth("40px");
 		scaleRange.getRange().setWidth("220px");
 		

@@ -331,7 +331,7 @@ public class HairCloth {
 	}
 	
 	
-	public void simulate(double time,Geometry clothGeometry,List<SphereData> sphereDatas) {
+	public void simulate(double time,Geometry clothGeometry,List<Mesh> spheres) {
 		if (lastTime==null) {
 			lastTime = time;
 			return;
@@ -390,15 +390,17 @@ public class HairCloth {
 			Particle particle = particles.get(i);
 			Vector3 pos = particle.position;
 			
-			for(SphereData data:sphereDatas){
+			for(Mesh data:spheres){
+				/*
 				if(!data.isEnabled()){
 					continue;
 				}
+				*/
 				
 				diff.subVectors(pos, data.getPosition());
-				if (diff.length() < data.getSize()) {
+				if (diff.length() < data.getScale().getX()) {
 					// collided
-					diff.normalize().multiplyScalar(data.getSize());
+					diff.normalize().multiplyScalar(data.getScale().getX());
 					pos.copy(data.getPosition()).add(diff);
 					//break;//?
 				}

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.akjava.gwt.clothhair.client.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.HairDataFunctions.HairPinToVertex;
+import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.cloth.ClothControls;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
@@ -34,6 +35,10 @@ import com.akjava.gwt.three.client.gwt.renderers.WebGLRendererParameter;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.animation.AnimationClip;
+import com.akjava.gwt.three.client.js.animation.AnimationMixer;
+import com.akjava.gwt.three.client.js.animation.KeyframeTrack;
+import com.akjava.gwt.three.client.js.animation.tracks.QuaternionKeyframeTrack;
 import com.akjava.gwt.three.client.js.cameras.PerspectiveCamera;
 import com.akjava.gwt.three.client.js.core.BufferAttribute;
 import com.akjava.gwt.three.client.js.core.BufferGeometry;
@@ -41,6 +46,7 @@ import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.core.Raycaster;
 import com.akjava.gwt.three.client.js.extras.geometries.SphereGeometry;
+import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.extras.helpers.VertexNormalsHelper;
 import com.akjava.gwt.three.client.js.lights.AmbientLight;
 import com.akjava.gwt.three.client.js.lights.DirectionalLight;
@@ -49,6 +55,7 @@ import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.materials.MultiMaterial;
 import com.akjava.gwt.three.client.js.math.Matrix3;
+import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.LineSegments;
 import com.akjava.gwt.three.client.js.objects.Mesh;
@@ -60,7 +67,9 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -79,6 +88,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -101,7 +111,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	//private Mesh sphere;
 	
-	
+	public static GWTThreeClothHair INSTANCE;
 	@Override
 	public WebGLRendererParameter createRendererParameter() {
 		return GWTParamUtils.WebGLRenderer().preserveDrawingBuffer(true).logarithmicDepthBuffer(false);
@@ -109,22 +119,58 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	@Override
 	public void animate(double timestamp) {
-		if(clothControls!=null){
-			clothControls.update(timestamp);
+		
+		
+		
+		/* for test
+		for(SkinningVertexCalculator skinningVertexCalculator:skinningVertexCalculators){
+			skinningVertexCalculator.update();
 			
-			updateSphereMeshs();
+			//do temp
+			//ThreeLog.log(skinningVertexCalculator.getResult().get(0));
+			tmpSphere.getPosition().copy(skinningVertexCalculator.getResult().get(0));
+			double size=skinningVertexCalculator.getResult().get(0).distanceTo(skinningVertexCalculator.getResult().get(1));
+			//LogUtils.log("distance:"+size);
+			tmpSphere.getScale().setScalar(size);	
 		}
+		*/
+		
+		
+		if(clothControls!=null){
+			updateSphereMeshs();//sphere first
+			clothControls.update(timestamp);
+		}
+		
+		//not support skinning
+		if(vertexHelper!=null){
+			vertexHelper.update();//for moving
+		}
+		
+		
+		if(mixer!=null){
+			mixer.update(clock.getDelta());
+		}
+		
+		if(skeltonHelper!=null){
+			skeltonHelper.update();
+		}
+		
 		//logarithmicDepthBuffer
 		renderer.render(scene, camera);//render last,very important
 	}
 	
 	private MeshPhongMaterial hairHeadMaterial;
 	private SphereGeometry ballGeo;
+	private Mesh tmpSphere;
 	
+	private SkeletonHelper skeltonHelper;
 	
 	@Override
 	public void onInitializedThree() {
 		super.onInitializedThree();
+		
+		INSTANCE=this;
+		
 		renderer.setClearColor(0xffffff);
 		
 		rendererContainer.addMouseMoveHandler(new MouseMoveHandler() {
@@ -154,9 +200,17 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		directionalLight.getPosition().set( -1, 1, 1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
 		scene.add( directionalLight );
 		
+		/*
+		 * shape morph need special treatment for r74
+		 */
+		//String url= "models/mbl3d/model8o.json";//var url= "morph.json";
 		
-		String url= "models/mbl3d/model8-hair-color-expand.json";//var url= "morph.json";
+		String url= "models/mbl3d/model8-hair-color-expand-bone.json";//"models/mbl3d/model8-hair-color-expand.json"
 		THREE.JSONLoader().load(url,new JSONLoadHandler() {
+			
+
+			
+
 			
 
 			
@@ -199,10 +253,26 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				
 				
+				for(int i=0;i<materials.length();i++){
+					materials.get(i).gwtCastMeshPhongMaterial().setSkinning(true);
+				}
+				
 				MultiMaterial mat=THREE.MultiMaterial(materials );//var mat=THREE.MultiMaterial( materials);//MultiMaterial mat=THREE.MultiMaterial( materials);//var mat=new THREE.MultiMaterial( materials);
 
 
 				characterMesh = THREE.SkinnedMesh( geometry, mat );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = new THREE.SkinnedMesh( geometry, mat );
+				
+				
+				//for updebug
+				skeltonHelper = THREE.SkeletonHelper( characterMesh );
+				skeltonHelper.setVisible(false);
+				scene.add( skeltonHelper );
+				
+				
+				//ThreeLog.logBoneNames(characterMesh);
+				
+				//LogUtils.log(characterMesh);
+				
 				characterMesh.setName("model");//mesh.setName("model");//mesh.setName("model");//mesh.name = "model";
 				//mesh.getPosition().set( x, y - bb.getMin().getY() * s, z );//mesh.getPosition().set( x, y - bb.getMin().y * s, z );//mesh.getPosition().set( x, y - bb.getMin().y * s, z );//mesh.position.set( x, y - bb.min.y * s, z );
 				characterMesh.getPosition().set(x, y, z);
@@ -235,6 +305,21 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				clothControls.setWind(true);
 				
+				
+				/* for test
+				SkinningVertexCalculator temp=new SkinningVertexCalculator(characterMesh);
+				//circle style
+				temp.add(new SkinningVertex(THREE.Vector3(0,bb.getMax().getY(),0), THREE.Vector4(60, 60, 60, 60), THREE.Vector4(1,0,0,0)));
+				temp.add(new SkinningVertex(THREE.Vector3(0,bb.getMax().getY(),.1), THREE.Vector4(60, 60, 60, 60), THREE.Vector4(1,0,0,0)));
+				
+				skinningVertexCalculators.add(temp);
+				//temp sphere
+				MeshPhongMaterial tmpMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0x888888).side(THREE.DoubleSide).transparent(true).opacity(0.5));
+				
+				tmpSphere = THREE.Mesh( ballGeo, tmpMaterial );
+				scene.add( tmpSphere );
+				*/
+				mixer=THREE.AnimationMixer(characterMesh);
 			}
 			
 			
@@ -255,18 +340,46 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				);
 		
 		
+		
 	}
 	
+	//List<SkinningVertexCalculator> skinningVertexCalculators=Lists.newArrayList();
 	
 
 	
 	
-	Map<SphereData,Mesh> sphereMeshMap=Maps.newHashMap();
+	Map<SphereData,SphereCalculatorAndMesh> sphereMeshMap=Maps.newHashMap();
+	
+	public static class SphereCalculatorAndMesh{
+		private Mesh mesh;
+		public SphereCalculatorAndMesh(SkinnedMesh character,int boneIndex,Mesh sphere) {
+			super();
+			this.mesh = sphere;
+			calculator=new SkinningVertexCalculator(character);
+			calculator.add(new SkinningVertex(THREE.Vector3(), THREE.Vector4(boneIndex, boneIndex, boneIndex, boneIndex), THREE.Vector4(1,0,0,0)));
+			calculator.add(new SkinningVertex(THREE.Vector3(), THREE.Vector4(boneIndex, boneIndex, boneIndex, boneIndex), THREE.Vector4(1,0,0,0)));
+			
+		}
+		public Mesh getMesh() {
+			return mesh;
+		}
+		public void setMesh(Mesh mesh) {
+			this.mesh = mesh;
+		}
+		public SkinningVertexCalculator getCalculator() {
+			return calculator;
+		}
+		public void setCalculator(SkinningVertexCalculator calculator) {
+			this.calculator = calculator;
+		}
+		private SkinningVertexCalculator calculator;
+	}
+	
 	
 	@Override
 	public void removeSphereData(SphereData data){
-		clothControls.removeSphereData(data);
-		Mesh sphere=sphereMeshMap.get(data);
+		Mesh sphere=sphereMeshMap.get(data).getMesh();
+		clothControls.removeSphere(sphere);
 		scene.remove(sphere);
 	}
 	@Override
@@ -278,18 +391,23 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		sphere.getScale().setScalar(data.getSize());
 		
-		clothControls.addSphereData(data);
+		clothControls.addSphere(sphere);
 		
 		
-		sphereMeshMap.put(data, sphere);
+		sphereMeshMap.put(data, new SphereCalculatorAndMesh(characterMesh, 60, sphere));
 	}
 	
 	public void updateSphereMeshs(){
 		for(SphereData data:sphereMeshMap.keySet()){
-			Mesh sphere=sphereMeshMap.get(data);
+			SphereCalculatorAndMesh sphereCalculatorAndMesh=sphereMeshMap.get(data);
+			sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(0).getVertex().copy(data.getPosition());
+			sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(1).getVertex().copy(data.getPosition()).gwtIncrementX(data.getSize());
+			sphereCalculatorAndMesh.getCalculator().update();
 			
-			sphere.getScale().setScalar(data.getSize());
-			sphere.getPosition().copy(data.getPosition());
+			double size=sphereCalculatorAndMesh.getCalculator().getResult().get(0).distanceTo(sphereCalculatorAndMesh.getCalculator().getResult().get(1));
+			//update sphere
+			sphereCalculatorAndMesh.getMesh().getScale().setScalar(size);
+			sphereCalculatorAndMesh.getMesh().getPosition().copy(sphereCalculatorAndMesh.getCalculator().getResult().get(0));
 		}
 	}
 	
@@ -572,7 +690,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		HairDataEditor editor=new HairDataEditor();
 		driver.initialize(editor);
 		basicPanel.add(editor);
-		createClothPanel();
+		createClothPanel(basicPanel);
 		
 		driver.edit(new HairData());//new data
 		
@@ -688,18 +806,20 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		});
 		 downloadPanels.add(downloadBt);
 		 downloadPanels.add(download);
+		 
+		 tab.add(new CharacterControlPanel(characterMesh),"character");
 	}
 	
 	
 	private Widget createSpherePanel() {
 		VerticalPanel  panel=new VerticalPanel();
 		
-		int ballSize=100;
+		double ballSize=.1;
 		
 		//double s=characterMesh.getScale().getX();
 		//initial data
-		
-		SphereData firstOne=new SphereData(0, characterMesh.getPosition().getY()*-1-100, 0, ballSize, true);
+		//TODO find better way
+		SphereData firstOne=new SphereData(0, characterMesh.getPosition().getY()/characterMesh.getScale().getX()*-1+0.75, 0, ballSize, true);
 		//addSphereData(firstOne);
 		
 		HorizontalPanel controler=new HorizontalPanel();
@@ -710,8 +830,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				for(Mesh mesh:sphereMeshMap.values()){
-					mesh.setVisible(event.getValue());
+				for(SphereCalculatorAndMesh smesh:sphereMeshMap.values()){
+					smesh.getMesh().setVisible(event.getValue());
 				}
 			}
 			
@@ -762,11 +882,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	private HairPin secondSelection;
 	private HairPin thirdSelection;
 	
-	private void createClothPanel(){
+	private void createClothPanel(Panel parent){
 		
 		//tmp
 		HorizontalPanel h=new HorizontalPanel();
-		controlerRootPanel.add(h);
+		parent.add(h);
 		
 		Button first=new Button("first",new ClickHandler() {
 			@Override
@@ -1035,12 +1155,75 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 
 	private void selectShpere(SphereData selectedSphere) {
-		MeshPhongMaterial material=sphereMeshMap.get(selectedSphere).getMaterial().gwtCastMeshPhongMaterial();
+		MeshPhongMaterial material=sphereMeshMap.get(selectedSphere).getMesh().getMaterial().gwtCastMeshPhongMaterial();
 		material.getColor().setHex(0x0000ff);
 	}
 	
 	private void unselectShpere(SphereData selectedSphere) {
-		MeshPhongMaterial material=sphereMeshMap.get(selectedSphere).getMaterial().gwtCastMeshPhongMaterial();
+		MeshPhongMaterial material=sphereMeshMap.get(selectedSphere).getMesh().getMaterial().gwtCastMeshPhongMaterial();
 		material.getColor().setHex(0x888888);
+	}
+	
+	private AnimationMixer mixer;
+	public void startAnimation(double x,double y,double z){
+		
+		//LogUtils.log(characterMesh);
+		
+		stopAnimation();
+		Quaternion q=THREE.Quaternion();
+		
+		Quaternion xq=THREE.Quaternion().setFromAxisAngle(THREE.Vector3(1, 0, 0), x);
+		q.multiply(xq);
+		
+		Quaternion yq=THREE.Quaternion().setFromAxisAngle(THREE.Vector3(0, 1, 0), y);
+		q.multiply(yq);
+		
+		Quaternion zq=THREE.Quaternion().setFromAxisAngle(THREE.Vector3(0, 0, 1), z);
+		q.multiply(zq);
+		
+		double duration=1.0;
+		
+		JsArray<KeyframeTrack> tracks=JavaScriptObject.createArray().cast();
+		
+		JsArrayNumber times=JavaScriptObject.createArray().cast();
+		times.push(0);
+		times.push(duration);
+		times.push(duration*2);
+		
+		JsArrayNumber values=JsArray.createArray().cast();
+		
+		
+		
+		concat(values,THREE.Quaternion().toArray());
+		concat(values,q.toArray());
+		concat(values,THREE.Quaternion().toArray());
+		
+		//LogUtils.log(values);
+		
+		//value is not valid number
+		
+		//head fixed
+		//quaternion is alias for rot
+		QuaternionKeyframeTrack track=THREE.QuaternionKeyframeTrack(".bones[60].quaternion", times, values);
+		
+		tracks.push(track);
+		
+		AnimationClip clip=THREE.AnimationClip("anime", -1, tracks);
+		//LogUtils.log(track.validate());
+		
+		mixer.uncacheClip(clip);//same name cache that.
+		mixer.clipAction(clip).play();
+	}
+	
+	public void concat(JsArrayNumber target,JsArrayNumber values){
+		for(int i=0;i<values.length();i++){
+			target.push(values.get(i));
+		}
+	}
+	
+	public void stopAnimation() {
+		mixer.stopAllAction();
+		
+		//characterMesh.getGeometry().getBones().get(60).setRotq(q)
 	}
 }
