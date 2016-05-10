@@ -24,7 +24,7 @@ public class CharacterControlPanel extends VerticalPanel{
 		this.mesh = mesh;
 		
 		this.add(new Label("Position"));
-		LabeledInputRangeWidget2 xPos=new LabeledInputRangeWidget2("x", -200, 200, 1);
+		LabeledInputRangeWidget2 xPos=new LabeledInputRangeWidget2("x", -900, 900, 1);
 		xPos.getLabel().setWidth("20px");
 		xPos.getRange().setWidth("240px");
 		this.add(xPos);
@@ -34,7 +34,7 @@ public class CharacterControlPanel extends VerticalPanel{
 				mesh.getPosition().setX(event.getValue().doubleValue());
 			}
 		});
-		LabeledInputRangeWidget2 yPos=new LabeledInputRangeWidget2("y", mesh.getPosition().getY()-200, mesh.getPosition().getY()+200, 1);
+		LabeledInputRangeWidget2 yPos=new LabeledInputRangeWidget2("y", mesh.getPosition().getY()-200, mesh.getPosition().getY()+1600, 1);
 		yPos.getLabel().setWidth("20px");
 		yPos.getRange().setWidth("240px");
 		this.add(yPos);

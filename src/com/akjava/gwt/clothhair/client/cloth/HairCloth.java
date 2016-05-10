@@ -330,7 +330,16 @@ public class HairCloth {
 		return u + v * (w + 1);
 	}
 	
+	private FloorModifier floorModifier;
 	
+	public FloorModifier getFloorModifier() {
+		return floorModifier;
+	}
+
+	public void setFloorModifier(FloorModifier floorModifier) {
+		this.floorModifier = floorModifier;
+	}
+
 	public void simulate(double time,Geometry clothGeometry,List<Mesh> spheres) {
 		if (lastTime==null) {
 			lastTime = time;
@@ -408,6 +417,14 @@ public class HairCloth {
 			}
 			
 			
+		}
+		
+		if(floorModifier!=null){
+			for (int i=0;i<particles.size();i++) {
+				Particle particle = particles.get(i);
+				Vector3 pos = particle.position;
+				floorModifier.modifyFloor(pos);
+			}
 		}
 		
 		/*

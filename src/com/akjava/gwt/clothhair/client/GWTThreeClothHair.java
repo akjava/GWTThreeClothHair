@@ -11,6 +11,7 @@ import com.akjava.gwt.clothhair.client.HairDataFunctions.HairPinToVertex;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.cloth.ClothControls;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
+import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataPanel;
@@ -114,7 +115,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	public static GWTThreeClothHair INSTANCE;
 	@Override
 	public WebGLRendererParameter createRendererParameter() {
-		return GWTParamUtils.WebGLRenderer().preserveDrawingBuffer(true).logarithmicDepthBuffer(false);
+		return GWTParamUtils.WebGLRenderer().preserveDrawingBuffer(true).logarithmicDepthBuffer(true);
 	}
 	
 	@Override
@@ -154,6 +155,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		if(skeltonHelper!=null){
 			skeltonHelper.update();
 		}
+		
+		//ThreeLog.log(camera.getPosition());
 		
 		//logarithmicDepthBuffer
 		renderer.render(scene, camera);//render last,very important
@@ -291,7 +294,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				
 				clothControls=new ClothControls();
-				
+				clothControls.setFloorModifier(new GroundYFloor(0));
 				
 				
 				//sphere.getScale().setScalar(clothControls.getBallSize());
@@ -301,6 +304,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				createControler();
 				
+				sphereDataPanel.setSkelton(characterMesh.getSkeleton());
 				
 				
 				clothControls.setWind(true);
@@ -394,7 +398,17 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		clothControls.addSphere(sphere);
 		
 		
-		sphereMeshMap.put(data, new SphereCalculatorAndMesh(characterMesh, 60, sphere));
+		sphereMeshMap.put(data, new SphereCalculatorAndMesh(characterMesh, data.getBoneIndex(), sphere));
+	}
+	
+	public void syncSphereDataAndSkinningVertexCalculator(SphereData data){
+		if(data==null){
+			return;
+		}
+		SkinningVertexCalculator calculator=sphereMeshMap.get(data).getCalculator();
+		for(SkinningVertex vertex:calculator.getSkinningVertexs()){
+			vertex.getSkinIndices().setX(data.getBoneIndex());
+		}
 	}
 	
 	public void updateSphereMeshs(){
@@ -416,7 +430,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	@Override
 	public PerspectiveCamera createCamera(){
 		
-		PerspectiveCamera camera=THREE.PerspectiveCamera(45, getWindowInnerWidth()/getWindowInnerHeight(), 10, 10000);
+		PerspectiveCamera camera=THREE.PerspectiveCamera(45, getWindowInnerWidth()/getWindowInnerHeight(), 10, 20000);
 		camera.getPosition().set(0, cameraY, 500);
 		return camera;
 	}
@@ -819,7 +833,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//double s=characterMesh.getScale().getX();
 		//initial data
 		//TODO find better way
-		SphereData firstOne=new SphereData(0, characterMesh.getPosition().getY()/characterMesh.getScale().getX()*-1+0.75, 0, ballSize, true);
+		
+		//TODO find better index by automatic
+		
+		SphereData firstOne=new SphereData(0, characterMesh.getPosition().getY()/characterMesh.getScale().getX()*-1+0.75, 0, ballSize, true,60);//hard code 60 is head
 		//addSphereData(firstOne);
 		
 		HorizontalPanel controler=new HorizontalPanel();
@@ -838,19 +855,19 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		});
 		controler.add(visibleAllCheck);
 	
-		SphereDataPanel dataPanel=new SphereDataPanel(this, firstOne);
+		sphereDataPanel = new SphereDataPanel(this, firstOne);
 	
 		String lines=storageControler.getValue(HairStorageKeys.KEY_SPHERES, null);
 		if(lines!=null){
 			Iterable<SphereData> datas=new SphereDataConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(lines));
 			for(SphereData data:datas){
-				dataPanel.addSpereData(data);
+				sphereDataPanel.addSpereData(data);
 			}
 		}else{
 			//if empty
-			dataPanel.addSpereData(firstOne.clone());
+			sphereDataPanel.addSpereData(firstOne.clone());
 		}
-		panel.add(dataPanel);
+		panel.add(sphereDataPanel);
 		
 		
 		
@@ -1165,6 +1182,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	
 	private AnimationMixer mixer;
+
+	private SphereDataPanel sphereDataPanel;
 	public void startAnimation(double x,double y,double z){
 		
 		//LogUtils.log(characterMesh);

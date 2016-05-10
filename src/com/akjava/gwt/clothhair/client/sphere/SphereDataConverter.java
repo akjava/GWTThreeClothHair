@@ -18,7 +18,7 @@ public class SphereDataConverter extends Converter<SphereData,String>{
 	@Override
 	protected String doForward(SphereData value) {
 		return Joiner.on(",").join(Doubles.asList(new double[]{value.getX(),value.getY(),value.getZ(),value.getSize()
-		,value.isEnabled()?1.0:0		
+		,value.isEnabled()?1.0:0,value.getBoneIndex()		
 		}));
 	}
 
@@ -32,8 +32,13 @@ public class SphereDataConverter extends Converter<SphereData,String>{
 			values[i]=ValuesUtils.toDouble(v.get(i), 0);
 		}
 		
+		int boneIndex=0;
+		if(values.length>5){
+			boneIndex=(int)values[5];
+		}
+		
 		SphereData data=new SphereData(values[0],values[1],values[2],values[3],
-				values[4]==1?true:false
+				values[4]==1?true:false,boneIndex
 				);
 		return data;
 	}

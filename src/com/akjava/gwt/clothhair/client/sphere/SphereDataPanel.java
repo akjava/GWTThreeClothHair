@@ -1,13 +1,19 @@
 package com.akjava.gwt.clothhair.client.sphere;
 
+import java.util.List;
+
+import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.HairStorageKeys;
-import com.akjava.gwt.clothhair.client.ScheduleCommand;
+import com.akjava.gwt.clothhair.client.sphere.SphereDataEditor.BoneData;
+import com.akjava.gwt.lib.client.GWTHTMLUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
+import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -29,10 +35,10 @@ public class SphereDataPanel extends VerticalPanel{
 	 public SphereDataPanel(final SphereDataControler controler,final SphereData defaultValue){
 		 this.controler=controler;
 		 this.defaultValue=defaultValue;
-		 final SphereDataEditor editor=new SphereDataEditor(defaultValue,this);  
-		 this.add(editor);
+		 sphereDataEditor = new SphereDataEditor(defaultValue,this);  
+		 this.add(sphereDataEditor);
 		 
-		 driver.initialize(editor);
+		 driver.initialize(sphereDataEditor);
 		 
 		 driver.edit(null);
 		 
@@ -114,8 +120,12 @@ public class SphereDataPanel extends VerticalPanel{
 	 
 	 private SphereDataConverter converter=new SphereDataConverter();
 	 private StorageControler storageControler=new StorageControler();
+	private SphereDataEditor sphereDataEditor;
 	 public void onFlushed(){
-		
+		//
+		 GWTThreeClothHair.INSTANCE.syncSphereDataAndSkinningVertexCalculator(sphereDataEditor.getValue());
+		 
+		 //store data
 		 String lines=Joiner.on("\r\n").join(converter.convertAll(cellObjects.getDatas()));
 		 try {
 			storageControler.setValue(HairStorageKeys.KEY_SPHERES, lines);
@@ -144,5 +154,12 @@ public class SphereDataPanel extends VerticalPanel{
 			public void removeSphereData(SphereData data);
 			public void addSphereData(SphereData data);
 			public void onSelectSphere(SphereData data);
+		}
+
+
+		public void setSkelton(Skeleton skeleton) {
+			
+			sphereDataEditor.setSkelton(skeleton);
+			
 		}
 }

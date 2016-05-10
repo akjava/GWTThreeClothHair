@@ -31,6 +31,7 @@ public class ClothControls {
 
 	public void addClothData(ClothData data){
 		data.getCloth().wind=wind;
+		data.getCloth().setFloorModifier(floorModifier);
 		cloths.add(data);
 	}
 	public void removeClothData(ClothData data){
@@ -51,6 +52,23 @@ public class ClothControls {
 			
 		}
 	}
+	
+	private FloorModifier floorModifier;
+	
+
+	public FloorModifier getFloorModifier() {
+		return floorModifier;
+	}
+
+
+	public void setFloorModifier(FloorModifier floorModifier) {
+		this.floorModifier = floorModifier;
+		for(ClothData data:cloths){
+			HairCloth cloth=data.getCloth();
+			cloth.setFloorModifier(floorModifier);
+		}
+	}
+
 
 	private void syncPinPositions(ClothData data) {
 		if(data.getCalculator().getResult().size()<2){
@@ -189,6 +207,8 @@ public class ClothControls {
 			clothGeometry.setNormalsNeedUpdate(true);//clothGeometry.normalsNeedUpdate = true;
 			clothGeometry.setVerticesNeedUpdate(true);//clothGeometry.verticesNeedUpdate = true;
 
+			clothGeometry.computeBoundingSphere();//TODO call separately?
+			
 			//sphere.getPosition().copy( cloth.ballPosition );//sphere.position.copy( ballPosition );
 		}
 	}

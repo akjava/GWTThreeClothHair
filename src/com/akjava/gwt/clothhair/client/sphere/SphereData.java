@@ -19,14 +19,25 @@ public Vector3 getPosition() {
 }
 
 public SphereData clone(){
-	return new SphereData(position.getX(),position.getY(), position.getZ(), size, enabled);
+	return new SphereData(position.getX(),position.getY(), position.getZ(), size, enabled,boneIndex);
 }
 
-public SphereData(double x, double y, double z, double size,boolean enabled) {
+public SphereData(double x, double y, double z, double size,boolean enabled,int boneIndex) {
 	super();
 	position.set(x, y, z);
 	this.size = size;
 	this.enabled=enabled;
+	this.boneIndex=boneIndex;
+}
+
+private int boneIndex;
+
+public int getBoneIndex() {
+	return boneIndex;
+}
+
+public void setBoneIndex(int boneIndex) {
+	this.boneIndex = boneIndex;
 }
 
 public double getX() {
