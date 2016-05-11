@@ -42,7 +42,7 @@ public class TexturePanel extends VerticalPanel{
 			}
 		});
 		
-		LabeledInputRangeWidget2 opacityRange=new LabeledInputRangeWidget2("opacity", 0, 1, 0.01);
+		LabeledInputRangeWidget2 opacityRange=new LabeledInputRangeWidget2("Opacity", 0, 1, 0.01);
 		opacityRange.getLabel().setWidth(labelWidth);
 		this.add(opacityRange);
 		opacityRange.addtRangeListener(new ValueChangeHandler<Number>() {
@@ -53,6 +53,18 @@ public class TexturePanel extends VerticalPanel{
 			}
 		});
 		opacityRange.setValue(1);
+		
+		LabeledInputRangeWidget2 alphaTestRange=new LabeledInputRangeWidget2("AlphaTest", 0, 1, 0.01);
+		alphaTestRange.getLabel().setWidth(labelWidth);
+		this.add(alphaTestRange);
+		alphaTestRange.addtRangeListener(new ValueChangeHandler<Number>() {
+			
+			@Override
+			public void onValueChange(ValueChangeEvent<Number> event) {
+				material.setAlphaTest(event.getValue().doubleValue());
+			}
+		});
+		alphaTestRange.setValue(material.getAlphaTest());
 		
 		final CheckBox check=new CheckBox("enable");
 		
@@ -95,6 +107,7 @@ public class TexturePanel extends VerticalPanel{
 	}
 	
 	public Label createTitle(String text){
+		
 		Label label=new Label(text);
 		label.setWidth(labelWidth);
 		return label;

@@ -6,6 +6,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.akjava.gwt.clothhair.client.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.HairDataFunctions.HairPinToVertex;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
@@ -62,6 +64,7 @@ import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.LineSegments;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
+import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.lib.common.utils.CSVUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -647,6 +650,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		controlerRootPanel.add(tab);
 		tab.selectTab(0);
 		
+		VerticalPanel hairPanel=new VerticalPanel();
+		tab.add(hairPanel,"hair");
+		
 		VerticalPanel basicPanel=new VerticalPanel();
 		tab.add(basicPanel,"basic");
 		
@@ -722,18 +728,19 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		
 		//texture panel;
-		basicPanel.add(new Label("Texture"));
-		basicPanel.add(new TexturePanel(hairMaterial));
+		hairPanel.add(new Label("Texture"));
+		hairPanel.add(new TexturePanel(hairMaterial));
+		hairPanel.add(new HairTexturePanel());
 		
 		
-		basicPanel.add(new HTML("<h4>Hair Editor</h4>"));
+		hairPanel.add(new HTML("<h4>Hair Editor</h4>"));
 		
 		
-		HorizontalPanel hairPanel=new HorizontalPanel();
-		basicPanel.add(hairPanel);
+		HorizontalPanel showHairPanel=new HorizontalPanel();
+		hairPanel.add(showHairPanel);
 		CheckBox showHair=new CheckBox("show hairs");
 		showHair.setValue(true);
-		hairPanel.add(showHair);
+		showHairPanel.add(showHair);
 		showHair.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
@@ -747,8 +754,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//editor
 		HairDataEditor editor=new HairDataEditor();
 		driver.initialize(editor);
-		basicPanel.add(editor);
-		createClothPanel(basicPanel);
+		hairPanel.add(editor);
+		createClothPanel(hairPanel);
 		
 		driver.edit(new HairData());//new data
 		
@@ -765,10 +772,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				table.addColumn(nameColumn);
 			}
 		};
-		basicPanel.add(table);
+		hairPanel.add(table);
 		
 		HorizontalPanel editPanel=new HorizontalPanel();
-		basicPanel.add(editPanel);
+		hairPanel.add(editPanel);
 		
 		
 		Button edit=new Button("remove & edit",new ClickHandler() {
@@ -846,10 +853,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			}
 		}, true, "UTF-8");
 		 upload.setAccept(".csv");
-		 basicPanel.add(upload);
+		 hairPanel.add(upload);
 		 
 		 HorizontalPanel downloadPanels=new HorizontalPanel();
-		 basicPanel.add(downloadPanels);
+		 hairPanel.add(downloadPanels);
 		 final HorizontalPanel download=new HorizontalPanel();
 		 
 		 Button downloadBt=new Button("download",new ClickHandler() {
@@ -867,6 +874,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		 
 		 tab.add(new CharacterMovePanel(characterMesh),"character");
 		 tab.add(new GravityPanel(clothControls),"gravity");
+	}
+	
+	public void setTextureMap(Texture texture){
+		hairMaterial.setMap(texture);
+		hairMaterial.setNeedsUpdate(true);
 	}
 	
 	
@@ -1216,7 +1228,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		selectShpere(selectedSphere);
 	}
 
-	private void selectShpere(SphereData selectedSphere) {
+	private void selectShpere(@Nullable SphereData selectedSphere) {
+		if(selectedSphere==null){
+			return;
+		}
 		MeshPhongMaterial material=sphereMeshMap.get(selectedSphere).getMesh().getMaterial().gwtCastMeshPhongMaterial();
 		material.getColor().setHex(0x0000ff);
 	}

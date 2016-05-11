@@ -32,3 +32,10 @@ h1 {
 #closeButton {
   margin: 15px 6px 6px;
 }
+
+.transparent_bg{
+margin-left: 8px;
+padding: 0px;	
+background-image: url("/img/transparent_bg.png");
+background-repeat: repeat;
+}
