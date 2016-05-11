@@ -8,7 +8,7 @@ private double floor;
 	super();
 	this.floor = floor;
 }
-	boolean enabled;
+	boolean enabled=true;
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -17,6 +17,9 @@ private double floor;
 	}
 	@Override
 	public void modifyFloor(Vector3 position) {
+		if(!enabled){
+			return;
+		}
 		if(position.getY()<floor){
 			position.setY(floor);
 		}
