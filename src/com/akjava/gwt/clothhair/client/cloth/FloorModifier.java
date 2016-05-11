@@ -4,4 +4,6 @@ import com.akjava.gwt.three.client.js.math.Vector3;
 
 public interface FloorModifier {
 	public void modifyFloor(Vector3 position);
+	public void setEnabled(boolean enabled);
+	public boolean isEnabled();
 }

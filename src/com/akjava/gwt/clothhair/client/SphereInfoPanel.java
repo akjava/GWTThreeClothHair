@@ -1,6 +1,6 @@
 package com.akjava.gwt.clothhair.client;
 
-import com.akjava.gwt.clothhair.client.cloth.ClothControls;
+import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  */
 public class SphereInfoPanel extends VerticalPanel{
 	private StorageControler storageControler;
-	public SphereInfoPanel(final StorageControler storageControler,final Mesh sphere,final ClothControls clothControls){
+	public SphereInfoPanel(final StorageControler storageControler,final Mesh sphere,final ClothControler clothControls){
 			this.storageControler=storageControler;
 		
 		//sphere

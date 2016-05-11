@@ -9,7 +9,7 @@ import java.util.Map;
 import com.akjava.gwt.clothhair.client.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.HairDataFunctions.HairPinToVertex;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
-import com.akjava.gwt.clothhair.client.cloth.ClothControls;
+import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
 import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
@@ -27,6 +27,7 @@ import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
+import com.akjava.gwt.stats.client.Stats;
 import com.akjava.gwt.three.client.examples.js.THREEExp;
 import com.akjava.gwt.three.client.examples.js.controls.OrbitControls;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
@@ -95,6 +96,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 
+
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
@@ -110,6 +112,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	private SkinnedMesh characterMesh;
 	private VertexNormalsHelper vertexHelper;
 	
+	private Stats stats;
 	//private Mesh sphere;
 	
 	public static GWTThreeClothHair INSTANCE;
@@ -160,6 +163,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//logarithmicDepthBuffer
 		renderer.render(scene, camera);//render last,very important
+		
+		if(stats!=null){
+			stats.update();
+		}
 	}
 	
 	private MeshPhongMaterial hairHeadMaterial;
@@ -210,6 +217,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		String url= "models/mbl3d/model8-hair-color-expand-bone.json";//"models/mbl3d/model8-hair-color-expand.json"
 		THREE.JSONLoader().load(url,new JSONLoadHandler() {
+			
+
 			
 
 			
@@ -293,7 +302,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				
 				
-				clothControls=new ClothControls();
+				clothControls=new ClothControler();
 				clothControls.setFloorModifier(new GroundYFloor(0));
 				
 				
@@ -324,6 +333,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				scene.add( tmpSphere );
 				*/
 				mixer=THREE.AnimationMixer(characterMesh);
+				
+				stats = Stats.insertStatsToRootPanel();
 			}
 			
 			
@@ -436,7 +447,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	
 
-	ClothControls clothControls;
+	ClothControler clothControls;
 
 	private int hairColor=0x553817;
 
@@ -664,6 +675,12 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
 				vertexHelper.setVisible(event.getValue());
+				if(selectedLine!=null){
+					selectedLine.setVisible(event.getValue());
+				}
+				if(hairDataLine!=null){
+					hairDataLine.setVisible(event.getValue());
+				}
 			}
 		});
 		h0.add(visibleVertexCheck);
@@ -821,7 +838,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		 downloadPanels.add(downloadBt);
 		 downloadPanels.add(download);
 		 
-		 tab.add(new CharacterControlPanel(characterMesh),"character");
+		 tab.add(new CharacterMovePanel(characterMesh),"character");
+		 tab.add(new GravityPanel(clothControls),"gravity");
 	}
 	
 	
@@ -1184,6 +1202,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	private AnimationMixer mixer;
 
 	private SphereDataPanel sphereDataPanel;
+	
+	//TODO add option mirror
 	public void startAnimation(double x,double y,double z){
 		
 		//LogUtils.log(characterMesh);
@@ -1200,6 +1220,17 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		Quaternion zq=THREE.Quaternion().setFromAxisAngle(THREE.Vector3(0, 0, 1), z);
 		q.multiply(zq);
 		
+		Quaternion q2=THREE.Quaternion();
+		
+		Quaternion xq2=THREE.Quaternion().setFromAxisAngle(THREE.Vector3(1, 0, 0), x*-1);
+		q2.multiply(xq2);
+		
+		Quaternion yq2=THREE.Quaternion().setFromAxisAngle(THREE.Vector3(0, 1, 0), y*-1);
+		q2.multiply(yq2);
+		
+		Quaternion zq2=THREE.Quaternion().setFromAxisAngle(THREE.Vector3(0, 0, 1), z*-1);
+		q2.multiply(zq2);
+		
 		double duration=1.0;
 		
 		JsArray<KeyframeTrack> tracks=JavaScriptObject.createArray().cast();
@@ -1208,13 +1239,16 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		times.push(0);
 		times.push(duration);
 		times.push(duration*2);
-		
+		times.push(duration*3);
+		times.push(duration*4);
 		JsArrayNumber values=JsArray.createArray().cast();
 		
 		
 		
 		concat(values,THREE.Quaternion().toArray());
 		concat(values,q.toArray());
+		concat(values,THREE.Quaternion().toArray());
+		concat(values,q2.toArray());
 		concat(values,THREE.Quaternion().toArray());
 		
 		//LogUtils.log(values);

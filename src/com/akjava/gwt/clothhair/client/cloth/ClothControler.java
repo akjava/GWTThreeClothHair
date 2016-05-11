@@ -10,9 +10,13 @@ import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.google.common.collect.Lists;
 
-public class ClothControls {
+public class ClothControler {
 	private List<ClothData> cloths=Lists.newArrayList();
 	
+	public List<ClothData> getCloths() {
+		return cloths;
+	}
+
 	List<Mesh> spheres=Lists.newArrayList();
 	
 	//List<Mesh> spheres=Lists.newArrayList();
@@ -25,7 +29,7 @@ public class ClothControls {
 	}
 	
 	
-	public ClothControls() {
+	public ClothControler() {
 		super();
 	}
 
@@ -207,6 +211,7 @@ public class ClothControls {
 			clothGeometry.setNormalsNeedUpdate(true);//clothGeometry.normalsNeedUpdate = true;
 			clothGeometry.setVerticesNeedUpdate(true);//clothGeometry.verticesNeedUpdate = true;
 
+			//seems not so heavy
 			clothGeometry.computeBoundingSphere();//TODO call separately?
 			
 			//sphere.getPosition().copy( cloth.ballPosition );//sphere.position.copy( ballPosition );

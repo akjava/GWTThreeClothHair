@@ -32,8 +32,24 @@ public class HairCloth {
 	// http://cg.alexandra.dk/tag/spring-mass-system/
 	// Real-time Cloth Animation http://www.darwin3d.com/gamedev/articles/col0599.pdf
 
+	
+	/**
+	 * 
+	 * @param DAMPING 0.03
+	 * @param MASS .1
+	 * @param GRAVITY 981 * 1.4
+	 */
+	public void initGravity(double DAMPING,double MASS,double GRAVITY){
+		this.DAMPING=DAMPING;
+		this.DRAG = 1.0 - DAMPING;
+		this.MASS=MASS;
+		this.GRAVITY=GRAVITY;
+		gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
+	}
+	
+	
 	double DAMPING = 0.03;
-	double DRAG = 1 - DAMPING;
+	double DRAG = 1.0 - DAMPING;
 	double MASS = .1;
 	double restDistance = 25;
 

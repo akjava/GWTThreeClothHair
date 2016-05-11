@@ -15,11 +15,11 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class CharacterControlPanel extends VerticalPanel{
+public class CharacterMovePanel extends VerticalPanel{
 
 	private SkinnedMesh mesh;
 
-	public CharacterControlPanel(final SkinnedMesh mesh) {
+	public CharacterMovePanel(final SkinnedMesh mesh) {
 		super();
 		this.mesh = mesh;
 		
