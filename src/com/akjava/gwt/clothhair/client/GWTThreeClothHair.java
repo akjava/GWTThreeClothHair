@@ -210,6 +210,17 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		directionalLight.getPosition().set( -1, 1, 1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
 		scene.add( directionalLight );
 		
+		
+		
+		MeshPhongMaterial groundMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0x888888).specular(0x111111)
+				.transparent(true).opacity(0.5).side(THREE.DoubleSide));
+		
+		groundMesh = THREE.Mesh( THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
+		groundMesh.getPosition().setY(0);//mesh.position.y = -250;
+		groundMesh.getRotation().setX(- Math.PI / 2);//mesh.rotation.x = - Math.PI / 2;
+		groundMesh.setReceiveShadow(true);//mesh.receiveShadow = true;
+		scene.add( groundMesh );
+		
 		/*
 		 * shape morph need special treatment for r74
 		 */
@@ -650,6 +661,22 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			}
 		});
 		basicPanel.add(windCheck);
+		
+		basicPanel.add(new Label("Ground"));
+		HorizontalPanel groundPanel=new HorizontalPanel();
+		basicPanel.add(groundPanel);
+		CheckBox groundCheck=new CheckBox();
+		groundCheck.setValue(true);
+		groundCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				groundMesh.setVisible(event.getValue());
+				clothControls.getFloorModifier().setEnabled(event.getValue());
+			}
+		});
+		basicPanel.add(groundCheck);
+		
 		
 		basicPanel.add(new Label("Camera"));
 		LabeledInputRangeWidget2 near=new LabeledInputRangeWidget2("near", 0.1, 100, 0.1);
@@ -1202,6 +1229,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	private AnimationMixer mixer;
 
 	private SphereDataPanel sphereDataPanel;
+
+	private Mesh groundMesh;
 	
 	//TODO add option mirror
 	public void startAnimation(double x,double y,double z){
