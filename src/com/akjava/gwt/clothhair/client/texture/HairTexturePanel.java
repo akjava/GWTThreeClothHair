@@ -332,6 +332,10 @@ public class HairTexturePanel extends VerticalPanel{
 			
 			modeBox.addItem("TRIANGLE");
 			modeBox.addItem("TRIANGLE2");
+			
+			modeBox.addItem("TRAPEZOID-S");
+			modeBox.addItem("TRAPEZOID2-S");
+			modeBox.addItem("TRAPEZOID3-S");
 			modeBox.setSelectedIndex(0);
 			modeBox.addChangeHandler(new ChangeHandler() {
 				
@@ -438,6 +442,10 @@ public class HairTexturePanel extends VerticalPanel{
 	private static final int TRIANGLE=7;
 	private static final int TRIANGLE2=8;
 	
+	private static final int TRAPEZOID_STRAIGHT=9;
+	private static final int TRAPEZOID2STRAIGHT=10;
+	private static final int TRAPEZOID3STRAIGHT=11;
+	
 	private void strokePath(Context2d context,int mode,double sx,double sy,double ex,double ey){
 		double w=ex-sx;
 		//double h=ey-sy;
@@ -481,6 +489,26 @@ public class HairTexturePanel extends VerticalPanel{
 		}else if(mode==TRIANGLE2){
 			context.moveTo(sx, sy);
 			context.lineTo(ex, ey);
+			context.lineTo(ex, sy);
+			
+		}else if(mode==TRAPEZOID_STRAIGHT || mode==TRAPEZOID2STRAIGHT || mode==TRAPEZOID3STRAIGHT ){
+			double sp=w/8;
+			if(mode==TRAPEZOID2STRAIGHT){
+				sp=w/16;
+			}else if(mode==TRAPEZOID3STRAIGHT){
+				sp=w/32;
+			}
+			double h=ey-sy;
+			context.moveTo(sx, sy);
+			context.lineTo(sx+sp, sy+h/2);
+			
+			context.quadraticCurveTo(sx+w/8*3, ey, sx+w/2,ey);
+			context.quadraticCurveTo(sx+w/8*5, ey, ex-sp,sy+h/2);
+			
+			//context.lineTo(sx+w/2, ey); //straight
+			
+			//context.lineTo(ex-sp, sy+h/2);
+			
 			context.lineTo(ex, sy);
 			
 		}

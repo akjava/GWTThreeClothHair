@@ -8,6 +8,8 @@ import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorDelegate;
 import com.google.gwt.editor.client.ValueAwareEditor;
 import com.google.gwt.editor.client.adapters.SimpleEditor;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -28,6 +30,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private LabeledInputRangeWidget2 narrowScale;
 		private LabeledInputRangeWidget2 edgeScale;
 		private ListBox edgeMode;
+		private ListBox channelBox;
 		
 		
 		public HairDataEditor(){
@@ -84,6 +87,21 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			edgeScale = new LabeledInputRangeWidget2("scale", 0.25, 4, 0.01);
 			edgeScale.getLabel().setWidth("40px");
 			h3.add(edgeScale);
+			
+			//channel
+			channelBox = new ListBox();
+			for(int i=0;i<16;i++){
+				channelBox.addItem(String.valueOf(i));
+			}
+			this.add(channelBox);
+			channelBox.setSelectedIndex(0);
+			channelBox.addChangeHandler(new ChangeHandler() {
+				
+				@Override
+				public void onChange(ChangeEvent event) {
+					//flush();
+				}
+			});
 		}
 		private Label createLabel(String name){
 			Label label=new Label(name);
@@ -108,7 +126,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setNarrowScale(narrowScale.getValue());
 				value.setEdgeMode(edgeMode.getSelectedIndex());
 				value.setEdgeModeScale(edgeScale.getValue());
-				
+				value.setChannel(channelBox.getSelectedIndex());
 			}
 
 			@Override
@@ -132,5 +150,6 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				narrowScale.setValue(value.getNarrowScale());
 				edgeMode.setSelectedIndex(value.getEdgeMode());
 				edgeScale.setValue(value.getEdgeModeScale());
+				channelBox.setSelectedIndex(value.getChannel());
 			}
 	}

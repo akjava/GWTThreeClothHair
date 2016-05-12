@@ -39,6 +39,8 @@ public class HairDataConverter extends Converter<HairData,String> {
 		
 		csv.add(String.valueOf(data.getScaleOfU()));//7
 		
+		csv.add(String.valueOf(data.getChannel()));//8
+		
 		return Joiner.on(",").join(csv);
 	}
 
@@ -93,6 +95,11 @@ public class HairDataConverter extends Converter<HairData,String> {
 		data.setEdgeModeScale(Double.valueOf(edges[1]));
 		
 		data.setScaleOfU(Double.valueOf(csv[7]));
+		
+		if(csv.length>8){
+			data.setChannel(Integer.valueOf(csv[8]));
+		}
+		
 		return data;
 	}
 

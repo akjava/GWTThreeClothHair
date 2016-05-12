@@ -254,6 +254,8 @@ public class HairCloth {
 			clothFunction=plane(width,height);
 			restDistance=width/(w);
 			
+			this.channel=hairData.getChannel();
+			
 			initPins();
 			
 			//LogUtils.log("restDistance:"+restDistance);

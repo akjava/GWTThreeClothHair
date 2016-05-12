@@ -44,13 +44,23 @@ public class SphereDataPanel extends VerticalPanel{
 		 SimpleCellTable<SphereData> table=new SimpleCellTable<SphereData>() {
 				@Override
 				public void addColumns(CellTable<SphereData> table) {
+					
+					TextColumn<SphereData> channelColumn=new TextColumn<SphereData>() {
+						@Override
+						public String getValue(SphereData object) {
+							return String.valueOf(object.getChannel());
+						}
+					};
+					table.addColumn(channelColumn,"channel");
+					
 					TextColumn<SphereData> xColumn=new TextColumn<SphereData>() {
 						@Override
 						public String getValue(SphereData object) {
 							return String.valueOf(object.getX());
 						}
 					};
-					table.addColumn(xColumn);
+					table.addColumn(xColumn,"x");
+					
 					
 					TextColumn<SphereData> yColumn=new TextColumn<SphereData>() {
 						@Override
@@ -58,7 +68,7 @@ public class SphereDataPanel extends VerticalPanel{
 							return String.valueOf(object.getY());
 						}
 					};
-					table.addColumn(yColumn);
+					table.addColumn(yColumn,"y");
 					
 					TextColumn<SphereData> zColumn=new TextColumn<SphereData>() {
 						@Override
@@ -66,7 +76,7 @@ public class SphereDataPanel extends VerticalPanel{
 							return String.valueOf(object.getZ());
 						}
 					};
-					table.addColumn(zColumn);
+					table.addColumn(zColumn,"z");
 					
 					TextColumn<SphereData> sizeColumn=new TextColumn<SphereData>() {
 						@Override
@@ -74,7 +84,7 @@ public class SphereDataPanel extends VerticalPanel{
 							return String.valueOf(object.getSize());
 						}
 					};
-					table.addColumn(sizeColumn);
+					table.addColumn(sizeColumn,"size");
 				}
 			};
 			

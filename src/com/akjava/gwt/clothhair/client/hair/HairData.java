@@ -160,6 +160,15 @@ public void setSyncMove(boolean syncMove) {
 }
 
 private int channel;//for sphere
+public int getChannel() {
+	return channel;
+}
+
+public void setChannel(int channel) {
+	this.channel = channel;
+}
+
+
 private double mass=.1;
 private boolean syncMove;//no fake physics;
 	
