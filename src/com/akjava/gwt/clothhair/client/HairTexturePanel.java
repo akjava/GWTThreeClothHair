@@ -6,7 +6,6 @@ import java.util.List;
 import com.akjava.gwt.lib.client.CanvasUtils;
 import com.akjava.gwt.lib.client.ImageElementListener;
 import com.akjava.gwt.lib.client.ImageElementUtils;
-import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.experimental.RectCanvasUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.textures.Texture;

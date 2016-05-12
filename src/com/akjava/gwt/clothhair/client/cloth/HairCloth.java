@@ -5,13 +5,9 @@ import java.util.List;
 
 import com.akjava.gwt.clothhair.client.HairData;
 import com.akjava.gwt.clothhair.client.HairDataUtils;
-import com.akjava.gwt.clothhair.client.sphere.SphereData;
-import com.akjava.gwt.lib.client.JavaScriptUtils;
-import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
-import com.akjava.gwt.three.client.js.extras.geometries.SphereGeometry;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -38,6 +34,10 @@ public class HairCloth {
 	 * @param DAMPING 0.03
 	 * @param MASS .1
 	 * @param GRAVITY 981 * 1.4
+	 */
+	
+	/*
+	 * somehow it's break ,shoudl re-add
 	 */
 	public void initGravity(double DAMPING,double MASS,double GRAVITY){
 		this.DAMPING=DAMPING;
@@ -66,7 +66,9 @@ public class HairCloth {
 	Vector3 gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
 
 
-	double TIMESTEP = 18.0 / 1000;
+	//double TIMESTEP = 9.0 / 1000;
+	double TIMESTEP = 18.0 / 1000;//i'm not sure what is this
+	
 	double TIMESTEP_SQ = TIMESTEP * TIMESTEP;
 
 	int[] pins;
@@ -120,7 +122,7 @@ public class HairCloth {
 	}
 	public class Particle{
 		Vector3 position;
-		private Vector3 previous;
+		Vector3 previous;
 		private Vector3 original;
 		//for after modify
 		public Vector3 getOriginal() {
@@ -356,6 +358,9 @@ public class HairCloth {
 		this.floorModifier = floorModifier;
 	}
 
+	//TODO store
+	boolean syncMove=false;
+	
 	public void simulate(double time,Geometry clothGeometry,List<Mesh> spheres) {
 		if (lastTime==null) {
 			lastTime = time;

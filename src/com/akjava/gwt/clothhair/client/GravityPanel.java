@@ -2,7 +2,6 @@ package com.akjava.gwt.clothhair.client;
 
 import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
-import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;

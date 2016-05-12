@@ -1,12 +1,12 @@
 package com.akjava.gwt.clothhair.client.sphere;
 
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.IOException;
 import java.util.List;
 
+import com.akjava.gwt.clothhair.client.SkeletonUtils;
+import com.akjava.gwt.clothhair.client.SkeletonUtils.BoneData;
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.google.common.collect.Lists;
@@ -51,7 +51,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		xRange.getRange().setWidth("220px");
 		
 		
-		yRange = new LabeledInputRangeWidget2("y", defaultValue.getY()-.4,  defaultValue.getY()+.2, .001);
+		yRange = new LabeledInputRangeWidget2("y", defaultValue.getY()-.8,  defaultValue.getY()+.2, .001);
 		this.add(yRange);
 		yRange.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
@@ -105,7 +105,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			}
 		});
 		
-		boneIndexBox = new ValueListBox<SphereDataEditor.BoneData>(new Renderer<BoneData>() {
+		boneIndexBox = new ValueListBox<BoneData>(new Renderer<BoneData>() {
 
 			@Override
 			public String render(BoneData object) {
@@ -122,7 +122,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 				
 			}
 		});
-		boneIndexBox.addValueChangeHandler(new ValueChangeHandler<SphereDataEditor.BoneData>() {
+		boneIndexBox.addValueChangeHandler(new ValueChangeHandler<BoneData>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<BoneData> event) {
 				flush();
@@ -136,27 +136,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		this.add(bonePanel);
 	}
 	
-	public static class BoneData {
-		private String name;
-		public BoneData(String name, int index) {
-			super();
-			this.name = name;
-			this.index = index;
-		}
-		public String getName() {
-			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
-		}
-		public int getIndex() {
-			return index;
-		}
-		public void setIndex(int index) {
-			this.index = index;
-		}
-		private int index;
-	}
+
 	
 	
 @Override
@@ -274,6 +254,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			}
 			boneIndexBox.setValue(data);
 			
+			
 		}
 		
 		public static interface SphereUpdateListener{
@@ -282,12 +263,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 
 
 		public void setSkelton(Skeleton skeleton) {
-			checkNotNull(skeleton,"SphereDataEditor:need skeleton");
-			checkArgument(skeleton.getBones().length()>0,"SphereDataEditor:need atleast one bone");
-			boneDatas = Lists.newArrayList();
-			for(int i=0;i<skeleton.getBones().length();i++){
-				boneDatas.add(new BoneData(skeleton.getBones().get(i).getName(), i));
-			}
+			boneDatas=SkeletonUtils.skeltonToBoneData(skeleton);
 			boneIndexBox.setValue(boneDatas.get(0));
 			boneIndexBox.setAcceptableValues(boneDatas);
 		}

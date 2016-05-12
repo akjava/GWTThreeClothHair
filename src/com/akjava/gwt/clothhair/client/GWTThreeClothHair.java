@@ -144,11 +144,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		}
 		*/
 		
-		
-		if(clothControls!=null){
-			updateSphereMeshs();//sphere first
-			clothControls.update(timestamp);
+		//mixer first,this make animation
+		if(mixer!=null){
+			mixer.update(clock.getDelta());//shoud i?
 		}
+		
+		
+		
 		
 		//not support skinning
 		if(vertexHelper!=null){
@@ -156,9 +158,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		}
 		
 		
-		if(mixer!=null){
-			mixer.update(clock.getDelta());
-		}
+		
 		
 		if(skeltonHelper!=null){
 			skeltonHelper.update();
@@ -166,8 +166,15 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//ThreeLog.log(camera.getPosition());
 		
+		if(clothControls!=null){
+			updateSphereMeshs();//sphere first
+			clothControls.update(timestamp);
+		}
+		
 		//logarithmicDepthBuffer
 		renderer.render(scene, camera);//render last,very important
+		
+		
 		
 		if(stats!=null){
 			stats.update();
@@ -331,8 +338,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				createControler();
 				
+				//dont modify skeleton
 				sphereDataPanel.setSkelton(characterMesh.getSkeleton());
-				
+				characterMovePanel.setSkelton(characterMesh.getSkeleton());
 				
 				clothControls.setWind(true);
 				
@@ -666,6 +674,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	/**
 	 * must call after sphere initialized;
 	 */
+
+	private CharacterMovePanel characterMovePanel;
 	private void createControler() {
 		TabPanel tab=new TabPanel();
 		
@@ -898,7 +908,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		 downloadPanels.add(downloadBt);
 		 downloadPanels.add(download);
 		 
-		 tab.add(new CharacterMovePanel(characterMesh),"character");
+		 characterMovePanel=new CharacterMovePanel(characterMesh);
+		 
+		 tab.add(characterMovePanel,"character");
 		 tab.add(new GravityPanel(clothControls),"gravity");
 		 
 		 
@@ -1264,11 +1276,14 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 	@Override
 	public void onSelectSphere(SphereData data) {
+		
 		if(selectedSphere!=null){
 			unselectShpere(selectedSphere);
 		}
+		
 		selectedSphere=data;
 		selectShpere(selectedSphere);
+		
 	}
 
 	private void selectShpere(@Nullable SphereData selectedSphere) {
@@ -1290,8 +1305,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 	private Mesh groundMesh;
 	
+	
+	//private int animationBoneIndex=60;
+	
+	
+
 	//TODO add option mirror
-	public void startAnimation(double x,double y,double z){
+	public void startAnimation(int boneIndex,double x,double y,double z){
 		
 		//LogUtils.log(characterMesh);
 		
@@ -1344,7 +1364,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//head fixed
 		//quaternion is alias for rot
-		QuaternionKeyframeTrack track=THREE.QuaternionKeyframeTrack(".bones[60].quaternion", times, values);
+		QuaternionKeyframeTrack track=THREE.QuaternionKeyframeTrack(".bones["+boneIndex+"].quaternion", times, values);
 		
 		tracks.push(track);
 		

@@ -1,18 +1,22 @@
 package com.akjava.gwt.clothhair.client;
 
+import java.io.IOException;
+import java.util.List;
+
+import com.akjava.gwt.clothhair.client.SkeletonUtils.BoneData;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
-import com.akjava.gwt.three.client.js.THREE;
-import com.akjava.gwt.three.client.js.objects.Mesh;
+import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.text.shared.Renderer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ValueListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class CharacterMovePanel extends VerticalPanel{
@@ -107,7 +111,45 @@ public class CharacterMovePanel extends VerticalPanel{
 		zPos.setValue(mesh.getPosition().getZ());
 		
 		
-		this.add(new Label("Animation"));
+		
+		
+		HorizontalPanel animationPanel=new HorizontalPanel();
+		animationPanel.setVerticalAlignment(ALIGN_MIDDLE);
+		this.add(animationPanel);
+		animationPanel.add(new Label("Animation-"));
+		
+		boneIndexBox = new ValueListBox<BoneData>(new Renderer<BoneData>() {
+
+			@Override
+			public String render(BoneData object) {
+				if(object==null){
+					return null;
+				}
+				// TODO Auto-generated method stub
+				return object.getName();
+			}
+
+			@Override
+			public void render(BoneData object, Appendable appendable) throws IOException {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		boneIndexBox.addValueChangeHandler(new ValueChangeHandler<BoneData>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<BoneData> event) {
+				lastBoneIndex=boneIndex;
+				boneIndex=event.getValue().getIndex();
+				
+				GWTThreeClothHair.INSTANCE.stopAnimation();
+				GWTThreeClothHair.INSTANCE.startAnimation(lastBoneIndex,0,0,0);
+			}
+		});
+		animationPanel.add(new Label("TargetBone:"));
+		animationPanel.add(boneIndexBox);
+		
+		
+		
 		LabeledInputRangeWidget2 xAnimation=new LabeledInputRangeWidget2("x", -180, 180, 1);
 		xAnimation.getLabel().setWidth("20px");
 		xAnimation.getRange().setWidth("240px");
@@ -159,7 +201,7 @@ public class CharacterMovePanel extends VerticalPanel{
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				GWTThreeClothHair.INSTANCE.stopAnimation();	
+				stopAnimation();
 				
 				
 			}
@@ -170,8 +212,7 @@ public class CharacterMovePanel extends VerticalPanel{
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				GWTThreeClothHair.INSTANCE.stopAnimation();
-				GWTThreeClothHair.INSTANCE.startAnimation(0,0,0);
+				resetAnimation();
 				
 				/*
 				 * i faild how to update by hand.
@@ -191,11 +232,33 @@ public class CharacterMovePanel extends VerticalPanel{
 
 		
 	}
+	private int lastBoneIndex;
+	private int boneIndex;
+	private void resetAnimation(){
+		GWTThreeClothHair.INSTANCE.stopAnimation();
+		GWTThreeClothHair.INSTANCE.startAnimation(boneIndex,0,0,0);
+	}
 	double animationX;
 	double animationY;
 	double animationZ;
+	private ValueListBox<BoneData> boneIndexBox;
+	
+	private void stopAnimation(){
+		GWTThreeClothHair.INSTANCE.stopAnimation();	
+	}
 
 	protected void startAnimation() {
-		GWTThreeClothHair.INSTANCE.startAnimation(Math.toRadians(animationX), Math.toRadians(animationY), Math.toRadians(animationZ));
+		GWTThreeClothHair.INSTANCE.startAnimation(boneIndex,Math.toRadians(animationX), Math.toRadians(animationY), Math.toRadians(animationZ));
+	}
+	
+	public void setSkelton(Skeleton skeleton) {
+		List<BoneData> boneDatas=SkeletonUtils.skeltonToBoneData(skeleton);
+		int defaultTarget=0;
+		if(boneDatas.size()<defaultTarget){
+			LogUtils.log("differect bone.change default index");
+			defaultTarget=0;
+		}
+		boneIndexBox.setValue(boneDatas.get(defaultTarget));//defaut head,watch out only work specific bone
+		boneIndexBox.setAcceptableValues(boneDatas);
 	}
 }

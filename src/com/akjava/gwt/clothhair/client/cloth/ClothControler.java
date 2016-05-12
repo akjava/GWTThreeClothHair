@@ -2,7 +2,6 @@ package com.akjava.gwt.clothhair.client.cloth;
 
 import java.util.List;
 
-import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Geometry;
@@ -85,6 +84,9 @@ public class ClothControler {
 			Vector3 v1=data.getCalculator().getResult().get(0);
 			Vector3 v2=data.getCalculator().getResult().get(1);
 			
+			Vector3 diff=THREE.Vector3();
+			diff.copy(data.getCloth().particles.get(0).position).sub(v1);
+			
 			data.getCloth().particles.get(0).setAllPosition(v1);
 			data.getCloth().particles.get(cw).setAllPosition(v2);
 			
@@ -95,15 +97,28 @@ public class ClothControler {
 				data.getCloth().particles.get(i).setAllPosition(v);
 			}
 			
+			if(data.getCloth().syncMove){
+				for(int i=cw;i<data.getCloth().particles.size();i++){
+					data.getCloth().particles.get(i).position.sub(diff);
+					data.getCloth().particles.get(i).previous.sub(diff);
+				}
+			}
 			
 			
 		}else{
 			int cw=data.getCloth().w/(data.getCalculator().getResult().size()-1);
 			int pinSize=data.getCalculator().getResult().size();
+			
+			Vector3 diff=THREE.Vector3();
 			for(int i=0;i<pinSize;i++){
 				Vector3 v1=data.getCalculator().getResult().get(i);
 				
 				int index=cw*i;
+				
+				if(i==0){
+					diff.copy(data.getCloth().particles.get(0).position).sub(v1);
+				}
+				
 				data.getCloth().particles.get(index).setAllPosition(v1);
 				
 				//LogUtils.log("main:"+index);
@@ -124,9 +139,18 @@ public class ClothControler {
 					}
 					
 				}
-				
-				
 			}
+			
+			//complete sync
+			
+			if(data.getCloth().syncMove){
+				for(int i=cw;i<data.getCloth().particles.size();i++){
+					data.getCloth().particles.get(i).position.sub(diff);
+					data.getCloth().particles.get(i).previous.sub(diff);
+				}
+			}
+			
+			
 		}
 		//for(int i=0;i<data.getCalculator().g)
 	}

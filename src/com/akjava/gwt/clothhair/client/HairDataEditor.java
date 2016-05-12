@@ -3,7 +3,6 @@ package com.akjava.gwt.clothhair.client;
 import java.util.List;
 
 import com.akjava.gwt.clothhair.client.HairData.HairPin;
-import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorDelegate;

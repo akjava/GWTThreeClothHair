@@ -1,13 +1,13 @@
-package com.akjava.gwt.clothhair.client;
+package com.akjava.gwt.clothhair.client.sphere;
 
+import com.akjava.gwt.clothhair.client.HairStorageKeys;
+import com.akjava.gwt.clothhair.client.TmpSphereInfoConverter;
 import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.three.client.js.objects.Mesh;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;

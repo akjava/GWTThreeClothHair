@@ -1,13 +1,9 @@
 package com.akjava.gwt.clothhair.client.sphere;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.HairStorageKeys;
-import com.akjava.gwt.clothhair.client.sphere.SphereDataEditor.BoneData;
-import com.akjava.gwt.lib.client.GWTHTMLUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
@@ -15,7 +11,6 @@ import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
 import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -86,8 +81,11 @@ public class SphereDataPanel extends VerticalPanel{
 			cellObjects = new EasyCellTableObjects<SphereData>(table){
 				@Override
 				public void onSelect(SphereData selection) {
+					
 					driver.edit(selection);
+					
 					controler.onSelectSphere(selection);
+					
 				}};
 				
 			this.add(table);
