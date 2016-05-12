@@ -1,9 +1,9 @@
-package com.akjava.gwt.clothhair.client;
+package com.akjava.gwt.clothhair.client.hair;
 
 import java.util.Arrays;
 import java.util.List;
 
-import com.akjava.gwt.clothhair.client.HairData.HairPin;
+import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.lib.common.functions.StringToPrimitiveFunctions;
 import com.google.common.base.Converter;

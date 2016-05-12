@@ -8,16 +8,20 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import com.akjava.gwt.clothhair.client.HairData.HairPin;
-import com.akjava.gwt.clothhair.client.HairDataFunctions.HairPinToVertex;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
 import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
+import com.akjava.gwt.clothhair.client.hair.HairData;
+import com.akjava.gwt.clothhair.client.hair.HairDataConverter;
+import com.akjava.gwt.clothhair.client.hair.HairDataEditor;
+import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
+import com.akjava.gwt.clothhair.client.hair.HairDataFunctions.HairPinToVertex;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataPanel;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataPanel.SphereDataControler;
+import com.akjava.gwt.clothhair.client.texture.HairTexturePanel;
 import com.akjava.gwt.clothhair.client.texture.TexturePanel;
 import com.akjava.gwt.html5.client.download.HTML5Download;
 import com.akjava.gwt.html5.client.file.File;
@@ -192,7 +196,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	@Override
 	public void onInitializedThree() {
 		super.onInitializedThree();
-		setRightTopPopupWidth("350px");
+		setRightTopPopupWidth("360px");
 		INSTANCE=this;
 		
 		renderer.setClearColor(0xffffff);
@@ -432,7 +436,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		sphere.getScale().setScalar(data.getSize());
 		
-		clothControls.addSphere(sphere);
+		clothControls.addSphere(sphere,data.getChannel());
+		
 		
 		
 		sphereMeshMap.put(data, new SphereCalculatorAndMesh(characterMesh, data.getBoneIndex(), sphere));
@@ -446,6 +451,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		for(SkinningVertex vertex:calculator.getSkinningVertexs()){
 			vertex.getSkinIndices().setX(data.getBoneIndex());
 		}
+		
+		//plus sync channel
+		clothControls.updateSphere(sphereMeshMap.get(data).getMesh(), data.getChannel());
 	}
 	
 	public void updateSphereMeshs(){
@@ -695,6 +703,12 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		VerticalPanel hairPanel=new VerticalPanel();
 		tab.add(hairPanel,"hair");
 		
+		TexturePanel texturePanel=(new TexturePanel(hairMaterial)); 
+		
+		tab.add(texturePanel,"texture");
+		
+		
+		
 		VerticalPanel basicPanel=new VerticalPanel();
 		tab.add(basicPanel,"basic");
 		
@@ -731,6 +745,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		
 		
+		
 		basicPanel.add(near);
 		near.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
@@ -764,12 +779,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		
 		//texture panel;
-		hairPanel.add(new Label("Texture"));
-		hairPanel.add(new TexturePanel(hairMaterial));
-		hairPanel.add(new HairTexturePanel());
+		
+		texturePanel.add(new HairTexturePanel());
 		
 		
-		hairPanel.add(new HTML("<h4>Hair Editor</h4>"));
+		//hairPanel.add(new HTML("<h4>Hair Editor</h4>"));
 		
 		
 		HorizontalPanel showHairPanel=new HorizontalPanel();

@@ -3,8 +3,8 @@ package com.akjava.gwt.clothhair.client.cloth;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.akjava.gwt.clothhair.client.HairData;
-import com.akjava.gwt.clothhair.client.HairDataUtils;
+import com.akjava.gwt.clothhair.client.hair.HairData;
+import com.akjava.gwt.clothhair.client.hair.HairDataUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
@@ -360,6 +360,7 @@ public class HairCloth {
 
 	//TODO store
 	boolean syncMove=false;
+	int channel;//for sphere;
 	
 	public void simulate(double time,Geometry clothGeometry,List<Mesh> spheres) {
 		if (lastTime==null) {

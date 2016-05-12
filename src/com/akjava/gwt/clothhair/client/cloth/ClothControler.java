@@ -1,6 +1,7 @@
 package com.akjava.gwt.clothhair.client.cloth;
 
 import java.util.List;
+import java.util.Map;
 
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
@@ -8,6 +9,7 @@ import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class ClothControler {
 	private List<ClothData> cloths=Lists.newArrayList();
@@ -16,15 +18,30 @@ public class ClothControler {
 		return cloths;
 	}
 
-	List<Mesh> spheres=Lists.newArrayList();
+	Map<Integer,List<Mesh>> spheresMap=Maps.newHashMap();
+	//List<Mesh> spheres=Lists.newArrayList();
 	
 	//List<Mesh> spheres=Lists.newArrayList();
 	
 	//private Mesh sphere;//TODO multiple
 	
 	
-	public void addSphere(Mesh data){
-		spheres.add(data);
+	private List<Mesh> getSphereList(int channel){
+		List<Mesh> list=spheresMap.get(channel);
+		if(list==null){
+			list=Lists.newArrayList();
+			spheresMap.put(channel, list);
+		}
+		return list;
+	}
+	
+	public void addSphere(Mesh data,int channel){
+		getSphereList(channel).add(data);
+	}
+	
+	public void updateSphere(Mesh data,int channel){
+		removeSphere(data);
+		addSphere(data,channel);
 	}
 	
 	
@@ -189,7 +206,7 @@ public class ClothControler {
 			//support-matrix4
 			
 			//should switch to sphere
-			cloth.simulate(time,clothGeometry,spheres);//set otherwhere?
+			cloth.simulate(time,clothGeometry,getSphereList(cloth.channel));//set otherwhere?
 		}
 	}
 	
@@ -243,6 +260,8 @@ public class ClothControler {
 	}
 
 	public void removeSphere(Mesh data) {
-		spheres.remove(data);
+		for(Integer key:spheresMap.keySet()){
+			spheresMap.get(key).remove(data);//if exist
+		}
 	}
 }

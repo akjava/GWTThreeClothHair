@@ -1,8 +1,9 @@
-package com.akjava.gwt.clothhair.client;
+package com.akjava.gwt.clothhair.client.texture;
 
 import java.io.IOException;
 import java.util.List;
 
+import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.lib.client.CanvasUtils;
 import com.akjava.gwt.lib.client.ImageElementListener;
 import com.akjava.gwt.lib.client.ImageElementUtils;

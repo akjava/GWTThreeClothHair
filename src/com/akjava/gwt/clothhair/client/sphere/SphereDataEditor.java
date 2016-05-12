@@ -13,6 +13,8 @@ import com.google.common.collect.Lists;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorDelegate;
 import com.google.gwt.editor.client.ValueAwareEditor;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -21,6 +23,7 @@ import com.google.gwt.text.shared.Renderer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.ValueListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -134,6 +137,27 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		bonePanel.add(new Label("TargetBone"));
 		bonePanel.add(boneIndexBox);
 		this.add(bonePanel);
+		
+		
+		HorizontalPanel channelPanel=new HorizontalPanel();
+		channelPanel.setVerticalAlignment(ALIGN_MIDDLE);
+		channelPanel.add(new Label("Channel for hair"));
+		this.add(channelPanel);
+		
+		channelBox = new ListBox();
+		for(int i=0;i<16;i++){
+			channelBox.addItem(String.valueOf(i));
+		}
+		channelPanel.add(channelBox);
+		channelBox.setSelectedIndex(0);
+		channelBox.addChangeHandler(new ChangeHandler() {
+			
+			@Override
+			public void onChange(ChangeEvent event) {
+				
+				flush();
+			}
+		});
 	}
 	
 
@@ -156,6 +180,8 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			value.setSize(scaleRange.getValue());
 			
 			value.setBoneIndex(boneIndexBox.getValue().getIndex());
+			
+			value.setChannel(channelBox.getSelectedIndex());
 			//sync here?
 			panel.onFlushed();
 		}
@@ -219,6 +245,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 
 		private ValueListBox<BoneData> boneIndexBox;
 		private List<BoneData> boneDatas;
+		private ListBox channelBox;
 		@Override
 		public void setValue(SphereData value) {
 			this.value=value;
@@ -254,6 +281,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			}
 			boneIndexBox.setValue(data);
 			
+			channelBox.setSelectedIndex(value.getChannel());
 			
 		}
 		

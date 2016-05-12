@@ -6,6 +6,16 @@ import com.akjava.gwt.three.client.js.math.Vector3;
 public class SphereData {
 private Vector3 position=THREE.Vector3();
 private boolean enabled;
+
+private int channel;
+public int getChannel() {
+	return channel;
+}
+
+public void setChannel(int channel) {
+	this.channel = channel;
+}
+
 public boolean isEnabled() {
 	return enabled;
 }
@@ -66,4 +76,5 @@ public void setSize(double size) {
 }
 
 private double size;
+
 }

@@ -1,7 +1,7 @@
 package com.akjava.gwt.clothhair.client.cloth;
 
-import com.akjava.gwt.clothhair.client.HairData;
-import com.akjava.gwt.clothhair.client.HairData.HairPin;
+import com.akjava.gwt.clothhair.client.hair.HairData;
+import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;

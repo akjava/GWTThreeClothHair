@@ -1,4 +1,4 @@
-package com.akjava.gwt.clothhair.client;
+package com.akjava.gwt.clothhair.client.hair;
 
 import java.util.List;
 
@@ -131,6 +131,37 @@ private double edgeModeScale=1.5;
 	public List<HairPin> getHairPins() {
 	return hairPins;
 }
+	
+	
+	
+private double damping= 0.03;
+public double getDamping() {
+	return damping;
+}
+
+public void setDamping(double damping) {
+	this.damping = damping;
+}
+
+public double getMass() {
+	return mass;
+}
+
+public void setMass(double mass) {
+	this.mass = mass;
+}
+
+public boolean isSyncMove() {
+	return syncMove;
+}
+
+public void setSyncMove(boolean syncMove) {
+	this.syncMove = syncMove;
+}
+
+private int channel;//for sphere
+private double mass=.1;
+private boolean syncMove;//no fake physics;
 	
 	
 //still format fixed
