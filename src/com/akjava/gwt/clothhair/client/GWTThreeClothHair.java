@@ -82,6 +82,8 @@ import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -177,11 +179,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	private Mesh tmpSphere;
 	
 	private SkeletonHelper skeltonHelper;
+
+	private double GROUND=-750;
 	
 	@Override
 	public void onInitializedThree() {
 		super.onInitializedThree();
-		
+		setRightTopPopupWidth("350px");
 		INSTANCE=this;
 		
 		renderer.setClearColor(0xffffff);
@@ -219,7 +223,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				.transparent(true).opacity(0.5).side(THREE.DoubleSide));
 		
 		groundMesh = THREE.Mesh( THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
-		groundMesh.getPosition().setY(0);//mesh.position.y = -250;
+		groundMesh.getPosition().setY(GROUND);//mesh.position.y = -250;
 		groundMesh.getRotation().setX(- Math.PI / 2);//mesh.rotation.x = - Math.PI / 2;
 		groundMesh.setReceiveShadow(true);//mesh.receiveShadow = true;
 		scene.add( groundMesh );
@@ -317,7 +321,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				
 				clothControls=new ClothControler();
-				clothControls.setFloorModifier(new GroundYFloor(0));
+				clothControls.setFloorModifier(new GroundYFloor(GROUND));
 				
 				
 				//sphere.getScale().setScalar(clothControls.getBallSize());
@@ -566,11 +570,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			currentSelection=new HairPin(faceIndex,vertexOfFaceIndex);
 			
 			
+			
 			if(selectedLine!=null){
 				scene.remove(selectedLine);
 			}
 			
 			selectedLine=THREE.LineSegments(geometry.gwtCastGeometry(), THREE.LineBasicMaterial(GWTParamUtils.LineBasicMaterial().color(0xff0000).linewidth(2)));
+			selectedLine.setVisible(vertexVisible);
 			scene.add(selectedLine);
 			
 		}
@@ -638,8 +644,25 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	
 	
+	public void onTabSelected(int index){
+		
+		if(index!=0){
+			updateSphereVisible(false);
+		}else{
+			updateSphereVisible(true);
+		}
+		
+		if(index!=1){
+			updateVertexVisible(false);
+		}else{
+			updateVertexVisible(true);
+		}
+		
+	}
 	
 	private StorageControler storageControler=new StorageControler();
+
+	private boolean vertexVisible=true;
 	/**
 	 * must call after sphere initialized;
 	 */
@@ -649,6 +672,15 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		tab.add(createSpherePanel(), "spheres");
 		controlerRootPanel.add(tab);
 		tab.selectTab(0);
+		
+		tab.addSelectionHandler(new SelectionHandler<Integer>() {
+			@Override
+			public void onSelection(SelectionEvent<Integer> event) {
+				int index=event.getSelectedItem();
+				onTabSelected(index);
+			}
+		});
+		
 		
 		VerticalPanel hairPanel=new VerticalPanel();
 		tab.add(hairPanel,"hair");
@@ -707,13 +739,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		visibleVertexCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				vertexHelper.setVisible(event.getValue());
-				if(selectedLine!=null){
-					selectedLine.setVisible(event.getValue());
-				}
-				if(hairDataLine!=null){
-					hairDataLine.setVisible(event.getValue());
-				}
+				updateVertexVisible(event.getValue());
 			}
 		});
 		h0.add(visibleVertexCheck);
@@ -874,13 +900,32 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		 
 		 tab.add(new CharacterMovePanel(characterMesh),"character");
 		 tab.add(new GravityPanel(clothControls),"gravity");
+		 
+		 
+		 tab.selectTab(1);//for debug
 	}
 	
+	protected void updateVertexVisible(boolean value) {
+		vertexVisible=value;
+		vertexHelper.setVisible(value);
+		if(selectedLine!=null){
+			selectedLine.setVisible(value);
+		}
+		if(hairDataLine!=null){
+			hairDataLine.setVisible(value);
+		}
+	}
+
 	public void setTextureMap(Texture texture){
 		hairMaterial.setMap(texture);
 		hairMaterial.setNeedsUpdate(true);
 	}
 	
+	private void updateSphereVisible(boolean visible){
+		for(SphereCalculatorAndMesh smesh:sphereMeshMap.values()){
+			smesh.getMesh().setVisible(visible);
+		}
+	}
 	
 	private Widget createSpherePanel() {
 		VerticalPanel  panel=new VerticalPanel();
@@ -904,9 +949,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				for(SphereCalculatorAndMesh smesh:sphereMeshMap.values()){
-					smesh.getMesh().setVisible(event.getValue());
-				}
+				updateSphereVisible(event.getValue());
 			}
 			
 		});

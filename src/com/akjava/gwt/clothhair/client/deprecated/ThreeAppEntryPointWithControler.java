@@ -64,6 +64,11 @@ public abstract class ThreeAppEntryPointWithControler extends SimpleThreeAppEntr
 		
 	}
 	
+	public void setRightTopPopupWidth(String width){
+		controlerRootPanel.setWidth(width);
+		moveToAroundRightTop(popup);
+	}
+	
 	/*
 	 * 320px
 	 */
@@ -81,7 +86,7 @@ public abstract class ThreeAppEntryPointWithControler extends SimpleThreeAppEntr
 		root.add(controler);
 		
 		final Button bt=new Button("Close Controls");
-		bt.setWidth("320px");
+		bt.setWidth("100%");
 		bt.addClickHandler(new ClickHandler() {
 			
 			@Override
