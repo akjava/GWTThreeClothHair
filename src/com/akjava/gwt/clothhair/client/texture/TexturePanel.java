@@ -28,7 +28,9 @@ public class TexturePanel extends VerticalPanel{
 		HorizontalPanel h1=new HorizontalPanel();
 		h1.setVerticalAlignment(ALIGN_MIDDLE);
 		this.add(h1);
-		h1.add(createTitle("Global-Color"));
+		//TODO add global options
+		
+		h1.add(createTitle("Color"));
 		ColorBox color=new ColorBox("color", "#553817");
 		h1.add(color);
 		color.addValueChangeHandler(new ValueChangeHandler<String>() {

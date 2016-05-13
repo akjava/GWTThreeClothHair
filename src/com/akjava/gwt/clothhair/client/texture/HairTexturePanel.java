@@ -7,10 +7,13 @@ import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.lib.client.CanvasUtils;
 import com.akjava.gwt.lib.client.ImageElementListener;
 import com.akjava.gwt.lib.client.ImageElementUtils;
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.experimental.RectCanvasUtils;
+import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.lib.common.graphics.Rect;
+import com.akjava.lib.common.utils.ColorUtils;
 import com.google.common.collect.Lists;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -88,13 +91,26 @@ public class HairTexturePanel extends VerticalPanel{
 				updateCanvas();
 			}
 		});
-		defaultPanel.add(new Label("slice:"));
+		defaultPanel.add(new Label("-slice:"));
 		defaultPanel.add(sliceBox);
 		
 		
+		lrBox = new ListBox();
+		lrBox.addItem("Auto");
+		lrBox.addItem("L");
+		lrBox.addItem("R");
+		lrBox.setSelectedIndex(0);
+		lrBox.addChangeHandler(new ChangeHandler() {
+			
+			@Override
+			public void onChange(ChangeEvent event) {
+				lrMode=lrBox.getSelectedIndex();
+				updateCanvas();
+			}
+		});
 		
-		
-		
+		defaultPanel.add(new Label("LR-Mode"));
+		defaultPanel.add(lrBox);
 		
 		defaultPattern=new HairPatternPanel();
 		add(defaultPattern);
@@ -167,6 +183,31 @@ public class HairTexturePanel extends VerticalPanel{
 		centerOptions.add(extendCenterBox);
 		
 		
+		HorizontalPanel strokePanel=new HorizontalPanel();
+		strokePanel.setVerticalAlignment(ALIGN_MIDDLE);
+		strokePanel.add(new Label("Storoke"));
+		strokeCheck = new CheckBox();
+		strokeCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				updateCanvas();
+				grayRange.setEnabled(event.getValue());
+			}
+		});
+		strokePanel.add(strokeCheck);
+		this.add(strokePanel);
+		
+		grayRange = new LabeledInputRangeWidget2("gray", 0, 255, 0);
+		this.add(grayRange);
+		grayRange.getLabel().setWidth("40px");
+		grayRange.getRange().setWidth("255px");
+		grayRange.addtRangeListener(new ValueChangeHandler<Number>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Number> event) {
+				updateCanvas();
+			}
+		});
 		
 		
 		HorizontalPanel buttons=new HorizontalPanel();
@@ -397,10 +438,21 @@ public class HairTexturePanel extends VerticalPanel{
 	
 	private HairPatternPanel defaultPattern;
 	
+	public static final int LR_AUTO=0;
+	public static final int LR_LEFT=1;
+	public static final int LR_RIGHT=2;
+	private int lrMode;
+	
 	private void updateCanvas(){
 		CanvasUtils.clear(canvas);
+		canvas.getContext2d().setStrokeStyle("#fff");//always stroke
 		
-		canvas.getContext2d().setStrokeStyle("#888");//TODO storoke color
+		int gray=(int) grayRange.getValue();
+		String strokeColor=ColorUtils.toCssGrayColor(gray);
+		if(strokeCheck.getValue()){
+			canvas.getContext2d().setStrokeStyle(strokeColor);
+		}
+		
 		
 		Context2d context2d= canvas.getContext2d();
 		double w=(double)canvas.getCoordinateSpaceWidth()/slice;
@@ -411,6 +463,7 @@ public class HairTexturePanel extends VerticalPanel{
 		
 		int center=slice/2;
 		
+		//draw center first
 		for(int i=0;i<slice;i++){
 			int mode=defaultPattern.mode;
 			double sx=i*w;
@@ -419,6 +472,14 @@ public class HairTexturePanel extends VerticalPanel{
 			double ey=h-splitH*defaultPattern.endVertical;
 			
 			if(isCenter(i)){
+				
+				boolean lr=i<center;
+				if(lrMode==LR_LEFT){
+					lr=true;
+				}else if(lrMode==LR_RIGHT){
+					lr=false;
+				}
+				
 				double centerSplitH=h/centerPattern.splitVertical;
 				double centerSh=centerSplitH*centerPattern.startVertical;
 				sx=i*w;
@@ -430,14 +491,20 @@ public class HairTexturePanel extends VerticalPanel{
 				Rect r=new Rect(sx,0,ex-sx,h);
 				RectCanvasUtils.clear(canvas,r);
 				
-				RectCanvasUtils.fill(new Rect(sx,0,ex-sx,centerSh), canvas, "#ffffff");
+				
+				
+				//RectCanvasUtils.fill(new Rect(sx,0,ex-sx,centerSh), canvas, "#ffffff");
 				mode=centerPattern.mode;
 				
 				context2d.beginPath();
-				strokePath(context2d,mode,sx,sy,ex,ey,i<center);
-				context2d.closePath();
+				strokePath(context2d,mode,sx,sy,ex,ey,lr,true);
+				//context2d.closePath();
 				context2d.fill();
+				
+				context2d.beginPath();
+				strokePath(context2d,mode,sx,sy,ex,ey,lr,false);
 				context2d.stroke();//?
+				
 			}
 			
 			
@@ -445,6 +512,13 @@ public class HairTexturePanel extends VerticalPanel{
 		}
 		
 		for(int i=0;i<slice;i++){
+			boolean lr=i<center;
+			if(lrMode==LR_LEFT){
+				lr=true;
+			}else if(lrMode==LR_RIGHT){
+				lr=false;
+			}
+			
 			int mode=defaultPattern.mode;
 			double sx=i*w;
 			double sy=sh;
@@ -454,9 +528,12 @@ public class HairTexturePanel extends VerticalPanel{
 			if(!isCenter(i)){
 			
 			context2d.beginPath();
-			strokePath(context2d,mode,sx,sy,ex,ey,i<center);//TODO support lef-right-mode
+			strokePath(context2d,mode,sx,sy,ex,ey,lr,true);//TODO support lef-right-mode
 			//context2d.closePath();
 			context2d.fill();
+			
+			context2d.beginPath();
+			strokePath(context2d,mode,sx,sy,ex,ey,lr,false);
 			context2d.stroke();//TODO support switch
 			}
 		}
@@ -486,8 +563,14 @@ public class HairTexturePanel extends VerticalPanel{
 	private static final int RCURVE2=17;
 	private static final int RCURVE3=18;
 	private static final int RCURVE4=19;
-	private void strokePath(Context2d context,int mode,double sx,double sy,double ex,double ey,boolean leftSide){
+	private void strokePath(Context2d context,int mode,double sx,double sy,double ex,double ey,boolean leftSide,boolean fill){
 		double w=ex-sx;
+		
+		if(fill){
+			context.moveTo(sx, 0);
+			context.lineTo(sx, sy);
+		}
+		
 		//double h=ey-sy;
 		if(mode==STRAIGHT){
 			context.moveTo(sx, sy);
@@ -647,8 +730,14 @@ public class HairTexturePanel extends VerticalPanel{
 			
 			
 		}
+		if(fill){
+			context.lineTo(ex, 0);
+		}
 		//context.closePath();
 	}
 	
 	private Canvas canvas;
+	private CheckBox strokeCheck;
+	private LabeledInputRangeWidget2 grayRange;
+	private ListBox lrBox;
 }
