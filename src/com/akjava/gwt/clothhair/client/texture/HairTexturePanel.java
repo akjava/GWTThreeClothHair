@@ -323,7 +323,7 @@ public class HairTexturePanel extends VerticalPanel{
 			modeBox.addItem("STRAIGHT");
 			modeBox.addItem("OVAL");
 			modeBox.addItem("SHARP");
-			modeBox.addItem("CURVE");
+			modeBox.addItem("SOFT");
 			modeBox.addItem("TRAPEZOID");
 			modeBox.addItem("TRAPEZOID2");
 			modeBox.addItem("TRAPEZOID3");
@@ -336,6 +336,10 @@ public class HairTexturePanel extends VerticalPanel{
 			modeBox.addItem("TRAPEZOID-S");
 			modeBox.addItem("TRAPEZOID2-S");
 			modeBox.addItem("TRAPEZOID3-S");
+			modeBox.addItem("CURVE");
+			modeBox.addItem("CURVE2");
+			modeBox.addItem("CURVE3");
+			modeBox.addItem("CURVE4");
 			modeBox.setSelectedIndex(0);
 			modeBox.addChangeHandler(new ChangeHandler() {
 				
@@ -398,6 +402,7 @@ public class HairTexturePanel extends VerticalPanel{
 		double sh=splitH*defaultPattern.startVertical;
 		RectCanvasUtils.fill(new Rect(0,0,canvas.getCoordinateSpaceWidth(),sh), canvas, "#ffffff");
 		
+		int center=slice/2;
 		
 		for(int i=0;i<slice;i++){
 			int mode=defaultPattern.mode;
@@ -420,33 +425,56 @@ public class HairTexturePanel extends VerticalPanel{
 				
 				RectCanvasUtils.fill(new Rect(sx,0,ex-sx,centerSh), canvas, "#ffffff");
 				mode=centerPattern.mode;
+				
+				context2d.beginPath();
+				strokePath(context2d,mode,sx,sy,ex,ey,i<center);
+				context2d.closePath();
+				context2d.fill();
+				context2d.stroke();//?
 			}
 			
 			
+			
+		}
+		
+		for(int i=0;i<slice;i++){
+			int mode=defaultPattern.mode;
+			double sx=i*w;
+			double sy=sh;
+			double ex=sx+w;
+			double ey=h-splitH*defaultPattern.endVertical;
+			
+			if(!isCenter(i)){
+			
 			context2d.beginPath();
-			strokePath(context2d,mode,sx,sy,ex,ey);
+			strokePath(context2d,mode,sx,sy,ex,ey,i<center);
 			context2d.closePath();
 			context2d.fill();
 			context2d.stroke();//?
+			}
 		}
 	}
 	
 	private static final int STRAIGHT=0;
 	private static final int OVAL=1;
 	private static final int SHARP=2;
-	private static final int CURVE=3;
+	private static final int SOFT=3;
 	private static final int TRAPEZOID=4;
 	private static final int TRAPEZOID2=5;
 	private static final int TRAPEZOID3=6;
 	//private static final int TRAPEZOID4=7;
-	private static final int TRIANGLE=7;
+	private static final int TRIANGLE=7; //maybe no need
 	private static final int TRIANGLE2=8;
 	
 	private static final int TRAPEZOID_STRAIGHT=9;
 	private static final int TRAPEZOID2STRAIGHT=10;
 	private static final int TRAPEZOID3STRAIGHT=11;
 	
-	private void strokePath(Context2d context,int mode,double sx,double sy,double ex,double ey){
+	private static final int CURVE=12;
+	private static final int CURVE2=13;
+	private static final int CURVE3=14;
+	private static final int CURVE4=15;
+	private void strokePath(Context2d context,int mode,double sx,double sy,double ex,double ey,boolean leftSide){
 		double w=ex-sx;
 		//double h=ey-sy;
 		if(mode==STRAIGHT){
@@ -464,7 +492,7 @@ public class HairTexturePanel extends VerticalPanel{
 			context.quadraticCurveTo(sx+w/8*3, ey, sx+w/2,ey);
 			context.quadraticCurveTo(sx+w/8*5, ey, ex,sy);
 			
-		}else if(mode==CURVE){
+		}else if(mode==SOFT){
 			context.moveTo(sx, sy);
 			context.quadraticCurveTo(sx+w/4, ey, sx+w/2,ey);
 			context.quadraticCurveTo(sx+w/4*3, ey, ex,sy);
@@ -510,6 +538,54 @@ public class HairTexturePanel extends VerticalPanel{
 			//context.lineTo(ex-sp, sy+h/2);
 			
 			context.lineTo(ex, sy);
+			
+		}else if(mode==CURVE){
+			if(leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
+				context.quadraticCurveTo(sx+w/4*3, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
+				context.quadraticCurveTo(ex-w/4*3, ey, sx,sy);
+			}
+			
+			
+		}else if(mode==CURVE2){
+			if(leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
+				context.quadraticCurveTo(sx+w/4, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
+				context.quadraticCurveTo(ex-w/4, ey, sx,sy);
+			}
+			
+			
+		}else if(mode==CURVE3){
+			if(leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w,ey);
+				context.quadraticCurveTo(sx+w, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w,ey);
+				context.quadraticCurveTo(ex-w, ey, sx,sy);
+			}
+			
+			
+		}else if(mode==CURVE4){
+			if(leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w*2,ey);
+				context.quadraticCurveTo(sx+w, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w*2,ey);
+				context.quadraticCurveTo(ex-w, ey, sx,sy);
+			}
+			
 			
 		}
 		context.closePath();

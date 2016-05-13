@@ -41,6 +41,8 @@ public class HairDataConverter extends Converter<HairData,String> {
 		
 		csv.add(String.valueOf(data.getChannel()));//8
 		
+		csv.add(String.valueOf(data.isSyncMove()));//9
+		
 		return Joiner.on(",").join(csv);
 	}
 
@@ -98,6 +100,10 @@ public class HairDataConverter extends Converter<HairData,String> {
 		
 		if(csv.length>8){
 			data.setChannel(Integer.valueOf(csv[8]));
+		}
+		
+		if(csv.length>9){
+			data.setSyncMove(Boolean.valueOf(csv[9]));
 		}
 		
 		return data;

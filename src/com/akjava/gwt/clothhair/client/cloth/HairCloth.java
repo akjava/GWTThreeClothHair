@@ -255,6 +255,7 @@ public class HairCloth {
 			restDistance=width/(w);
 			
 			this.channel=hairData.getChannel();
+			this.syncMove=hairData.isSyncMove();
 			
 			initPins();
 			

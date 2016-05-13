@@ -31,6 +31,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private LabeledInputRangeWidget2 edgeScale;
 		private ListBox edgeMode;
 		private ListBox channelBox;
+		private CheckBox syncCheck;
 		
 		
 		public HairDataEditor(){
@@ -89,11 +90,16 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			h3.add(edgeScale);
 			
 			//channel
+			
+			HorizontalPanel channelPanel=new HorizontalPanel();
+			channelPanel.setVerticalAlignment(ALIGN_MIDDLE);
+			channelPanel.add(createLabel("channel:"));
+			this.add(channelPanel);
 			channelBox = new ListBox();
 			for(int i=0;i<16;i++){
 				channelBox.addItem(String.valueOf(i));
 			}
-			this.add(channelBox);
+			channelPanel.add(channelBox);
 			channelBox.setSelectedIndex(0);
 			channelBox.addChangeHandler(new ChangeHandler() {
 				
@@ -102,6 +108,14 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					//flush();
 				}
 			});
+			
+			HorizontalPanel syncPanel=new HorizontalPanel();
+			syncPanel.setVerticalAlignment(ALIGN_MIDDLE);
+			syncPanel.add(createLabel("sync:"));
+			this.add(syncPanel);
+			syncCheck = new CheckBox();
+			syncPanel.add(syncCheck);
+			
 		}
 		private Label createLabel(String name){
 			Label label=new Label(name);
@@ -127,6 +141,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setEdgeMode(edgeMode.getSelectedIndex());
 				value.setEdgeModeScale(edgeScale.getValue());
 				value.setChannel(channelBox.getSelectedIndex());
+				value.setSyncMove(syncCheck.getValue());
 			}
 
 			@Override
@@ -151,5 +166,6 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				edgeMode.setSelectedIndex(value.getEdgeMode());
 				edgeScale.setValue(value.getEdgeModeScale());
 				channelBox.setSelectedIndex(value.getChannel());
+				syncCheck.setValue(value.isSyncMove());
 			}
 	}

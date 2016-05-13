@@ -928,7 +928,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		 tab.add(new GravityPanel(clothControls),"gravity");
 		 
 		 
-		 tab.selectTab(1);//for debug
+		 tab.selectTab(2);//for debug
 	}
 	
 	protected void updateVertexVisible(boolean value) {
