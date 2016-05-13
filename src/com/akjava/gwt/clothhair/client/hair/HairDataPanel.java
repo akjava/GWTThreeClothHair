@@ -34,9 +34,11 @@ import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.lib.common.utils.CSVUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
+
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -49,6 +51,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -59,9 +62,12 @@ public class HairDataPanel extends VerticalPanel{
 	private EasyCellTableObjects<HairCellObjectData> cellObjects;
 
 	private SkinnedMesh characterMesh;
-	public HairDataPanel(SkinnedMesh characterMesh){
+
+	private Label verticalDistanceLabel;
+	public HairDataPanel(final SkinnedMesh characterMesh){
 		this.characterMesh=characterMesh;
 		VerticalPanel hairPanel=new VerticalPanel();
+		this.add(hairPanel);
 
 		HorizontalPanel showHairPanel=new HorizontalPanel();
 		hairPanel.add(showHairPanel);
@@ -78,11 +84,22 @@ public class HairDataPanel extends VerticalPanel{
 		});
 		
 
-		//editor
-		HairDataEditor editor=new HairDataEditor();
+		editor = new HairDataEditor(this);
 		driver.initialize(editor);
+		
+		
 		hairPanel.add(editor);
 		createClothPanel(hairPanel);
+		
+		HorizontalPanel distancePanel=new HorizontalPanel();
+		hairPanel.add(distancePanel);
+		horizontalDistanceLabel = new Label("H:");
+		horizontalDistanceLabel.setWidth("150px");
+		distancePanel.add(horizontalDistanceLabel);
+		
+		verticalDistanceLabel = new Label("V:");
+		verticalDistanceLabel.setWidth("150px");
+		distancePanel.add(verticalDistanceLabel);
 		
 		driver.edit(new HairData());//new data
 		
@@ -90,13 +107,71 @@ public class HairDataPanel extends VerticalPanel{
 		SimpleCellTable<HairCellObjectData> table=new SimpleCellTable<HairCellObjectData>() {
 			@Override
 			public void addColumns(CellTable<HairCellObjectData> table) {
+				TextColumn<HairCellObjectData> channelColumn=new TextColumn<HairCellObjectData>() {
+					@Override
+					public String getValue(HairCellObjectData object) {
+						return String.valueOf(object.getHairData().getChannel());
+						//return hairDataConverter.convert(object.getHairData());
+					}
+				};
+				table.addColumn(channelColumn,"CH");
+				
+				TextColumn<HairCellObjectData> pinsColumn=new TextColumn<HairCellObjectData>() {
+					@Override
+					public String getValue(HairCellObjectData object) {
+						
+						return String.valueOf(object.getHairData().getHairPins().size());
+						//return hairDataConverter.convert(object.getHairData());
+					}
+				};
+				table.addColumn(pinsColumn,"pin");
+				
+				
+				TextColumn<HairCellObjectData> distanceColumn=new TextColumn<HairCellObjectData>() {
+					@Override
+					public String getValue(HairCellObjectData object) {
+						double width=HairDataUtils.getTotalPinDistance(object.getHairData(), characterMesh,false);
+						String text=String.valueOf(width);
+						
+						return text.substring(0,Math.min(7, text.length()));
+					}
+				};
+				table.addColumn(distanceColumn,"distance");
+				
 				TextColumn<HairCellObjectData> nameColumn=new TextColumn<HairCellObjectData>() {
 					@Override
 					public String getValue(HairCellObjectData object) {
-						return hairDataConverter.convert(object.getHairData());
+						
+						return Strings.padStart(String.valueOf(object.getHairData().getSizeOfU()),2,'0')+","+
+								Strings.padStart(String.valueOf(object.getHairData().getSizeOfV()),2,'0')+","+
+						object.getHairData().getScaleOfU();
+						//return hairDataConverter.convert(object.getHairData());
 					}
 				};
-				table.addColumn(nameColumn);
+				table.addColumn(nameColumn,"UVS");
+				
+				TextColumn<HairCellObjectData> syncColumn=new TextColumn<HairCellObjectData>() {
+					@Override
+					public String getValue(HairCellObjectData object) {
+						
+						return String.valueOf(object.getHairData().isSyncMove());
+						//return hairDataConverter.convert(object.getHairData());
+					}
+				};
+				table.addColumn(syncColumn,"sync");
+				
+				/*
+				TextColumn<HairCellObjectData> nameColumn=new TextColumn<HairCellObjectData>() {
+					@Override
+					public String getValue(HairCellObjectData object) {
+						
+						Vector3 vec=hairPinToVertex(characterMesh, object.getHairData().getHairPins().get(0), false);
+						return vec.getX()+","+vec.getY()+","+vec.getZ();
+						//return hairDataConverter.convert(object.getHairData());
+					}
+				};
+				table.addColumn(nameColumn,"1st-pin");
+				*/
 			}
 		};
 		hairPanel.add(table);
@@ -119,6 +194,7 @@ public class HairDataPanel extends VerticalPanel{
 					}
 					//LogUtils.log(hairDataConverter.convert(data.getHairData()));
 					updateHairDataLine();
+					
 				}
 			}
 		});
@@ -142,6 +218,7 @@ public class HairDataPanel extends VerticalPanel{
 				if(data!=null){
 					HairData copied=data.getHairData().clone();
 					driver.edit(copied);
+					updateDistanceLabel();
 				}
 			}
 		});
@@ -153,6 +230,7 @@ public class HairDataPanel extends VerticalPanel{
 			public void onSelect(HairCellObjectData selection) {
 				// TODO Auto-generated method stub
 				//editor edit
+				
 			}};
 			
 			
@@ -240,6 +318,7 @@ private void createClothPanel(Panel parent){
 			@Override
 			public void onClick(ClickEvent event) {
 				firstSelection=currentSelection;
+				
 				updateHairDataLine();
 			}
 		});
@@ -285,6 +364,39 @@ private void createClothPanel(Panel parent){
 		});
 		h.add(addCloth);
 		
+	}
+
+	void updateDistanceLabel(){
+		List<HairPin> pins=Lists.newArrayList();
+		if(firstSelection!=null){
+			pins.add(firstSelection);
+		}
+		
+		if(secondSelection!=null){
+			pins.add(secondSelection);
+		}
+		
+		if(thirdSelection!=null){
+			pins.add(thirdSelection);
+		}
+		
+		
+		double distance=HairDataUtils.getTotalPinDistance(pins, characterMesh, false);
+		horizontalDistanceLabel.setText(
+				("H:"+distance).substring(0,7)
+						);
+		//no need * scaleof u
+		
+		int w = (pins.size()-1)*editor.getSizeOfU();
+		int h= editor.getSizeOfV();
+		
+		
+		
+		double vdistanceh=HairDataUtils.getTotalVDistance(distance*editor.getScaleOfU(), w, h);
+		double ratio=vdistanceh/distance;
+		verticalDistanceLabel.setText(
+				("V:"+vdistanceh).substring(0,7)+" ratio="+String.valueOf(ratio).substring(0,4)
+						);
 	}
 
 	private HairDataConverter hairDataConverter=new HairDataConverter();
@@ -337,7 +449,10 @@ private void createClothPanel(Panel parent){
 
 public void updateHairDataLine(){
 	
+	updateDistanceLabel();
+	
 	if(firstSelection==null && secondSelection==null){
+		
 		return;
 	}
 	
@@ -389,6 +504,7 @@ public void updateHairDataLine(){
 	
 	hairDataLine=THREE.LineSegments(geometry.gwtCastGeometry(), THREE.LineBasicMaterial(GWTParamUtils.LineBasicMaterial().color(0x0000ff).linewidth(2)));
 	GWTThreeClothHair.INSTANCE.getScene().add(hairDataLine);
+	
 	
 }
 
@@ -566,6 +682,10 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 	}
 
 	private StorageControler storageControler=new StorageControler();
+
+	private Label horizontalDistanceLabel;
+
+	private HairDataEditor editor;
 
 	private void clearAllHairData(){
 		for(HairCellObjectData data:cellObjects.getDatas()){

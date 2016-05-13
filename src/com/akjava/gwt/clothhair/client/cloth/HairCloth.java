@@ -244,7 +244,7 @@ public class HairCloth {
 			
 			this.h = hairData.getSizeOfV();
 			
-			double width=HairDataUtils.getTotalPinDistance(hairData, mesh);
+			double width=HairDataUtils.getTotalPinDistance(hairData, mesh,true);
 			
 			width*=hairData.getScaleOfU();
 			

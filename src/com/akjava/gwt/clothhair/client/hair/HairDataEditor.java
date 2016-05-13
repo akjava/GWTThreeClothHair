@@ -10,6 +10,8 @@ import com.google.gwt.editor.client.ValueAwareEditor;
 import com.google.gwt.editor.client.adapters.SimpleEditor;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -33,17 +35,51 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private ListBox channelBox;
 		private CheckBox syncCheck;
 		
+		private HairDataPanel hairDataPanel;
 		
-		public HairDataEditor(){
+		public double getScaleOfU(){
+			return scaleOfU.getValue();
+		}
+		public int getSizeOfU(){
+			return (int)uSize.getValue();
+		}
+		public int getSizeOfV(){
+			return (int)vSize.getValue();
+		}
+		
+		public HairDataEditor(final HairDataPanel hairDataPanel){
+			this.hairDataPanel=hairDataPanel;
 			hairPinEditor=SimpleEditor.of();
 			
 			uSize = new LabeledInputRangeWidget2("U-Size(W)", 0, 80, 1);
 			this.add(uSize);
+			uSize.addtRangeListener(new ValueChangeHandler<Number>() {
+				
+				@Override
+				public void onValueChange(ValueChangeEvent<Number> event) {
+					hairDataPanel.updateDistanceLabel();
+				}
+			});
+
 			vSize = new LabeledInputRangeWidget2("V-Size(H)", 0, 80, 1);
 			this.add(vSize);
+			vSize.addtRangeListener(new ValueChangeHandler<Number>() {
+				
+				@Override
+				public void onValueChange(ValueChangeEvent<Number> event) {
+					hairDataPanel.updateDistanceLabel();
+				}
+			});
+
 			
 			scaleOfU = new LabeledInputRangeWidget2("Scale of U", 0.1, 16, 0.1);
 			this.add(scaleOfU);
+			scaleOfU.addtRangeListener(new ValueChangeHandler<Number>() {
+				@Override
+				public void onValueChange(ValueChangeEvent<Number> event) {
+					hairDataPanel.updateDistanceLabel();
+				}
+			});
 			
 			//cut-u
 			HorizontalPanel h1=new HorizontalPanel();
