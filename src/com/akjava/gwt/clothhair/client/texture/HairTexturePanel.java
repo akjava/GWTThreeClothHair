@@ -48,7 +48,7 @@ public class HairTexturePanel extends VerticalPanel{
 		canvas = CanvasUtils.createCanvas(256, 256);
 		canvas.setCoordinateSpaceWidth(512);
 		canvas.setCoordinateSpaceHeight(512);
-		canvas.getContext2d().setStrokeStyle("#ffffff");
+		
 		this.add(canvas);
 		canvas.setStyleName("transparent_bg");
 		
@@ -340,6 +340,10 @@ public class HairTexturePanel extends VerticalPanel{
 			modeBox.addItem("CURVE2");
 			modeBox.addItem("CURVE3");
 			modeBox.addItem("CURVE4");
+			modeBox.addItem("RCURVE");
+			modeBox.addItem("RCURVE2");
+			modeBox.addItem("RCURVE3");
+			modeBox.addItem("RCURVE4");
 			modeBox.setSelectedIndex(0);
 			modeBox.addChangeHandler(new ChangeHandler() {
 				
@@ -395,6 +399,9 @@ public class HairTexturePanel extends VerticalPanel{
 	
 	private void updateCanvas(){
 		CanvasUtils.clear(canvas);
+		
+		canvas.getContext2d().setStrokeStyle("#888");//TODO storoke color
+		
 		Context2d context2d= canvas.getContext2d();
 		double w=(double)canvas.getCoordinateSpaceWidth()/slice;
 		double h=canvas.getCoordinateSpaceHeight();
@@ -447,10 +454,10 @@ public class HairTexturePanel extends VerticalPanel{
 			if(!isCenter(i)){
 			
 			context2d.beginPath();
-			strokePath(context2d,mode,sx,sy,ex,ey,i<center);
-			context2d.closePath();
+			strokePath(context2d,mode,sx,sy,ex,ey,i<center);//TODO support lef-right-mode
+			//context2d.closePath();
 			context2d.fill();
-			context2d.stroke();//?
+			context2d.stroke();//TODO support switch
 			}
 		}
 	}
@@ -474,6 +481,11 @@ public class HairTexturePanel extends VerticalPanel{
 	private static final int CURVE2=13;
 	private static final int CURVE3=14;
 	private static final int CURVE4=15;
+	
+	private static final int RCURVE=16;
+	private static final int RCURVE2=17;
+	private static final int RCURVE3=18;
+	private static final int RCURVE4=19;
 	private void strokePath(Context2d context,int mode,double sx,double sy,double ex,double ey,boolean leftSide){
 		double w=ex-sx;
 		//double h=ey-sy;
@@ -587,8 +599,55 @@ public class HairTexturePanel extends VerticalPanel{
 			}
 			
 			
+		}else if(mode==RCURVE){
+			if(!leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
+				context.quadraticCurveTo(sx+w/4*3, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
+				context.quadraticCurveTo(ex-w/4*3, ey, sx,sy);
+			}
+			
+		}else if(mode==RCURVE2){
+			if(!leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
+				context.quadraticCurveTo(sx+w/4, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
+				context.quadraticCurveTo(ex-w/4, ey, sx,sy);
+			}
+			
+			
+		}else if(mode==RCURVE3){
+			if(!leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w,ey);
+				context.quadraticCurveTo(sx+w, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w,ey);
+				context.quadraticCurveTo(ex-w, ey, sx,sy);
+			}
+			
+			
+		}else if(mode==RCURVE4){
+			if(!leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w*2,ey);
+				context.quadraticCurveTo(sx+w, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w*2,ey);
+				context.quadraticCurveTo(ex-w, ey, sx,sy);
+			}
+			
+			
 		}
-		context.closePath();
+		//context.closePath();
 	}
 	
 	private Canvas canvas;

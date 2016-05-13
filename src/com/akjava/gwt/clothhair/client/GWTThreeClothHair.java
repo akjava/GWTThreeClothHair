@@ -1324,9 +1324,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	
 
-	//TODO add option mirror
+	
 	public void startAnimation(int boneIndex,double x,double y,double z){
-		
+		if(mixer==null){
+			return;
+		}
 		//LogUtils.log(characterMesh);
 		
 		stopAnimation();
@@ -1396,6 +1398,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	
 	public void stopAnimation() {
+		if(mixer==null){
+			return;
+		}
 		mixer.stopAllAction();
 		
 		//characterMesh.getGeometry().getBones().get(60).setRotq(q)
