@@ -26,8 +26,9 @@ public class TexturePanel extends VerticalPanel{
 	public TexturePanel(final MeshPhongMaterial material){
 		this.material=material;
 		HorizontalPanel h1=new HorizontalPanel();
+		h1.setVerticalAlignment(ALIGN_MIDDLE);
 		this.add(h1);
-		h1.add(createTitle("Color"));
+		h1.add(createTitle("Global-Color"));
 		ColorBox color=new ColorBox("color", "#553817");
 		h1.add(color);
 		color.addValueChangeHandler(new ValueChangeHandler<String>() {
@@ -59,6 +60,7 @@ public class TexturePanel extends VerticalPanel{
 			@Override
 			public void onValueChange(ValueChangeEvent<Number> event) {
 				material.setAlphaTest(event.getValue().doubleValue());
+				material.setNeedsUpdate(true);
 			}
 		});
 		alphaTestRange.setValue(material.getAlphaTest());
@@ -68,7 +70,7 @@ public class TexturePanel extends VerticalPanel{
 		//TODO support map;
 		HorizontalPanel h2=new HorizontalPanel();
 		this.add(h2);
-		h1.add(createTitle("Map"));
+		h2.add(createTitle("Map-Image"));
 		FileUploadForm mapUpload=FileUtils.createImageFileUploadForm(new ImageFileListener() {
 			
 			

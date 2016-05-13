@@ -221,10 +221,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		controls.update();
 
 		
-		AmbientLight ambient = THREE.AmbientLight( 0xeeeeee );//var ambient = new THREE.AmbientLight( 0xffffff );
+		AmbientLight ambient = THREE.AmbientLight( 0xcccccc );//var ambient = new THREE.AmbientLight( 0xffffff );
 		scene.add( ambient );
 
-		DirectionalLight directionalLight = THREE.DirectionalLight( 0x333333 );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
+		DirectionalLight directionalLight = THREE.DirectionalLight( 0x444444 );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
 		directionalLight.getPosition().set( -1, 1, 1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
 		scene.add( directionalLight );
 		
@@ -684,34 +684,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	 */
 
 	private CharacterMovePanel characterMovePanel;
-	private void createControler() {
-		TabPanel tab=new TabPanel();
-		
-		tab.add(createSpherePanel(), "spheres");
-		controlerRootPanel.add(tab);
-		tab.selectTab(0);
-		
-		tab.addSelectionHandler(new SelectionHandler<Integer>() {
-			@Override
-			public void onSelection(SelectionEvent<Integer> event) {
-				int index=event.getSelectedItem();
-				onTabSelected(index);
-			}
-		});
-		
-		
-		VerticalPanel hairPanel=new VerticalPanel();
-		tab.add(hairPanel,"hair");
-		
-		TexturePanel texturePanel=(new TexturePanel(hairMaterial)); 
-		
-		tab.add(texturePanel,"texture");
-		
-		
-		
+	
+	private Panel createBasicPanel(){
 		VerticalPanel basicPanel=new VerticalPanel();
-		tab.add(basicPanel,"basic");
-		
+
 		basicPanel.add(new Label("Wind"));
 		CheckBox windCheck=new CheckBox();
 		windCheck.setValue(true);
@@ -769,23 +745,12 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		});
 		h0.add(visibleVertexCheck);
 		basicPanel.add(h0);
-		
-		
-		/*
-		SphereInfoPanel sphereInfoPanel=new SphereInfoPanel(storageControler,sphere,clothControls);
-		controlerRootPanel.add(sphereInfoPanel);
-		*/
-		
-		
-		
-		//texture panel;
-		
-		texturePanel.add(new HairTexturePanel());
-		
-		
-		//hairPanel.add(new HTML("<h4>Hair Editor</h4>"));
-		
-		
+		return basicPanel;
+	}
+	
+	private Panel createHairDataPanel(){
+		VerticalPanel hairPanel=new VerticalPanel();
+
 		HorizontalPanel showHairPanel=new HorizontalPanel();
 		hairPanel.add(showHairPanel);
 		CheckBox showHair=new CheckBox("show hairs");
@@ -921,14 +886,39 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		});
 		 downloadPanels.add(downloadBt);
 		 downloadPanels.add(download);
+		 return hairPanel;
+	}
+	
+	private Panel createTexturePanel(){
+		TexturePanel texturePanel=new TexturePanel(hairMaterial);
+		texturePanel.add(new HairTexturePanel());
+		return texturePanel;
+	}
+	
+	private void createControler() {
+		TabPanel tab=new TabPanel();
+		tab.addSelectionHandler(new SelectionHandler<Integer>() {
+			@Override
+			public void onSelection(SelectionEvent<Integer> event) {
+				int index=event.getSelectedItem();
+				onTabSelected(index);
+			}
+		});
+		controlerRootPanel.add(tab);
+		
+		
+		tab.add(createSpherePanel(), "spheres");
+		tab.add(createHairDataPanel(),"hair");
+		tab.add(createTexturePanel(),"texture");
+		tab.add(createBasicPanel(),"basic");
+		tab.add(createCharacterMovePanel(),"character");
+		tab.add(new GravityPanel(clothControls),"gravity");
 		 
-		 characterMovePanel=new CharacterMovePanel(characterMesh);
-		 
-		 tab.add(characterMovePanel,"character");
-		 tab.add(new GravityPanel(clothControls),"gravity");
-		 
-		 
-		 tab.selectTab(2);//for debug
+		 tab.selectTab(2);
+	}
+	private Panel createCharacterMovePanel(){
+		characterMovePanel=new CharacterMovePanel(characterMesh);
+		return characterMovePanel;
 	}
 	
 	protected void updateVertexVisible(boolean value) {
