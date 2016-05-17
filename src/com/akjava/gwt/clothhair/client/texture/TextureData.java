@@ -2,6 +2,11 @@ package com.akjava.gwt.clothhair.client.texture;
 
 
 //no need without editor
+/**
+ * @deprecated
+ * @author aki
+ *
+ */
 public class TextureData {
 	private boolean useGlobalColor;
 	private int color;

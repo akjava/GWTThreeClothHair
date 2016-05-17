@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
+import com.akjava.gwt.clothhair.client.texture.HairTextureDataConverter;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.lib.common.functions.StringToPrimitiveFunctions;
 import com.google.common.base.Converter;
@@ -13,6 +14,7 @@ import com.google.common.collect.Lists;
 
 public class HairDataConverter extends Converter<HairData,String> {
 
+	private HairTextureDataConverter converter=new HairTextureDataConverter();
 	@Override
 	protected String doForward(HairData data) {
 		List<String> csv=Lists.newArrayList();
@@ -42,6 +44,11 @@ public class HairDataConverter extends Converter<HairData,String> {
 		csv.add(String.valueOf(data.getChannel()));//8
 		
 		csv.add(String.valueOf(data.isSyncMove()));//9
+		
+		csv.add(data.getMass()+":"+data.getDamping());//10
+		
+		csv.add(converter.convert(data.getHairTextureData()));//11
+		
 		
 		return Joiner.on(",").join(csv);
 	}
@@ -104,6 +111,15 @@ public class HairDataConverter extends Converter<HairData,String> {
 		
 		if(csv.length>9){
 			data.setSyncMove(Boolean.valueOf(csv[9]));
+		}
+		
+		if(csv.length>10){
+			String[] mass_damping=csv[10].split(":");
+			data.setMass(Double.valueOf(mass_damping[0]));
+			data.setDamping(Double.valueOf(mass_damping[1]));
+		}
+		if(csv.length>11){
+			data.setHairTextureData(converter.reverse().convert(csv[11]));
 		}
 		
 		return data;

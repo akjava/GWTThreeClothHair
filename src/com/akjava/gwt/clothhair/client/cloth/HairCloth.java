@@ -39,11 +39,17 @@ public class HairCloth {
 	/*
 	 * somehow it's break ,shoudl re-add
 	 */
-	public void initGravity(double DAMPING,double MASS,double GRAVITY){
+	public void initGravity(double MASS,double DAMPING,double GRAVITY){
 		this.DAMPING=DAMPING;
 		this.DRAG = 1.0 - DAMPING;
 		this.MASS=MASS;
 		this.GRAVITY=GRAVITY;
+		gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
+	}
+	public void initGravities(double MASS,double DAMPING){
+		this.DAMPING=DAMPING;
+		this.DRAG = 1.0 - DAMPING;
+		this.MASS=MASS;
 		gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
 	}
 	
@@ -250,6 +256,7 @@ public class HairCloth {
 			
 			double height=HairDataUtils.getTotalVDistance(width, w, h);
 			
+			this.initGravities(hairData.getMass(),hairData.getDamping());
 
 			clothFunction=plane(width,height);
 			restDistance=width/(w);

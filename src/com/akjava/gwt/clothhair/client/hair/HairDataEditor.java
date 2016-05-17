@@ -3,6 +3,8 @@ package com.akjava.gwt.clothhair.client.hair;
 import java.util.List;
 
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
+import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorDelegate;
@@ -10,8 +12,11 @@ import com.google.gwt.editor.client.ValueAwareEditor;
 import com.google.gwt.editor.client.adapters.SimpleEditor;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -21,6 +26,26 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class HairDataEditor extends VerticalPanel implements Editor<HairData>,ValueAwareEditor<HairData>{
 
 		private HairData value;
+		public HairData getValue() {
+			return value;
+		}
+
+		private HairTextureDataEditor hairTextureDataEditor;
+
+		public void setHairTextureDataEditor(HairTextureDataEditor hairTextureDataEditor) {
+			this.hairTextureDataEditor = hairTextureDataEditor;
+		}
+
+		/**
+		 * @igIgnore
+		 * @return
+		 */
+		
+		@Ignore
+		public HairTextureDataEditor getHairTextureDataEditor() {
+			return hairTextureDataEditor;
+		}
+
 		private SimpleEditor<List<HairPin>> hairPinEditor;
 		private LabeledInputRangeWidget2 uSize;
 		private LabeledInputRangeWidget2 vSize;
@@ -36,6 +61,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private CheckBox syncCheck;
 		
 		private HairDataPanel hairDataPanel;
+		private LabeledInputRangeWidget2 mass;
+		private LabeledInputRangeWidget2 damping;
 		
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
@@ -145,6 +172,22 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				}
 			});
 			
+			Button resetGrvities=new Button("Reset mass&damping",new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					mass.setValue(0.1);
+					damping.setValue(0.03);	
+				}
+			});
+			channelPanel.add(resetGrvities);
+			
+			mass = new LabeledInputRangeWidget2("mass", 0.01, 1, 0.01);
+			this.add(mass);
+			damping = new LabeledInputRangeWidget2("damping", 0.001, 0.1, 0.001);
+			this.add(damping);
+			
+			
 			HorizontalPanel syncPanel=new HorizontalPanel();
 			syncPanel.setVerticalAlignment(ALIGN_MIDDLE);
 			syncPanel.add(createLabel("sync:"));
@@ -178,6 +221,10 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setEdgeModeScale(edgeScale.getValue());
 				value.setChannel(channelBox.getSelectedIndex());
 				value.setSyncMove(syncCheck.getValue());
+				value.setMass(mass.getValue());
+				value.setDamping(damping.getValue());
+				
+				//no need getHairTextureData update,because these value are updated dynamic
 			}
 
 			@Override
@@ -203,5 +250,12 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				edgeScale.setValue(value.getEdgeModeScale());
 				channelBox.setSelectedIndex(value.getChannel());
 				syncCheck.setValue(value.isSyncMove());
+				mass.setValue(value.getMass());
+				damping.setValue(value.getDamping());
+				
+				if(hairTextureDataEditor==null){
+					LogUtils.log("no hairTextureDataEditor");
+				}
+				hairTextureDataEditor.setValue(value.getHairTextureData());
 			}
 	}

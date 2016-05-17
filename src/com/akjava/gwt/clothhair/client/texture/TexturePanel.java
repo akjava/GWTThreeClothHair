@@ -4,12 +4,9 @@ import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileUploadForm;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.html5.client.file.FileUtils.ImageFileListener;
-import com.akjava.gwt.html5.client.input.ColorBox;
-import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.textures.Texture;
-import com.akjava.lib.common.utils.ColorUtils;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -23,6 +20,10 @@ public class TexturePanel extends VerticalPanel{
 	private final String labelWidth="80px";
 	private MeshPhongMaterial material;
 	private Texture texture;
+	private HairTextureDataEditor hairTextureDataEditor;
+	public HairTextureDataEditor getHairTextureDataEditor() {
+		return hairTextureDataEditor;
+	}
 	public TexturePanel(final MeshPhongMaterial material){
 		this.material=material;
 		HorizontalPanel h1=new HorizontalPanel();
@@ -30,46 +31,15 @@ public class TexturePanel extends VerticalPanel{
 		this.add(h1);
 		//TODO add global options
 		
-		h1.add(createTitle("Color"));
-		ColorBox color=new ColorBox("color", "#553817");
-		h1.add(color);
-		color.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<String> event) {
-				int colorValue=ColorUtils.toColor(event.getValue());
-				material.getColor().setHex(colorValue);
-			}
-		});
+		hairTextureDataEditor = new HairTextureDataEditor();
+		this.add(hairTextureDataEditor);
+		hairTextureDataEditor.setVisible(false);//wake up on set value
 		
-		LabeledInputRangeWidget2 opacityRange=new LabeledInputRangeWidget2("Opacity", 0, 1, 0.01);
-		opacityRange.getLabel().setWidth(labelWidth);
-		this.add(opacityRange);
-		opacityRange.addtRangeListener(new ValueChangeHandler<Number>() {
-			
-			@Override
-			public void onValueChange(ValueChangeEvent<Number> event) {
-				material.setOpacity(event.getValue().doubleValue());
-			}
-		});
-		opacityRange.setValue(1);
 		
-		LabeledInputRangeWidget2 alphaTestRange=new LabeledInputRangeWidget2("AlphaTest", 0, 1, 0.01);
-		alphaTestRange.getLabel().setWidth(labelWidth);
-		this.add(alphaTestRange);
-		alphaTestRange.addtRangeListener(new ValueChangeHandler<Number>() {
-			
-			@Override
-			public void onValueChange(ValueChangeEvent<Number> event) {
-				material.setAlphaTest(event.getValue().doubleValue());
-				material.setNeedsUpdate(true);
-			}
-		});
-		alphaTestRange.setValue(material.getAlphaTest());
-		
-		final CheckBox check=new CheckBox("enable");
 		
 		//TODO support map;
+		/* enable again later
+		final CheckBox check=new CheckBox("enable");
 		HorizontalPanel h2=new HorizontalPanel();
 		this.add(h2);
 		h2.add(createTitle("Map-Image"));
@@ -97,6 +67,7 @@ public class TexturePanel extends VerticalPanel{
 				
 			}
 		});
+		*/
 	}
 	public void textureUpdate(boolean enable){
 		if(enable){

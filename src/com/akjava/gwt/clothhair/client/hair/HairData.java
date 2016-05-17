@@ -2,6 +2,7 @@ package com.akjava.gwt.clothhair.client.hair;
 
 import java.util.List;
 
+import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.google.common.collect.Lists;
 
 public class HairData {
@@ -95,6 +96,7 @@ public double getNarrowScale() {
 public void setNarrowScale(double narrowScale) {
 	this.narrowScale = narrowScale;
 }
+
 
 
 
@@ -206,5 +208,14 @@ public void setHairPins(List<HairPin> hairPins) {
 			this.vertexOfFaceIndex = vertexOfFaceIndex;
 		}
 		private int vertexOfFaceIndex;//0-2		
+	}
+	
+	private HairTextureData hairTextureData=new HairTextureData();
+	public HairTextureData getHairTextureData() {
+		return hairTextureData;
+	}
+
+	public void setHairTextureData(HairTextureData hairTextureData) {
+		this.hairTextureData = hairTextureData;
 	}
 }

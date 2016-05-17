@@ -17,6 +17,11 @@ import com.google.gwt.user.client.ui.VerticalPanel;
  * 
  * but i think at least need mass
  */
+/**
+ * @deprecated no need anymore
+ * @author aki
+ *
+ */
 public class GravityPanel extends VerticalPanel{
 
 	
@@ -95,7 +100,7 @@ public class GravityPanel extends VerticalPanel{
 	protected void updateGravity() {
 		
 		for(ClothData data:controls.getCloths()){
-			data.getCloth().initGravity(damping, mass, gravity);
+			data.getCloth().initGravity(mass,damping, gravity);
 		}
 	}
 	

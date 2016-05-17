@@ -230,6 +230,7 @@ public class CharacterMovePanel extends VerticalPanel{
 		animationButtons.add(resetBt);
 		
 
+		this.add(new FacialAnimationPanel(this));
 		
 	}
 	private int lastBoneIndex;
@@ -243,11 +244,11 @@ public class CharacterMovePanel extends VerticalPanel{
 	double animationZ;
 	private ValueListBox<BoneData> boneIndexBox;
 	
-	private void stopAnimation(){
+	public void stopAnimation(){
 		GWTThreeClothHair.INSTANCE.stopAnimation();	
 	}
 
-	protected void startAnimation() {
+	public void startAnimation() {
 		GWTThreeClothHair.INSTANCE.startAnimation(boneIndex,Math.toRadians(animationX), Math.toRadians(animationY), Math.toRadians(animationZ));
 	}
 	

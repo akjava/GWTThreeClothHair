@@ -1,9 +1,12 @@
 package com.akjava.gwt.clothhair.client.texture;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.util.List;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
+import com.akjava.gwt.clothhair.client.texture.HairPatternData.DrawPatternData;
 import com.akjava.gwt.lib.client.CanvasUtils;
 import com.akjava.gwt.lib.client.ImageElementListener;
 import com.akjava.gwt.lib.client.ImageElementUtils;
@@ -18,6 +21,9 @@ import com.google.common.collect.Lists;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.editor.client.Editor;
+import com.google.gwt.editor.client.EditorDelegate;
+import com.google.gwt.editor.client.ValueAwareEditor;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -34,16 +40,16 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.ValueListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class HairTexturePanel extends VerticalPanel{
+public class HairPatternDataEditor extends VerticalPanel implements Editor<HairPatternData>,ValueAwareEditor<HairPatternData>{
 	private boolean useCenter;
 	private boolean useEven;
 	private int extendCenter;
 	
-	private HairPatternPanel centerPattern;
+	private DrawPatternDataEditor centerPattern;
 	private ValueListBox<Integer> sliceBox;
 	 int slice=1;
 	//part of HairEditor?
-	public HairTexturePanel(){
+	public HairPatternDataEditor(){
 		//dynamic version
 		//preset version
 		
@@ -81,7 +87,7 @@ public class HairTexturePanel extends VerticalPanel{
 				
 			}
 		});
-		sliceBox.setValue(1);
+		
 		sliceBox.setAcceptableValues(sliceValues);
 		sliceBox.addValueChangeHandler(new ValueChangeHandler<Integer>() {
 			
@@ -99,7 +105,7 @@ public class HairTexturePanel extends VerticalPanel{
 		lrBox.addItem("Auto");
 		lrBox.addItem("L");
 		lrBox.addItem("R");
-		lrBox.setSelectedIndex(0);
+		
 		lrBox.addChangeHandler(new ChangeHandler() {
 			
 			@Override
@@ -112,16 +118,16 @@ public class HairTexturePanel extends VerticalPanel{
 		defaultPanel.add(new Label("LR-Mode"));
 		defaultPanel.add(lrBox);
 		
-		defaultPattern=new HairPatternPanel();
+		defaultPattern=new DrawPatternDataEditor();
 		add(defaultPattern);
-		centerPattern=new HairPatternPanel();
+		centerPattern=new DrawPatternDataEditor();
 		
 		
 		HorizontalPanel centerOptions=new HorizontalPanel();
 		add(centerOptions);
 		
-		final CheckBox useEvenCheck=new CheckBox("Even center");
-		final ValueListBox<Integer> extendCenterBox = new ValueListBox<Integer>(new Renderer<Integer>() {
+		useEvenCheck = new CheckBox("Even center");
+		extendCenterBox = new ValueListBox<Integer>(new Renderer<Integer>() {
 			@Override
 			public String render(Integer object) {
 				return String.valueOf(object);
@@ -134,15 +140,14 @@ public class HairTexturePanel extends VerticalPanel{
 			}
 		});
 		
-		CheckBox useCenterCheck=new CheckBox("Use center");
-		useCenterCheck.setValue(false);
+		useCenterCheck = new CheckBox("Use center");
+		
 		useCenterCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
 				useCenter=event.getValue();
-				centerPattern.setEnabled(event.getValue());
-				useEvenCheck.setEnabled(event.getValue());
-				extendCenterBox.setEnabled(event.getValue());
+				updateCenterPatterns(event.getValue());
+				
 				updateCanvas();
 			}
 		});
@@ -151,7 +156,7 @@ public class HairTexturePanel extends VerticalPanel{
 		centerPattern.setEnabled(false);
 		
 		useEvenCheck.setEnabled(false);
-		useEvenCheck.setValue(false);
+		
 		useEvenCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			
 
@@ -216,28 +221,8 @@ public class HairTexturePanel extends VerticalPanel{
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				//redraw if need
-				
-				//canvasTexture.setNeedsUpdate(true);
-				ImageElementUtils.createWithLoader(canvas.toDataUrl(), new ImageElementListener() {
-					
-					@Override
-					public void onLoad(ImageElement element) {
-						Texture texture=THREE.Texture(element);
-						texture.setNeedsUpdate(true);
-						texture.setFlipY(false);
-						GWTThreeClothHair.INSTANCE.setTextureMap(texture);
-					}
-					
-					@Override
-					public void onError(String url, ErrorEvent event) {
-						// TODO Auto-generated method stub
-						
-					}
-				});
-						
-				
-				
+				flush();
+				GWTThreeClothHair.INSTANCE.updateHairTextureData(true);	
 			}
 		});
 		buttons.add(updateBt);
@@ -245,16 +230,23 @@ public class HairTexturePanel extends VerticalPanel{
 		Button clearBt=new Button("clear pattern",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				//TODO fix,add enable/disable button?
 				GWTThreeClothHair.INSTANCE.setTextureMap(null);
 			}
 		}
 			);
 		buttons.add(clearBt);
 		
-		updateCanvas();
+		//updateCanvas();
 	}
 	
-	private class HairPatternPanel extends VerticalPanel{
+	protected void updateCenterPatterns(Boolean value) {
+		centerPattern.setEnabled(value);
+		useEvenCheck.setEnabled(value);
+		extendCenterBox.setEnabled(value);
+	}
+
+	private class DrawPatternDataEditor extends VerticalPanel implements Editor<DrawPatternData>,ValueAwareEditor<DrawPatternData>{
 		 int mode;
 		 int splitVertical=1;
 		 int startVertical;
@@ -265,7 +257,7 @@ public class HairTexturePanel extends VerticalPanel{
 		private ValueListBox<Integer> splitBox;
 		private ValueListBox<Integer> endBox;
 		private ListBox modeBox;
-		public HairPatternPanel(){
+		public DrawPatternDataEditor(){
 
 			HorizontalPanel controls=new HorizontalPanel();
 			controls.setVerticalAlignment(ALIGN_MIDDLE);
@@ -302,6 +294,7 @@ public class HairTexturePanel extends VerticalPanel{
 
 				@Override
 				public void onValueChange(ValueChangeEvent<Integer> event) {
+					flush();
 					startVertical=event.getValue();
 					updateCanvas();
 				}
@@ -328,6 +321,7 @@ public class HairTexturePanel extends VerticalPanel{
 				
 				@Override
 				public void onValueChange(ValueChangeEvent<Integer> event) {
+					flush();
 					splitVertical=event.getValue();
 					updateCanvas();
 				}
@@ -352,6 +346,7 @@ public class HairTexturePanel extends VerticalPanel{
 			endBox.addValueChangeHandler(new ValueChangeHandler<Integer>() {
 				@Override
 				public void onValueChange(ValueChangeEvent<Integer> event) {
+					flush();
 					endVertical=event.getValue();
 					updateCanvas();
 				}
@@ -390,6 +385,7 @@ public class HairTexturePanel extends VerticalPanel{
 				
 				@Override
 				public void onChange(ChangeEvent event) {
+					flush();
 					mode=modeBox.getSelectedIndex();
 					updateCanvas();
 				}
@@ -401,6 +397,45 @@ public class HairTexturePanel extends VerticalPanel{
 			modeBox.setEnabled(value);
 			splitBox.setEnabled(value);
 			startBox.setEnabled(value);
+		}
+		@Override
+		public void setDelegate(EditorDelegate<DrawPatternData> delegate) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void flush() {
+			flushValues(patternValue);
+		}
+		
+		
+		
+		public void flushValues(DrawPatternData value){
+			if(patternValue==null){
+				return;
+			}
+			value.setMode(modeBox.getSelectedIndex());
+			value.setStartVertical(startBox.getValue());
+			value.setSplitVertical(splitBox.getValue());
+			value.setEndVertical(endBox.getValue());
+		}
+		@Override
+		public void onPropertyChange(String... paths) {
+			// TODO Auto-generated method stub
+			
+		}
+		private DrawPatternData patternValue;
+		@Override
+		public void setValue(DrawPatternData patternValue) {
+			this.patternValue=patternValue;
+			if(patternValue==null){
+				return;
+			}
+			modeBox.setSelectedIndex(patternValue.getMode());
+			startBox.setValue(patternValue.getStartVertical());
+			splitBox.setValue(patternValue.getSplitVertical());
+			endBox.setValue(patternValue.getEndVertical());
+			
 		}
 	}
 	
@@ -436,7 +471,7 @@ public class HairTexturePanel extends VerticalPanel{
 		//TODO more options
 	}
 	
-	private HairPatternPanel defaultPattern;
+	private DrawPatternDataEditor defaultPattern;
 	
 	public static final int LR_AUTO=0;
 	public static final int LR_LEFT=1;
@@ -444,6 +479,11 @@ public class HairTexturePanel extends VerticalPanel{
 	private int lrMode;
 	
 	private void updateCanvas(){
+		HairPatternData newData=new HairPatternData();
+		flushValues(newData);
+		HairPatternDataUtils.paint(canvas, newData);
+	}
+	private void updateCanvasOld(){
 		CanvasUtils.clear(canvas);
 		canvas.getContext2d().setStrokeStyle("#fff");//always stroke
 		
@@ -736,8 +776,71 @@ public class HairTexturePanel extends VerticalPanel{
 		//context.closePath();
 	}
 	
-	private Canvas canvas;
+	public static Canvas canvas;
 	private CheckBox strokeCheck;
 	private LabeledInputRangeWidget2 grayRange;
 	private ListBox lrBox;
+	@Override
+	public void setDelegate(EditorDelegate<HairPatternData> delegate) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void flush() {
+		flushValues(value);
+	}
+	
+	//canvas painter need data make temporaly data
+	public void flushValues(HairPatternData value){
+		checkNotNull(value, "flushValues:value is null");
+		value.setSlices(sliceBox.getValue());
+		value.setLrMode(lrBox.getSelectedIndex());
+		value.setUseCenter(useCenterCheck.getValue());
+		value.setEvenCenter(useEvenCheck.getValue());
+		value.setStroke(strokeCheck.getValue());
+		value.setStrokeGrayscale((int)grayRange.getValue());
+		value.setExtendCenter(extendCenterBox.getValue());
+		
+		defaultPattern.flushValues(value.getDefaultPatternData());
+		centerPattern.flushValues(value.getCenterPatternData());
+	}
+	
+	@Override
+	public void onPropertyChange(String... paths) {
+		// TODO Auto-generated method stub
+		
+	}
+	private HairPatternData value;
+	private CheckBox useCenterCheck;
+	private CheckBox useEvenCheck;
+	private ValueListBox<Integer> extendCenterBox;
+	@Override
+	public void setValue(HairPatternData value) {
+		this.value=value;
+		
+		if(value==null){
+			//this.setVisible(false);
+			return;
+		}else{
+			//this.setVisible(true);
+		}
+		
+		sliceBox.setValue(value.getSlices());
+		lrBox.setSelectedIndex(value.getLrMode());
+		
+		useCenterCheck.setValue(value.isUseCenter());
+		updateCenterPatterns(value.isUseCenter());
+		
+		
+		useEvenCheck.setValue(value.isEvenCenter());
+		strokeCheck.setValue(value.isStroke());
+		grayRange.setValue(value.getStrokeGrayscale());
+		extendCenterBox.setValue(value.getExtendCenter());
+		
+		defaultPattern.setValue(value.getDefaultPatternData());
+		centerPattern.setValue(value.getCenterPatternData());
+		
+		
+		updateCanvas();
+	}
 }

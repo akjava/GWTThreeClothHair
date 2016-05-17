@@ -1,0 +1,318 @@
+package com.akjava.gwt.clothhair.client.texture;
+
+import com.akjava.gwt.clothhair.client.texture.HairPatternData.DrawPatternData;
+import com.akjava.gwt.lib.client.CanvasUtils;
+import com.akjava.gwt.lib.client.LogUtils;
+import com.akjava.gwt.lib.client.experimental.RectCanvasUtils;
+import com.akjava.lib.common.graphics.Rect;
+import com.akjava.lib.common.utils.ColorUtils;
+import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.Context2d;
+
+import static com.akjava.gwt.clothhair.client.texture.HairPatternData.*;//mode
+
+public class HairPatternDataUtils {
+
+	public static boolean isCenter(int index,HairPatternData data){
+		if(!data.isUseCenter()){
+			return false;
+		}
+		
+		int center=data.getSlices()/2;
+		int center2=center;
+		if(data.isEvenCenter()){
+			if(data.getSlices()%2==0){
+				center2=center-1;
+			}
+			//LogUtils.log(center+","+center2+","+(slice%2));
+		}
+		
+		if(data.getExtendCenter()==0){
+			return index==center || index==center2;
+		}else{
+			int min=center-data.getExtendCenter();
+			int max=center+data.getExtendCenter();
+			if(center!=center2){
+				min=center2-data.getExtendCenter();
+			}
+			
+			return index>=min && index<=max;
+		}
+		
+		
+		
+		
+		//TODO more options
+	}
+	
+	public static void paint(Canvas canvas,HairPatternData data){
+		//LogUtils.log(data);
+		CanvasUtils.clear(canvas);
+		canvas.getContext2d().setStrokeStyle("#fff");//always stroke
+		
+		int gray=(int) data.getStrokeGrayscale();
+		String strokeColor=ColorUtils.toCssGrayColor(gray);
+		if(data.isStroke()){
+			canvas.getContext2d().setStrokeStyle(strokeColor);
+		}
+		
+		DrawPatternData defaultPattern=data.getDefaultPatternData();
+		
+		Context2d context2d= canvas.getContext2d();
+		double w=(double)canvas.getCoordinateSpaceWidth()/data.getSlices();
+		double h=canvas.getCoordinateSpaceHeight();
+		double splitH=h/data.getDefaultPatternData().getSplitVertical();
+		double sh=splitH*data.getDefaultPatternData().getStartVertical();
+		RectCanvasUtils.fill(new Rect(0,0,canvas.getCoordinateSpaceWidth(),sh), canvas, "#ffffff");
+		
+		int center=data.getSlices()/2;
+		
+		//draw center first
+		for(int i=0;i<data.getSlices();i++){
+			int mode=defaultPattern.getMode();
+			double sx=i*w;
+			double sy=sh;
+			double ex=sx+w;
+			double ey=h-splitH*defaultPattern.getEndVertical();
+			
+			if(isCenter(i,data)){
+				
+				boolean lr=i<center;
+				if(data.getLrMode()==LR_LEFT){
+					lr=true;
+				}else if(data.getLrMode()==LR_RIGHT){
+					lr=false;
+				}
+				
+				double centerSplitH=h/data.getCenterPatternData().getSplitVertical();
+				double centerSh=centerSplitH*data.getCenterPatternData().getStartVertical();
+				sx=i*w;
+				sy=centerSh;
+				ex=sx+w;
+				ey=h-centerSplitH*data.getCenterPatternData().getEndVertical();
+				
+				//clear part of center
+				Rect r=new Rect(sx,0,ex-sx,h);
+				RectCanvasUtils.clear(canvas,r);
+				
+				
+				
+				//RectCanvasUtils.fill(new Rect(sx,0,ex-sx,centerSh), canvas, "#ffffff");
+				mode=data.getCenterPatternData().getMode();
+				
+				context2d.beginPath();
+				strokePath(context2d,mode,sx,sy,ex,ey,lr,true);
+				//context2d.closePath();
+				context2d.fill();
+				
+				context2d.beginPath();
+				strokePath(context2d,mode,sx,sy,ex,ey,lr,false);
+				context2d.stroke();//?
+				
+			}
+			
+			
+			
+		}
+		
+		for(int i=0;i<data.getSlices();i++){
+			boolean lr=i<center;
+			if(data.getLrMode()==LR_LEFT){
+				lr=true;
+			}else if(data.getLrMode()==LR_RIGHT){
+				lr=false;
+			}
+			
+			int mode=defaultPattern.getMode();
+			double sx=i*w;
+			double sy=sh;
+			double ex=sx+w;
+			double ey=h-splitH*defaultPattern.getEndVertical();
+			
+			if(!isCenter(i,data)){
+			
+			context2d.beginPath();
+			strokePath(context2d,mode,sx,sy,ex,ey,lr,true);//TODO support lef-right-mode
+			//context2d.closePath();
+			context2d.fill();
+			
+			context2d.beginPath();
+			strokePath(context2d,mode,sx,sy,ex,ey,lr,false);
+			context2d.stroke();//TODO support switch
+			}
+		}
+	}
+	
+	private static void strokePath(Context2d context,int mode,double sx,double sy,double ex,double ey,boolean leftSide,boolean fill){
+		double w=ex-sx;
+		
+		if(fill){
+			context.moveTo(sx, 0);
+			context.lineTo(sx, sy);
+		}
+		
+		//double h=ey-sy;
+		if(mode==STRAIGHT){
+			context.moveTo(sx, sy);
+			context.lineTo(sx+w/2, ey);
+			context.lineTo(ex, sy);
+			
+		}else if(mode==OVAL){
+			context.moveTo(sx, sy);
+			context.quadraticCurveTo(sx, ey, sx+w/2,ey);
+			context.quadraticCurveTo(ex, ey, ex,sy);
+			
+		}else if(mode==SHARP){
+			context.moveTo(sx, sy);
+			context.quadraticCurveTo(sx+w/8*3, ey, sx+w/2,ey);
+			context.quadraticCurveTo(sx+w/8*5, ey, ex,sy);
+			
+		}else if(mode==SOFT){
+			context.moveTo(sx, sy);
+			context.quadraticCurveTo(sx+w/4, ey, sx+w/2,ey);
+			context.quadraticCurveTo(sx+w/4*3, ey, ex,sy);
+			
+		}else if(mode==TRAPEZOID || mode==TRAPEZOID2 || mode==TRAPEZOID3 ){
+			double sp=w/8;
+			if(mode==TRAPEZOID2){
+				sp=w/16;
+			}else if(mode==TRAPEZOID3){
+				sp=w/32;
+			}
+			context.moveTo(sx, sy);
+			context.lineTo(sx+sp, ey);
+			context.lineTo(ex-sp, ey);
+			context.lineTo(ex, sy);
+			
+		}else if(mode==TRIANGLE){
+			context.moveTo(sx, sy);
+			context.lineTo(sx, ey);
+			context.lineTo(ex, sy);
+			
+		}else if(mode==TRIANGLE2){
+			context.moveTo(sx, sy);
+			context.lineTo(ex, ey);
+			context.lineTo(ex, sy);
+			
+		}else if(mode==TRAPEZOID_STRAIGHT || mode==TRAPEZOID2STRAIGHT || mode==TRAPEZOID3STRAIGHT ){
+			double sp=w/8;
+			if(mode==TRAPEZOID2STRAIGHT){
+				sp=w/16;
+			}else if(mode==TRAPEZOID3STRAIGHT){
+				sp=w/32;
+			}
+			double h=ey-sy;
+			context.moveTo(sx, sy);
+			context.lineTo(sx+sp, sy+h/2);
+			
+			context.quadraticCurveTo(sx+w/8*3, ey, sx+w/2,ey);
+			context.quadraticCurveTo(sx+w/8*5, ey, ex-sp,sy+h/2);
+			
+			//context.lineTo(sx+w/2, ey); //straight
+			
+			//context.lineTo(ex-sp, sy+h/2);
+			
+			context.lineTo(ex, sy);
+			
+		}else if(mode==CURVE){
+			if(leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
+				context.quadraticCurveTo(sx+w/4*3, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
+				context.quadraticCurveTo(ex-w/4*3, ey, sx,sy);
+			}
+			
+			
+		}else if(mode==CURVE2){
+			if(leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
+				context.quadraticCurveTo(sx+w/4, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
+				context.quadraticCurveTo(ex-w/4, ey, sx,sy);
+			}
+			
+			
+		}else if(mode==CURVE3){
+			if(leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w,ey);
+				context.quadraticCurveTo(sx+w, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w,ey);
+				context.quadraticCurveTo(ex-w, ey, sx,sy);
+			}
+			
+			
+		}else if(mode==CURVE4){
+			if(leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w*2,ey);
+				context.quadraticCurveTo(sx+w, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w*2,ey);
+				context.quadraticCurveTo(ex-w, ey, sx,sy);
+			}
+			
+			
+		}else if(mode==RCURVE){
+			if(!leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
+				context.quadraticCurveTo(sx+w/4*3, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
+				context.quadraticCurveTo(ex-w/4*3, ey, sx,sy);
+			}
+			
+		}else if(mode==RCURVE2){
+			if(!leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
+				context.quadraticCurveTo(sx+w/4, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
+				context.quadraticCurveTo(ex-w/4, ey, sx,sy);
+			}
+			
+			
+		}else if(mode==RCURVE3){
+			if(!leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w,ey);
+				context.quadraticCurveTo(sx+w, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w,ey);
+				context.quadraticCurveTo(ex-w, ey, sx,sy);
+			}
+			
+			
+		}else if(mode==RCURVE4){
+			if(!leftSide){
+				context.moveTo(sx, sy);
+				context.quadraticCurveTo(sx, ey, ex+w*2,ey);
+				context.quadraticCurveTo(sx+w, ey, ex,sy);
+			}else{
+				context.moveTo(ex, sy);
+				context.quadraticCurveTo(ex, ey, sx-w*2,ey);
+				context.quadraticCurveTo(ex-w, ey, sx,sy);
+			}
+			
+			
+		}
+		if(fill){
+			context.lineTo(ex, 0);
+		}
+		//context.closePath();
+	}
+}
