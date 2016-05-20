@@ -18,13 +18,28 @@ public class HairTextureDataEditor extends VerticalPanel implements Editor<HairT
 
 	public HairTextureDataEditor(){
 
+		useLocalColorCheck = new CheckBox("use local color");
+		useLocalColorCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				colorBox.setVisible(event.getValue());
+				flush();
+				GWTThreeClothHair.INSTANCE.updateHairTextureData(false);
+			}
+		});
+		this.add(useLocalColorCheck);
+		
 		HorizontalPanel h1=new HorizontalPanel();
 		h1.setVerticalAlignment(ALIGN_MIDDLE);
 		this.add(h1);
 		
+		
+		
 		h1.add(createTitle("Local Color"));
 		colorBox = new ColorBox("color", "#553817");
 		h1.add(colorBox);
+		colorBox.setVisible(false);
+		
 		colorBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 
 			@Override
@@ -103,7 +118,7 @@ public class HairTextureDataEditor extends VerticalPanel implements Editor<HairT
 		value.setOpacity(opacityRange.getValue());
 		value.setAlphaTest(alphaTestRange.getValue());
 		value.setEnablePatternImage(enablePatternTextureCheck.getValue());
-		
+		value.setUseLocalColor(useLocalColorCheck.getValue());
 		//hairPatternDataEditor.flush(); //there are set parameter box
 		//alredy linked hairPatternDataEditor
 	}
@@ -120,6 +135,7 @@ public class HairTextureDataEditor extends VerticalPanel implements Editor<HairT
 	private LabeledInputRangeWidget2 alphaTestRange;
 	private HairPatternDataEditor hairPatternDataEditor;
 	private CheckBox enablePatternTextureCheck;
+	private CheckBox useLocalColorCheck;
 	@Override
 	public void setValue(HairTextureData value) {
 		this.value=value;
@@ -129,6 +145,11 @@ public class HairTextureDataEditor extends VerticalPanel implements Editor<HairT
 		}else{
 			this.setVisible(true);
 		}
+		
+		
+		useLocalColorCheck.setValue(value.isUseLocalColor());
+		
+		colorBox.setVisible(value.isUseLocalColor());
 		
 		colorBox.setValue(ColorUtils.toCssColor(value.getColor()));
 		opacityRange.setValue(value.getOpacity());

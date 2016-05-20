@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.HairStorageKeys;
@@ -43,6 +44,7 @@ import com.akjava.lib.common.utils.CSVUtils;
 import com.akjava.lib.common.utils.ColorUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Stopwatch;
 import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -87,15 +89,18 @@ public class HairDataPanel extends VerticalPanel{
 		
 		HorizontalPanel h1=new HorizontalPanel();
 		h1.add(new Label("Global Color"));
-		ColorBox colorBox = new ColorBox("global color", "#553817");
+		ColorBox colorBox = new ColorBox("global color", ColorUtils.toCssColor(GWTThreeClothHair.INSTANCE.globalHairColor));
 		h1.add(colorBox);
 		colorBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 
 			@Override
 			public void onValueChange(ValueChangeEvent<String> event) {
+				final Stopwatch watch=Stopwatch.createStarted();
 				final int colorValue=ColorUtils.toColor(event.getValue());
+				
 				final Canvas canvas=CanvasUtils.createCanvas(8192, 8192);
-				THREE.ImageLoader().load("models/mbl3d/simpleeye-8kbluexxx.png", new ImageLoadHandler() {
+				LogUtils.log("create canvas:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
+				THREE.ImageLoader().load("models/mbl3d/simpleeye-2kbluexxx.png", new ImageLoadHandler() {
 					
 					@Override
 					public void onProgress(NativeEvent progress) {
@@ -105,12 +110,18 @@ public class HairDataPanel extends VerticalPanel{
 					
 					@Override
 					public void onLoad(ImageElement imageElement) {
+						LogUtils.log("load:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						ImageData data=ImageDataUtils.create(canvas, imageElement);
-						ImageDataUtils.replaceColor(data,GWTThreeClothHair.INSTANCE.hairColor,colorValue);
+						LogUtils.log("imageData:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
+						ImageDataUtils.replaceColor(data,GWTThreeClothHair.INSTANCE.globalHairColor,colorValue);
+						LogUtils.log("replace:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						ImageDataUtils.putImageData(data, canvas);
+						LogUtils.log("putData:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						Texture texture=THREE.TextureLoader().load(canvas.toDataUrl());
+						LogUtils.log("make texture:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						//texture.setFlipY(false);
 						GWTThreeClothHair.INSTANCE.getBodyMaterial().setMap(texture);
+						LogUtils.log("make texture:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						//extremly slow
 						for(HairCellObjectData cellData:cellObjects.getDatas()){
 							//TODO check use local or not
@@ -133,16 +144,6 @@ public class HairDataPanel extends VerticalPanel{
 		VerticalPanel hairPanel=new VerticalPanel();
 		this.add(hairPanel);
 
-		
-		//trying replaceing color
-		//should do with worker
-		Button test=new Button("global color",new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				
-			}
-		});
-		this.add(test);
 		
 		
 		HorizontalPanel showHairPanel=new HorizontalPanel();

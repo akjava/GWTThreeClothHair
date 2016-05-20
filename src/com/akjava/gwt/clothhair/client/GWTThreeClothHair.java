@@ -481,7 +481,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		});
 		
 		hairMaterial = THREE.MeshPhongMaterial(GWTParamUtils.
-				MeshPhongMaterial().color(hairColor).side(THREE.DoubleSide).specular(0xffffff).shininess(15)
+				MeshPhongMaterial().color(globalHairColor).side(THREE.DoubleSide).specular(0xffffff).shininess(15)
 				.alphaTest(0.9)//best for cloth
 				.transparent(true).opacity(1)
 				
@@ -591,7 +591,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	/**
 	 * @deprecated switch to global color,however where? TODO fix
 	 */
-	public static   int hairColor=0xb7a9cd;
+	public    int globalHairColor=0xb7a9cd;
 
 	
 	protected Vector3 matrixedPoint(Vector3 vec){
@@ -815,7 +815,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		tab.add(createSpherePanel(), "spheres");
 		
-		tab.add(createTexturePanel(),"texture");
+		tab.add(createTexturePanel(),"h-image");
 		
 		
 		//hair data panel make and initialize data inside,TODO load later
@@ -1051,7 +1051,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		MeshPhongMaterial material=selection.getMesh().getMaterial().gwtCastMeshPhongMaterial();
 		HairTextureData textureData=selection.getHairData().getHairTextureData();
 		//TODO support local or global
-		material.setColor(THREE.Color(textureData.getColor()));
+		
+		int color=textureData.isUseLocalColor()?textureData.getColor():globalHairColor;
+		
+		material.setColor(THREE.Color(color));
 		
 		
 		material.setOpacity(textureData.getOpacity());

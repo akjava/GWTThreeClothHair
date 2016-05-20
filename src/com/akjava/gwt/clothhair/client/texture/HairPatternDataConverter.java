@@ -24,9 +24,14 @@ public class HairPatternDataConverter extends Converter<HairPatternData, String>
 		
 		if(data.getDefaultPatternData()!=null){
 			list.add(patternDataConverter.convert(data.getDefaultPatternData()));
+		}else{
+			list.add("");
 		}
+		
 		if(data.getCenterPatternData()!=null){
 			list.add(patternDataConverter.convert(data.getCenterPatternData()));
+		}else{
+			list.add("");
 		}
 		
 		

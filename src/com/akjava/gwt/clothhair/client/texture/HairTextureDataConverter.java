@@ -19,6 +19,7 @@ public class HairTextureDataConverter extends Converter<HairTextureData,String>{
 			list.add(String.valueOf(data.getOpacity()));
 			list.add(String.valueOf(data.getAlphaTest()));
 			list.add(String.valueOf(data.isEnablePatternImage()));
+			list.add(String.valueOf(data.isUseLocalColor()));
 		}
 		return Joiner.on(":").join(list);
 	}
@@ -45,6 +46,10 @@ public class HairTextureDataConverter extends Converter<HairTextureData,String>{
 		if(list.size()>4){
 			data.setEnablePatternImage(ValuesUtils.toBoolean(list.get(4),false));
 		}
+		if(list.size()>5){
+			data.setUseLocalColor(ValuesUtils.toBoolean(list.get(5),false));
+		}
+		
 		
 		return data;
 	}

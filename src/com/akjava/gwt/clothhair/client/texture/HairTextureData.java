@@ -44,6 +44,13 @@ private int specular;
 private int shininess;
 
 private boolean useLocalColor;
+public boolean isUseLocalColor() {
+	return useLocalColor;
+}
+public void setUseLocalColor(boolean useLocalColor) {
+	this.useLocalColor = useLocalColor;
+}
+
 private boolean useImage;
 private String imageName="";
 
@@ -61,6 +68,7 @@ public String toString(){
 			.add("opacity", opacity)
 			.add("alphaText", alphaTest)
 			.add("enablePatternImage", enablePatternImage)
+			.add("useLocalColor", useLocalColor)
 			.toString();
 }
 
