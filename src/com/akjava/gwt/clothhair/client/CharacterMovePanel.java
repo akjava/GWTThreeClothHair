@@ -150,7 +150,7 @@ public class CharacterMovePanel extends VerticalPanel{
 		
 		
 		
-		LabeledInputRangeWidget2 xAnimation=new LabeledInputRangeWidget2("x", -180, 180, 1);
+		final LabeledInputRangeWidget2 xAnimation=new LabeledInputRangeWidget2("x", -180, 180, 1);
 		xAnimation.getLabel().setWidth("20px");
 		xAnimation.getRange().setWidth("240px");
 		this.add(xAnimation);
@@ -161,7 +161,7 @@ public class CharacterMovePanel extends VerticalPanel{
 				startAnimation();
 			}
 		});
-		LabeledInputRangeWidget2 yAnimation=new LabeledInputRangeWidget2("y", -180, 180, 1);
+		final LabeledInputRangeWidget2 yAnimation=new LabeledInputRangeWidget2("y", -180, 180, 1);
 		yAnimation.getLabel().setWidth("20px");
 		yAnimation.getRange().setWidth("240px");
 		this.add(yAnimation);
@@ -172,7 +172,7 @@ public class CharacterMovePanel extends VerticalPanel{
 				startAnimation();
 			}
 		});
-		LabeledInputRangeWidget2 zAnimation=new LabeledInputRangeWidget2("z", -180, 180, 1);
+		final LabeledInputRangeWidget2 zAnimation=new LabeledInputRangeWidget2("z", -180, 180, 1);
 		zAnimation.getLabel().setWidth("20px");
 		zAnimation.getRange().setWidth("240px");
 		this.add(zAnimation);
@@ -188,7 +188,7 @@ public class CharacterMovePanel extends VerticalPanel{
 		this.add(animationButtons);
 		
 		//TODO support target bone;
-		Button startBt=new Button("start",new ClickHandler() {
+		Button startBt=new Button("Start",new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -197,7 +197,7 @@ public class CharacterMovePanel extends VerticalPanel{
 		});
 		animationButtons.add(startBt);
 		
-		Button stopBt=new Button("stop",new ClickHandler() {
+		Button stopBt=new Button("Stop",new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -208,11 +208,17 @@ public class CharacterMovePanel extends VerticalPanel{
 		});
 		animationButtons.add(stopBt);
 		
-		Button resetBt=new Button("resetBt",new ClickHandler() {
+		Button resetBt=new Button("Reset",new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
 				resetAnimation();
+				xAnimation.setValue(0);
+				yAnimation.setValue(0);
+				zAnimation.setValue(0);
+				animationX=0;
+				animationY=0;
+				animationZ=0;
 				
 				/*
 				 * i faild how to update by hand.

@@ -188,6 +188,11 @@ public class HairCloth {
 	}
 	
 	int w;
+	public int getW() {
+		return w;
+	}
+
+
 	int h;
 	
 	private List<Constrain> constrains=new ArrayList<Constrain>();
@@ -245,7 +250,7 @@ public class HairCloth {
 	
 	public HairCloth(HairData hairData,Mesh mesh){
 			
-		
+			//TODO support 0 sizeOfU
 			this.w = (hairData.getHairPins().size()-1)*hairData.getSizeOfU();
 			
 			this.h = hairData.getSizeOfV();

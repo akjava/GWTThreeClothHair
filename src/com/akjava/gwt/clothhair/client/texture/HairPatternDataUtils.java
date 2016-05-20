@@ -48,7 +48,7 @@ public class HairPatternDataUtils {
 	public static void paint(Canvas canvas,HairPatternData data){
 		//LogUtils.log(data);
 		CanvasUtils.clear(canvas);
-		canvas.getContext2d().setStrokeStyle("#fff");//always stroke
+		canvas.getContext2d().setStrokeStyle("#ffffff");//always stroke
 		
 		int gray=(int) data.getStrokeGrayscale();
 		String strokeColor=ColorUtils.toCssGrayColor(gray);
@@ -63,9 +63,12 @@ public class HairPatternDataUtils {
 		double h=canvas.getCoordinateSpaceHeight();
 		double splitH=h/data.getDefaultPatternData().getSplitVertical();
 		double sh=splitH*data.getDefaultPatternData().getStartVertical();
-		RectCanvasUtils.fill(new Rect(0,0,canvas.getCoordinateSpaceWidth(),sh), canvas, "#ffffff");
+		
+		//RectCanvasUtils.fill(new Rect(0,0,canvas.getCoordinateSpaceWidth(),sh), canvas, "#ffffff");
 		
 		int center=data.getSlices()/2;
+		
+		context2d.setFillStyle("#ffffff");
 		
 		//draw center first
 		for(int i=0;i<data.getSlices();i++){
@@ -92,13 +95,19 @@ public class HairPatternDataUtils {
 				ey=h-centerSplitH*data.getCenterPatternData().getEndVertical();
 				
 				//clear part of center
+				/*
 				Rect r=new Rect(sx,0,ex-sx,h);
-				RectCanvasUtils.clear(canvas,r);
+				RectCanvasUtils.clear(canvas,r);//why erasing?
+				*/
 				
 				
+				/*
+				 * this fill need paint gap between each slices(somehow fill make gap)
+				 */
+				RectCanvasUtils.fill(new Rect(sx,0,ex-sx,centerSh), canvas, "#ffffff");
 				
-				//RectCanvasUtils.fill(new Rect(sx,0,ex-sx,centerSh), canvas, "#ffffff");
 				mode=data.getCenterPatternData().getMode();
+				
 				
 				context2d.beginPath();
 				strokePath(context2d,mode,sx,sy,ex,ey,lr,true);
@@ -131,6 +140,8 @@ public class HairPatternDataUtils {
 			
 			if(!isCenter(i,data)){
 			
+			RectCanvasUtils.fill(new Rect(sx,0,ex-sx,sh), canvas, "#ffffff");
+				
 			context2d.beginPath();
 			strokePath(context2d,mode,sx,sy,ex,ey,lr,true);//TODO support lef-right-mode
 			//context2d.closePath();
@@ -141,34 +152,67 @@ public class HairPatternDataUtils {
 			context2d.stroke();//TODO support switch
 			}
 		}
+		
+	}
+	
+	private static boolean isRightSideCurve(boolean leftSide,int mode){
+		if(!leftSide){
+			if(mode==CURVE || mode==CURVE2 || mode==CURVE3 || mode==CURVE4 ){
+				return true;
+			}
+			
+			
+		}else{
+			if(mode==RCURVE || mode==RCURVE2 || mode==RCURVE3 || mode==RCURVE4 ){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private static void strokePath(Context2d context,int mode,double sx,double sy,double ex,double ey,boolean leftSide,boolean fill){
 		double w=ex-sx;
 		
-		if(fill){
-			context.moveTo(sx, 0);
-			context.lineTo(sx, sy);
-		}
+		
+		/*
+		 * without start from 0 made gap between startAt
+		 */
+			if(isRightSideCurve(leftSide,mode)){
+				if(fill){
+				context.moveTo(ex, 0);
+				context.lineTo(ex, sy);
+				}else{
+					context.moveTo(ex, sy);
+				}
+			}else{
+				if(fill){
+				context.moveTo(sx, 0);
+				context.lineTo(sx, sy);
+				}else{
+					context.moveTo(sx, sy);
+				}
+			}
+			
+	
 		
 		//double h=ey-sy;
 		if(mode==STRAIGHT){
-			context.moveTo(sx, sy);
+		
 			context.lineTo(sx+w/2, ey);
 			context.lineTo(ex, sy);
 			
 		}else if(mode==OVAL){
-			context.moveTo(sx, sy);
+			
 			context.quadraticCurveTo(sx, ey, sx+w/2,ey);
 			context.quadraticCurveTo(ex, ey, ex,sy);
 			
 		}else if(mode==SHARP){
-			context.moveTo(sx, sy);
+			
 			context.quadraticCurveTo(sx+w/8*3, ey, sx+w/2,ey);
 			context.quadraticCurveTo(sx+w/8*5, ey, ex,sy);
 			
 		}else if(mode==SOFT){
-			context.moveTo(sx, sy);
+			
 			context.quadraticCurveTo(sx+w/4, ey, sx+w/2,ey);
 			context.quadraticCurveTo(sx+w/4*3, ey, ex,sy);
 			
@@ -179,18 +223,18 @@ public class HairPatternDataUtils {
 			}else if(mode==TRAPEZOID3){
 				sp=w/32;
 			}
-			context.moveTo(sx, sy);
+			
 			context.lineTo(sx+sp, ey);
 			context.lineTo(ex-sp, ey);
 			context.lineTo(ex, sy);
 			
 		}else if(mode==TRIANGLE){
-			context.moveTo(sx, sy);
+			
 			context.lineTo(sx, ey);
 			context.lineTo(ex, sy);
 			
 		}else if(mode==TRIANGLE2){
-			context.moveTo(sx, sy);
+			
 			context.lineTo(ex, ey);
 			context.lineTo(ex, sy);
 			
@@ -202,7 +246,7 @@ public class HairPatternDataUtils {
 				sp=w/32;
 			}
 			double h=ey-sy;
-			context.moveTo(sx, sy);
+			
 			context.lineTo(sx+sp, sy+h/2);
 			
 			context.quadraticCurveTo(sx+w/8*3, ey, sx+w/2,ey);
@@ -216,11 +260,11 @@ public class HairPatternDataUtils {
 			
 		}else if(mode==CURVE){
 			if(leftSide){
-				context.moveTo(sx, sy);
+				
 				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
 				context.quadraticCurveTo(sx+w/4*3, ey, ex,sy);
 			}else{
-				context.moveTo(ex, sy);
+				
 				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
 				context.quadraticCurveTo(ex-w/4*3, ey, sx,sy);
 			}
@@ -228,11 +272,11 @@ public class HairPatternDataUtils {
 			
 		}else if(mode==CURVE2){
 			if(leftSide){
-				context.moveTo(sx, sy);
+				
 				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
 				context.quadraticCurveTo(sx+w/4, ey, ex,sy);
 			}else{
-				context.moveTo(ex, sy);
+				
 				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
 				context.quadraticCurveTo(ex-w/4, ey, sx,sy);
 			}
@@ -240,11 +284,11 @@ public class HairPatternDataUtils {
 			
 		}else if(mode==CURVE3){
 			if(leftSide){
-				context.moveTo(sx, sy);
+				
 				context.quadraticCurveTo(sx, ey, ex+w,ey);
 				context.quadraticCurveTo(sx+w, ey, ex,sy);
 			}else{
-				context.moveTo(ex, sy);
+				
 				context.quadraticCurveTo(ex, ey, sx-w,ey);
 				context.quadraticCurveTo(ex-w, ey, sx,sy);
 			}
@@ -252,11 +296,11 @@ public class HairPatternDataUtils {
 			
 		}else if(mode==CURVE4){
 			if(leftSide){
-				context.moveTo(sx, sy);
+				
 				context.quadraticCurveTo(sx, ey, ex+w*2,ey);
 				context.quadraticCurveTo(sx+w, ey, ex,sy);
 			}else{
-				context.moveTo(ex, sy);
+				
 				context.quadraticCurveTo(ex, ey, sx-w*2,ey);
 				context.quadraticCurveTo(ex-w, ey, sx,sy);
 			}
@@ -264,22 +308,22 @@ public class HairPatternDataUtils {
 			
 		}else if(mode==RCURVE){
 			if(!leftSide){
-				context.moveTo(sx, sy);
+				
 				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
 				context.quadraticCurveTo(sx+w/4*3, ey, ex,sy);
 			}else{
-				context.moveTo(ex, sy);
+				
 				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
 				context.quadraticCurveTo(ex-w/4*3, ey, sx,sy);
 			}
 			
 		}else if(mode==RCURVE2){
 			if(!leftSide){
-				context.moveTo(sx, sy);
+				
 				context.quadraticCurveTo(sx, ey, ex+w/4,ey);
 				context.quadraticCurveTo(sx+w/4, ey, ex,sy);
 			}else{
-				context.moveTo(ex, sy);
+				
 				context.quadraticCurveTo(ex, ey, sx-w/4,ey);
 				context.quadraticCurveTo(ex-w/4, ey, sx,sy);
 			}
@@ -287,11 +331,11 @@ public class HairPatternDataUtils {
 			
 		}else if(mode==RCURVE3){
 			if(!leftSide){
-				context.moveTo(sx, sy);
+				
 				context.quadraticCurveTo(sx, ey, ex+w,ey);
 				context.quadraticCurveTo(sx+w, ey, ex,sy);
 			}else{
-				context.moveTo(ex, sy);
+				
 				context.quadraticCurveTo(ex, ey, sx-w,ey);
 				context.quadraticCurveTo(ex-w, ey, sx,sy);
 			}
@@ -299,19 +343,23 @@ public class HairPatternDataUtils {
 			
 		}else if(mode==RCURVE4){
 			if(!leftSide){
-				context.moveTo(sx, sy);
+				
 				context.quadraticCurveTo(sx, ey, ex+w*2,ey);
 				context.quadraticCurveTo(sx+w, ey, ex,sy);
 			}else{
-				context.moveTo(ex, sy);
+				
 				context.quadraticCurveTo(ex, ey, sx-w*2,ey);
 				context.quadraticCurveTo(ex-w, ey, sx,sy);
 			}
-			
-			
 		}
-		if(fill){
-			context.lineTo(ex, 0);
+		if(isRightSideCurve(leftSide,mode)){
+			if(fill){
+			context.lineTo(sx, 0);
+			}
+		}else{
+			if(fill){
+				context.lineTo(ex, 0);
+				}
 		}
 		//context.closePath();
 	}

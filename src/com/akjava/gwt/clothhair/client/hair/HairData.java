@@ -3,6 +3,7 @@ package com.akjava.gwt.clothhair.client.hair;
 import java.util.List;
 
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 
 public class HairData {
@@ -208,6 +209,38 @@ public void setHairPins(List<HairPin> hairPins) {
 			this.vertexOfFaceIndex = vertexOfFaceIndex;
 		}
 		private int vertexOfFaceIndex;//0-2		
+		
+		
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + faceIndex;
+			result = prime * result + vertexOfFaceIndex;
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			HairPin other = (HairPin) obj;
+			if (faceIndex != other.faceIndex)
+				return false;
+			if (vertexOfFaceIndex != other.vertexOfFaceIndex)
+				return false;
+			return true;
+		}
+		public String toString(){
+			return MoreObjects.toStringHelper("HairPin")
+					.add("faceIndex", faceIndex)
+					.add("vertexOfFaceIndex", vertexOfFaceIndex)
+					.toString();
+		}
 	}
 	
 	private HairTextureData hairTextureData=new HairTextureData();

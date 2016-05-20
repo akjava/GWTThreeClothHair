@@ -22,7 +22,7 @@ public class HairTextureDataEditor extends VerticalPanel implements Editor<HairT
 		h1.setVerticalAlignment(ALIGN_MIDDLE);
 		this.add(h1);
 		
-		h1.add(createTitle("Color"));
+		h1.add(createTitle("Local Color"));
 		colorBox = new ColorBox("color", "#553817");
 		h1.add(colorBox);
 		colorBox.addValueChangeHandler(new ValueChangeHandler<String>() {

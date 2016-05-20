@@ -1,5 +1,6 @@
 package com.akjava.gwt.clothhair.client.deprecated;
 
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.renderers.WebGLRendererParameter;
 import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
 import com.akjava.gwt.three.client.js.THREE;
@@ -10,6 +11,8 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -17,6 +20,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.RootPanel;
 
 public abstract class SimpleThreeAppEntryPoint extends AbstractThreeApp implements EntryPoint{
 
@@ -31,7 +35,18 @@ public abstract class SimpleThreeAppEntryPoint extends AbstractThreeApp implemen
 
 	public void onModuleLoad() {
 		final DockLayoutPanel root=new DockLayoutPanel(Unit.PX);
+		
 		RootLayoutPanel.get().add(root);
+		
+		RootPanel.get().addDomHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				onKeyDownEvent(event);
+				
+			}
+		}, KeyDownEvent.getType());
+		
+		
 		
 		onBeforeStartApp();
 		Scheduler.get().scheduleDeferred(new ScheduledCommand() {	
@@ -41,6 +56,10 @@ public abstract class SimpleThreeAppEntryPoint extends AbstractThreeApp implemen
 				onAfterStartApp();
 			}
 		});
+	}
+	
+	public void onKeyDownEvent(KeyDownEvent event){
+		
 	}
 	
 	public abstract WebGLRendererParameter createRendererParameter();

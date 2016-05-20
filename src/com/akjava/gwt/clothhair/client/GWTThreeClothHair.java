@@ -9,16 +9,15 @@ import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel;
-import com.akjava.gwt.clothhair.client.hair.HairDataUtils;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairCellObjectData;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataPanel;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataPanel.SphereDataControler;
+import com.akjava.gwt.clothhair.client.texture.HairPatternDataEditor;
 import com.akjava.gwt.clothhair.client.texture.HairPatternDataUtils;
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
-import com.akjava.gwt.clothhair.client.texture.HairPatternDataEditor;
 import com.akjava.gwt.clothhair.client.texture.TexturePanel;
 import com.akjava.gwt.lib.client.CanvasUtils;
 import com.akjava.gwt.lib.client.ImageElementListener;
@@ -71,6 +70,9 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.event.dom.client.ErrorEvent;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -83,6 +85,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -175,6 +178,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 	private double GROUND=-750;
 	
+	/**
+	 * @deprecated
+	 * @param materials
+	 * @return
+	 */
 	private JsArray<Material>  fixMaterial(JsArray<Material> materials){
 		final MeshPhongMaterial eyeMaterial=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial()
 				.morphTargets(true)
@@ -237,14 +245,25 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		}
 		return filterd;
 	}
-	
+	private MeshPhongMaterial bodyMaterial;
+	public MeshPhongMaterial getBodyMaterial() {
+		return bodyMaterial;
+	}
+	@Override
+	public void onKeyDownEvent(KeyDownEvent event){
+		if(event.getNativeKeyCode()==KeyCodes.KEY_SPACE){
+			event.preventDefault();
+			hairDataPanel.executeAddPoint();
+		}
+	}
+
 	@Override
 	public void onInitializedThree() {
 		super.onInitializedThree();
 		setRightTopPopupWidth("360px");
 		INSTANCE=this;
 		
-		renderer.setClearColor(0xffffff);
+		//renderer.setClearColor(0xffffff);
 		
 		rendererContainer.addMouseMoveHandler(new MouseMoveHandler() {
 			@Override
@@ -261,17 +280,40 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		});
 		
 		
+		
+		
+		/*
+		rendererContainer.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(event.getNativeKeyCode()==KeyCodes.KEY_SPACE){
+					event.preventDefault();
+					hairDataPanel.executeAddPoint();
+				}
+			}
+		});
+		*/
+		
+		
 		controls = THREEExp.OrbitControls(camera,rendererContainer.getElement() );
 		controls.setTarget(THREE.Vector3( 0, cameraY, 0 ));
 		controls.update();
 
 		
-		AmbientLight ambient = THREE.AmbientLight( 0xcccccc );//var ambient = new THREE.AmbientLight( 0xffffff );
+		AmbientLight ambient = THREE.AmbientLight( 0xb7b7b7 );//var ambient = new THREE.AmbientLight( 0xffffff );
 		scene.add( ambient );
 
 		DirectionalLight directionalLight = THREE.DirectionalLight( 0x444444 );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
 		directionalLight.getPosition().set( -1, 1, 1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
 		scene.add( directionalLight );
+		
+		DirectionalLight directionalLight2 = THREE.DirectionalLight( 0x444444 );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
+		directionalLight2.getPosition().set( 1, 1, -1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
+		scene.add( directionalLight2 );
+		
+		DirectionalLight directionalLight3 = THREE.DirectionalLight( 0x444444 );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
+		directionalLight3.getPosition().set( 1, -1, 1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
+		scene.add( directionalLight3 );
 		
 		
 		
@@ -290,11 +332,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//String url= "models/mbl3d/model8o.json";//var url= "morph.json";
 		
 		//watch out tmp serieas not much type
-		String url= "models/mbl3d/tmp7.json";
+		String url= "models/mbl3d/tmp10.json"; //tmp9xxx3-front4
+		LogUtils.log(url);
 		//String url="models/mbl3d/model8-hair-color-expand-bone.json"; //no-morph over 40fps
 		new Mbl3dLoader().load(url,new JSONLoadHandler() {
 			
 			private MultiMaterial multiMaterials;
+			
 
 			@Override
 			public void loaded(Geometry geometry,JsArray<Material> materials) {
@@ -337,25 +381,29 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				multiMaterials = THREE.MultiMaterial(materials );
 
 				
-				Texture mapTexture=THREE.TextureLoader().load("models/mbl3d/simpleeye-8kblue.png");//simpleeye2
+				Texture mapTexture=THREE.TextureLoader().load("models/mbl3d/simpleeye-8kbluexxx.png");//simpleeye2
 				//default LinearMipMapLinearFilter use small mipmapping this approach contain some transparent area,
 				//change nearest or paint all transparent area
 				mapTexture.setMinFilter(THREE.NearestFilter);
 				
 				
-				//single material twice first
-				final MeshPhongMaterial eyeMaterial=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial()
+				bodyMaterial = THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial()
 						.morphTargets(true)
 						.skinning(true)
 						.transparent(true)
-						.specular(0x111111).shininess(5)
+						
+						//.emissiveMap(THREE.TextureLoader().load("models/mbl3d/emissive.png"))
+						.specularMap(THREE.TextureLoader().load("models/mbl3d/specular.png"))
+						.specular(0xffffff)
+						//.emissive(0xffffff)
+						.shininess(5)
 						.side(THREE.DoubleSide)//for inside mouse
 						//.specular(1).shininess(1)
 						.map(mapTexture)
 						//.map(THREE.TextureLoader().load("models/mbl3d/simpleeye2.png"))
 						);
 				
-				characterMesh = THREE.SkinnedMesh( geometry, eyeMaterial );
+				characterMesh = THREE.SkinnedMesh( geometry, bodyMaterial );
 				
 				//characterMesh = THREE.SkinnedMesh( geometry, multiMaterials );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = new THREE.SkinnedMesh( geometry, mat );
 				
@@ -541,9 +589,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 	//private int hairColor=0x553817;//brown
 	/**
-	 * @deprecated switch to global color
+	 * @deprecated switch to global color,however where? TODO fix
 	 */
-	private   int hairColor=0xb7a9cd;
+	public static   int hairColor=0xb7a9cd;
 
 	
 	protected Vector3 matrixedPoint(Vector3 vec){
@@ -601,7 +649,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			}
 			
 			//make lines
-			double size=4.8;
+			double size=48;
 			Matrix3 normalMatrix=THREE.Matrix3();
 			Vector3 v1 = THREE.Vector3();
 			Vector3 v2 = THREE.Vector3();
@@ -630,7 +678,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			
 			
 			
-			LineSegments selectedLine=THREE.LineSegments(geometry.gwtCastGeometry(), THREE.LineBasicMaterial(GWTParamUtils.LineBasicMaterial().color(0xff0000).linewidth(2)));
+			LineSegments selectedLine=THREE.LineSegments(geometry.gwtCastGeometry(), THREE.LineBasicMaterial(GWTParamUtils.LineBasicMaterial().color(0xff0000).linewidth(1)));
 			selectedLine.setVisible(vertexVisible);
 			hairDataPanel.setNewLine(selectedLine);
 			
@@ -974,6 +1022,19 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 	}
 	
+	
+	public void updateHairTextureColor(HairCellObjectData selection,int colorValue){
+		if(selection==null){
+			LogUtils.log("updateHairTextureData:null selection");
+			return;
+		}
+		//store hair datas 
+		//sync textures
+		MeshPhongMaterial material=selection.getMesh().getMaterial().gwtCastMeshPhongMaterial();
+		HairTextureData textureData=selection.getHairData().getHairTextureData();
+		//TODO support local or global
+		material.setColor(THREE.Color(colorValue));
+	}
 		
 		public void updateHairTextureData(HairCellObjectData selection,boolean updateHairTextureMap){
 		if(selection==null){
@@ -991,6 +1052,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		HairTextureData textureData=selection.getHairData().getHairTextureData();
 		//TODO support local or global
 		material.setColor(THREE.Color(textureData.getColor()));
+		
+		
 		material.setOpacity(textureData.getOpacity());
 		material.setAlphaTest(textureData.getAlphaTest());
 		
