@@ -1,5 +1,6 @@
 package com.akjava.gwt.clothhair.client.texture;
 
+import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileUploadForm;
 import com.akjava.gwt.html5.client.file.FileUtils;
@@ -18,14 +19,14 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class TexturePanel extends VerticalPanel{
 
 	private final String labelWidth="80px";
-	private MeshPhongMaterial material;
-	private Texture texture;
+	
+	//private Texture texture;
 	private HairTextureDataEditor hairTextureDataEditor;
 	public HairTextureDataEditor getHairTextureDataEditor() {
 		return hairTextureDataEditor;
 	}
-	public TexturePanel(final MeshPhongMaterial material){
-		this.material=material;
+	public TexturePanel(){
+		
 		HorizontalPanel h1=new HorizontalPanel();
 		h1.setVerticalAlignment(ALIGN_MIDDLE);
 		this.add(h1);
@@ -40,43 +41,30 @@ public class TexturePanel extends VerticalPanel{
 		//TODO support map;
 		/* enable again later
 		final CheckBox check=new CheckBox("enable");
+		*/
 		HorizontalPanel h2=new HorizontalPanel();
 		this.add(h2);
-		h2.add(createTitle("Map-Image"));
+		h2.add(createTitle("test-Map-Image"));
 		FileUploadForm mapUpload=FileUtils.createImageFileUploadForm(new ImageFileListener() {
 			
 			
 
 			@Override
 			public void uploaded(File file, ImageElement imageElement) {
-				texture = THREE.Texture(imageElement);
+				Texture texture = THREE.Texture(imageElement);
 				texture.setFlipY(false);
 				texture.setNeedsUpdate(true);//very important
-				textureUpdate(check.getValue());
+				
+				GWTThreeClothHair.INSTANCE.updateHairTextureMap(texture);
 			}
 		}, true, true);
 		mapUpload.setAccept(FileUploadForm.ACCEPT_IMAGE);
 		h2.add(mapUpload);
 		
-		h2.add(check);
-		check.setValue(true);
-		check.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-			@Override
-			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				textureUpdate(event.getValue());
-				
-			}
-		});
-		*/
+		
+		
 	}
-	public void textureUpdate(boolean enable){
-		if(enable){
-			material.setMap(texture);
-		}else{
-			material.setMap(null);
-		}
-		material.setNeedsUpdate(true);
-	}
+
 	
 	public Label createTitle(String text){
 		

@@ -25,11 +25,16 @@ public abstract class AbstractThreeApp implements AnimationCallback{
 	protected Panel parent;
 	
 	private boolean debugAnimateOneTime;
-	
+	private int maxAnimateCount;
+	private int animated;
 	
 	
 	public boolean isDebugAnimateOneTime() {
 		return debugAnimateOneTime;
+	}
+	
+	public void setDebugAnimateCount(int animeteCount) {
+		this.maxAnimateCount = maxAnimateCount;
 	}
 
 	public void setDebugAnimateOneTimeOnly(boolean debugAnimateOneTime) {
@@ -69,6 +74,11 @@ public abstract class AbstractThreeApp implements AnimationCallback{
 		}else{
 			LogUtils.log("debugAnimateOneTime:true only render called one time for debug");
 		}
+		if(maxAnimateCount!=0 && animated>=maxAnimateCount){
+			maxAnimateCount++;
+			return;
+		}
+		
 		animate(timestamp);
 	}
 	public abstract void animate(double timestamp);

@@ -20,17 +20,21 @@ import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
 import com.akjava.gwt.clothhair.client.texture.TexturePanel;
 import com.akjava.gwt.lib.client.CanvasUtils;
+import com.akjava.gwt.lib.client.GWTHTMLUtils;
 import com.akjava.gwt.lib.client.ImageElementListener;
 import com.akjava.gwt.lib.client.ImageElementUtils;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
+import com.akjava.gwt.lib.client.experimental.ImageDataUtils;
+import com.akjava.gwt.lib.client.experimental.ImageDataUtils.RGBColorFilter;
 import com.akjava.gwt.stats.client.Stats;
 import com.akjava.gwt.three.client.examples.js.THREEExp;
 import com.akjava.gwt.three.client.examples.js.controls.OrbitControls;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
 import com.akjava.gwt.three.client.gwt.core.BoundingBox;
 import com.akjava.gwt.three.client.gwt.core.Intersect;
+import com.akjava.gwt.three.client.gwt.math.HSL;
 import com.akjava.gwt.three.client.gwt.renderers.WebGLRendererParameter;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.three.client.java.utils.Mbl3dLoader;
@@ -50,10 +54,12 @@ import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.extras.helpers.VertexNormalsHelper;
 import com.akjava.gwt.three.client.js.lights.AmbientLight;
 import com.akjava.gwt.three.client.js.lights.DirectionalLight;
+import com.akjava.gwt.three.client.js.loaders.ImageLoader.ImageLoadHandler;
 import com.akjava.gwt.three.client.js.loaders.JSONLoader.JSONLoadHandler;
 import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.materials.MultiMaterial;
+import com.akjava.gwt.three.client.js.math.Color;
 import com.akjava.gwt.three.client.js.math.Matrix3;
 import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
@@ -65,14 +71,17 @@ import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.lib.common.utils.CSVUtils;
 import com.google.common.collect.Maps;
 import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.ImageData;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -81,11 +90,11 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -158,6 +167,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		if(clothControls!=null){
 			updateSphereMeshs();//sphere first
 			clothControls.update(timestamp);
+			
+			
+			
 		}
 		
 		//logarithmicDepthBuffer
@@ -168,6 +180,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		if(stats!=null){
 			stats.update();
 		}
+		
 	}
 	
 	private MeshPhongMaterial hairHeadMaterial;
@@ -257,8 +270,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		}
 	}
 
+	public String textureUrl;
 	@Override
 	public void onInitializedThree() {
+		final String modelUrl=GWTHTMLUtils.getInputValueById("model", "model11.json");
+		textureUrl=GWTHTMLUtils.getInputValueById("texture", "models/mbl3d/simpleeye-2kbluexxx-extendhead.png");
+		LogUtils.log("model-texture:"+modelUrl+","+textureUrl);
+		
 		super.onInitializedThree();
 		setRightTopPopupWidth("360px");
 		INSTANCE=this;
@@ -326,24 +344,25 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		groundMesh.setReceiveShadow(true);//mesh.receiveShadow = true;
 		scene.add( groundMesh );
 		
+		
 		/*
 		 * shape morph need special treatment for r74
 		 */
 		//String url= "models/mbl3d/model8o.json";//var url= "morph.json";
 		
 		//watch out tmp serieas not much type
-		String url= "models/mbl3d/tmp10.json"; //tmp9xxx3-front4
-		LogUtils.log(url);
+		//String url= "models/mbl3d/model11-eyelid-extendhead.json"; //tmp9xxx3-front4
+		
 		//String url="models/mbl3d/model8-hair-color-expand-bone.json"; //no-morph over 40fps
-		new Mbl3dLoader().load(url,new JSONLoadHandler() {
+		new Mbl3dLoader().load(modelUrl,new JSONLoadHandler() {
 			
 			private MultiMaterial multiMaterials;
 			
 
 			@Override
-			public void loaded(Geometry geometry,JsArray<Material> materials) {
+			public void loaded(Geometry geometry,JsArray<Material> m) {
 				
-				materials=fixMaterial(materials);
+				//materials=fixMaterial(materials);
 				
 				geometry.computeBoundingBox();
 				BoundingBox bb = geometry.getBoundingBox();
@@ -353,6 +372,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				double x=-0, y=-0,z= -0,s= 1000;
 				y=-bb.getMax().getY()/2*s;
 				
+				/*
 				for(int i=0;i<materials.length();i++){
 					MeshPhongMaterial m=materials.get(i).cast();//need cast GWT problem
 					if(m.getName().equals("Hair")){
@@ -379,9 +399,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				}
 				//Multi-material is extreamly slow about 25 fps,
 				multiMaterials = THREE.MultiMaterial(materials );
-
+				*/
 				
-				Texture mapTexture=THREE.TextureLoader().load("models/mbl3d/simpleeye-8kbluexxx.png");//simpleeye2
+				Texture mapTexture=THREE.TextureLoader().load(textureUrl);//simpleeye2
 				//default LinearMipMapLinearFilter use small mipmapping this approach contain some transparent area,
 				//change nearest or paint all transparent area
 				mapTexture.setMinFilter(THREE.NearestFilter);
@@ -393,8 +413,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						.transparent(true)
 						
 						//.emissiveMap(THREE.TextureLoader().load("models/mbl3d/emissive.png"))
-						.specularMap(THREE.TextureLoader().load("models/mbl3d/specular.png"))
-						.specular(0xffffff)
+						//.specularMap(THREE.TextureLoader().load("models/mbl3d/specular.png"))
+						//.specular(0xffffff)//specular(0xffffff)// ff is for map ,11 is skin
+						.specular(0x111111)
 						//.emissive(0xffffff)
 						.shininess(5)
 						.side(THREE.DoubleSide)//for inside mouse
@@ -404,7 +425,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						);
 				
 				characterMesh = THREE.SkinnedMesh( geometry, bodyMaterial );
-				
+				LogUtils.log(characterMesh);
 				//characterMesh = THREE.SkinnedMesh( geometry, multiMaterials );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = new THREE.SkinnedMesh( geometry, mat );
 				
 				
@@ -588,12 +609,20 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	ClothControler clothControls;
 
 	//private int hairColor=0x553817;//brown
-	/**
-	 * @deprecated switch to global color,however where? TODO fix
-	 */
-	public    int globalHairColor=0xb7a9cd;
-
 	
+	public int defaultHairTextureColor=0xb7a9cd;//TODO move outside
+	private    int globalHairColor=defaultHairTextureColor;
+	
+	
+	public int getGlobalHairColor() {
+		return globalHairColor;
+	}
+
+	public void setGlobalHairColor(int globalHairColor) {
+		//LogUtils.log("setGlobalHairColor:"+globalHairColor);
+		this.globalHairColor = globalHairColor;
+	}
+
 	protected Vector3 matrixedPoint(Vector3 vec){
 		return vec.clone().applyMatrix4(characterMesh.getMatrixWorld());
 	}
@@ -786,8 +815,90 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		});
 		h0.add(visibleVertexCheck);
 		basicPanel.add(h0);
+		
+		Button test=new Button("test",new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				final Canvas canvas=CanvasUtils.createCanvas(2048, 2048);
+				THREE.ImageLoader().load(GWTThreeClothHair.INSTANCE.textureUrl, new ImageLoadHandler() {
+					
+					@Override
+					public void onProgress(NativeEvent progress) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					@Override
+					public void onLoad(ImageElement imageElement) {
+						ImageData data=ImageDataUtils.create(canvas, imageElement);
+						
+						//ImageDataUtils.replaceColor(data,GWTThreeClothHair.INSTANCE.defaultHairTextureColor,colorValue);
+						
+						ImageDataUtils.executeRGBFilter(data, new RGBColorFilter() {
+							@Override
+							public int[] filterRGB(int r, int g, int b, int a) {
+								// TODO Auto-generated method stub
+								//TODO make range & rect
+								return hslOnRGB(r,g,b,0.1,0.01,0.01);
+							}
+						
+						});
+						
+						
+						ImageDataUtils.putImageData(data, canvas);
+						Texture texture=THREE.TextureLoader().load(canvas.toDataUrl());
+						//texture.setFlipY(false);
+						GWTThreeClothHair.INSTANCE.getBodyMaterial().setMap(texture);
+						//extremly slow
+						
+					}
+					
+					@Override
+					public void onError(NativeEvent error) {
+						// TODO Auto-generated method stub
+						
+					}
+				});
+				
+				
+			}
+			
+			
+			
+		});
+		basicPanel.add(test);
 		return basicPanel;
 	}
+	
+	
+	/*
+	 * these value for reduce instances time
+	 */
+	public static Color hslColor=THREE.Color(0);
+	public static int[] rgbColor=new int[3];
+	public static int[] hslOnRGB(int r,int g,int b,double addH,double addL,double addS){
+		hslColor.setRGB(r/255.0, g/255.0, b/255.0);
+		HSL hsl=hslColor.getHSL();
+		double h=hsl.h()+addH;
+		h%=1.0;
+		if(h<0){
+			h=1.0-h;
+		}
+		
+		double l=hsl.l()+addL;
+		l=Math.max( 0, Math.min( 1.0, l ) );
+		
+		double s=hsl.s()+addS;
+		s=Math.max( 0, Math.min( 1.0, s ) );
+		
+		hslColor.setHSL(h, s, l);
+		rgbColor[0]=(int) (hslColor.getR()*255);
+		rgbColor[1]=(int) (hslColor.getG()*255);
+		rgbColor[2]=(int) (hslColor.getB()*255);
+		return rgbColor;
+	}
+	
 	
 	HairDataPanel hairDataPanel;
 	private Panel createHairDataPanel(HairTextureDataEditor editor){
@@ -796,7 +907,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	
 	private Panel createTexturePanel(){
-		texturePanel = new TexturePanel(hairMaterial);
+		texturePanel = new TexturePanel();
 		
 		return texturePanel;
 	}
@@ -829,7 +940,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//link
 		
-		tab.selectTab(2);
+		tab.selectTab(3);
 	}
 	private Panel createCharacterMovePanel(){
 		characterMovePanel=new CharacterMovePanel(characterMesh);
@@ -1022,6 +1133,26 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 	}
 	
+	public void updateHairTextureMap(Texture texture){
+		//get hair data selection
+		for(HairCellObjectData selection:hairDataPanel.getDatas()){
+			updateHairTextureMap(selection,texture);
+		}
+	}
+	
+	
+	public void updateHairTextureMap(HairCellObjectData selection,Texture texture){
+		if(selection==null){
+			LogUtils.log("updateHairTextureData:null selection");
+			return;
+		}
+		//store hair datas 
+		//sync textures
+		MeshPhongMaterial material=selection.getMesh().getMaterial().gwtCastMeshPhongMaterial();
+		HairTextureData textureData=selection.getHairData().getHairTextureData();
+		//TODO support local or global
+		material.setMap(texture);
+	}
 	
 	public void updateHairTextureColor(HairCellObjectData selection,int colorValue){
 		if(selection==null){
@@ -1054,6 +1185,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		int color=textureData.isUseLocalColor()?textureData.getColor():globalHairColor;
 		
+		//LogUtils.log("updateHairTextureData:"+color);
 		material.setColor(THREE.Color(color));
 		
 		
@@ -1074,7 +1206,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 
 	
-	public void startAnimation(int boneIndex,double x,double y,double z){
+		public void startAnimation(int boneIndex,double x,double y,double z){
+			startAnimation(boneIndex,x,y,z,true);
+		}
+	public void startAnimation(int boneIndex,double x,double y,double z,boolean both){
 		if(mixer==null){
 			return;
 		}
@@ -1111,8 +1246,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		times.push(0);
 		times.push(duration);
 		times.push(duration*2);
+		if(both){
 		times.push(duration*3);
 		times.push(duration*4);
+		}
 		JsArrayNumber values=JsArray.createArray().cast();
 		
 		
@@ -1120,8 +1257,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		concat(values,THREE.Quaternion().toArray());
 		concat(values,q.toArray());
 		concat(values,THREE.Quaternion().toArray());
+		if(both){
 		concat(values,q2.toArray());
 		concat(values,THREE.Quaternion().toArray());
+		}
 		
 		//LogUtils.log(values);
 		

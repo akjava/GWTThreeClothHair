@@ -14,6 +14,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.text.shared.Renderer;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ValueListBox;
@@ -235,6 +236,9 @@ public class CharacterMovePanel extends VerticalPanel{
 		});
 		animationButtons.add(resetBt);
 		
+		bothCheck = new CheckBox("both-direction");
+		bothCheck.setValue(true);
+		animationButtons.add(bothCheck);
 
 		this.add(new FacialAnimationPanel(this));
 		
@@ -249,13 +253,14 @@ public class CharacterMovePanel extends VerticalPanel{
 	double animationY;
 	double animationZ;
 	private ValueListBox<BoneData> boneIndexBox;
+	private CheckBox bothCheck;
 	
 	public void stopAnimation(){
 		GWTThreeClothHair.INSTANCE.stopAnimation();	
 	}
 
 	public void startAnimation() {
-		GWTThreeClothHair.INSTANCE.startAnimation(boneIndex,Math.toRadians(animationX), Math.toRadians(animationY), Math.toRadians(animationZ));
+		GWTThreeClothHair.INSTANCE.startAnimation(boneIndex,Math.toRadians(animationX), Math.toRadians(animationY), Math.toRadians(animationZ),bothCheck.getValue());
 	}
 	
 	public void setSkelton(Skeleton skeleton) {

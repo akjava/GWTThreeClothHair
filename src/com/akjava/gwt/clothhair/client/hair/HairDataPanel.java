@@ -82,6 +82,9 @@ public class HairDataPanel extends VerticalPanel{
 	public HairCellObjectData getSelection(){
 		return cellObjects.getSelection();
 	}
+	public List<HairCellObjectData> getDatas(){
+		return cellObjects.getDatas();
+	}
 	private Label verticalDistanceLabel;
 	public HairDataPanel(final SkinnedMesh characterMesh,HairTextureDataEditor hairTextureDataEditor){
 		this.characterMesh=characterMesh;
@@ -89,18 +92,20 @@ public class HairDataPanel extends VerticalPanel{
 		
 		HorizontalPanel h1=new HorizontalPanel();
 		h1.add(new Label("Global Color"));
-		ColorBox colorBox = new ColorBox("global color", ColorUtils.toCssColor(GWTThreeClothHair.INSTANCE.globalHairColor));
+		ColorBox colorBox = new ColorBox("global color", ColorUtils.toCssColor(GWTThreeClothHair.INSTANCE.getGlobalHairColor()));
 		h1.add(colorBox);
 		colorBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 
 			@Override
 			public void onValueChange(ValueChangeEvent<String> event) {
+				GWTThreeClothHair.INSTANCE.setGlobalHairColor(ColorUtils.toColor(event.getValue()));
+				
 				final Stopwatch watch=Stopwatch.createStarted();
 				final int colorValue=ColorUtils.toColor(event.getValue());
 				
-				final Canvas canvas=CanvasUtils.createCanvas(8192, 8192);
+				final Canvas canvas=CanvasUtils.createCanvas(2048, 2048);
 				LogUtils.log("create canvas:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
-				THREE.ImageLoader().load("models/mbl3d/simpleeye-2kbluexxx.png", new ImageLoadHandler() {
+				THREE.ImageLoader().load(GWTThreeClothHair.INSTANCE.textureUrl, new ImageLoadHandler() {
 					
 					@Override
 					public void onProgress(NativeEvent progress) {
@@ -113,7 +118,7 @@ public class HairDataPanel extends VerticalPanel{
 						LogUtils.log("load:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						ImageData data=ImageDataUtils.create(canvas, imageElement);
 						LogUtils.log("imageData:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
-						ImageDataUtils.replaceColor(data,GWTThreeClothHair.INSTANCE.globalHairColor,colorValue);
+						ImageDataUtils.replaceColor(data,GWTThreeClothHair.INSTANCE.defaultHairTextureColor,colorValue);
 						LogUtils.log("replace:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						ImageDataUtils.putImageData(data, canvas);
 						LogUtils.log("putData:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
@@ -832,7 +837,8 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 				.side(THREE.DoubleSide)
 				.transparent(true)
 				
-				.specular(0xffffff)
+				.specular(0x111111)
+				//.specular(0xffffff)
 				.shininess(5) //switch default same as texture otherwise not good at connection
 				//.wireframe(true)
 				//.specular(0xffffff)//TODO move editor

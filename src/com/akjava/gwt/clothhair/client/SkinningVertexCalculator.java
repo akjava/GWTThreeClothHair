@@ -2,6 +2,7 @@ package com.akjava.gwt.clothhair.client;
 
 import java.util.List;
 
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Vector3;
@@ -89,6 +90,12 @@ public class SkinningVertexCalculator {
 	        	boneIndex=(int)vertex.getSkinIndices().getW();
 	        	boneWeight=vertex.getSkinWeights().getW();
 	        }
+	        if(boneIndex<0 || boneIndex>=skinnedMesh.getSkeleton().getBones().length()){
+	        	LogUtils.log("boneIndex="+boneIndex+",but bones below");
+	        	LogUtils.log(skinnedMesh.getSkeleton().getBones());
+	        	throw new RuntimeException("out of index");
+	        }
+	        
 	        tempMatrix.multiplyMatrices (skinnedMesh.getSkeleton().getBones().get(boneIndex).getMatrixWorld(), skinnedMesh.getSkeleton().getBoneInverses().get(boneIndex));
 	        result.add (temp.copy (vec3).applyMatrix4 (tempMatrix).multiplyScalar (boneWeight));
 	    }
