@@ -48,5 +48,10 @@ public class SphereDataConverter extends Converter<SphereData,String>{
 		
 		return data;
 	}
+	
+	public SphereData copy(SphereData data){
+		String text=doForward(data);
+		return doBackward(text);
+	}
 
 }

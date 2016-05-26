@@ -3,6 +3,7 @@ package com.akjava.gwt.clothhair.client.cloth;
 import java.util.List;
 import java.util.Map;
 
+import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Geometry;
@@ -123,12 +124,32 @@ public class ClothControler {
 			
 			
 		}else{
-			int cw=data.getCloth().w/(data.getCalculator().getResult().size()-1);
-			int pinSize=data.getCalculator().getResult().size();
+			
+			//int pinSize=data.getCalculator().getResult().size();
+			
+			
+			
+			List<Vector3> generalPinVectors=Lists.newArrayList();
+			List<Vector3> customlVector=Lists.newArrayList();
+			List<Integer> customTarget=Lists.newArrayList();
+			
+			
+			for(int i=0;i<data.getCalculator().getSkinningVertexs().size();i++){
+				if(data.getCalculator().getSkinningVertexs().get(i).getTargetClothIndex()==-1){
+					generalPinVectors.add(data.getCalculator().getResult().get(i));
+				}else{
+					customlVector.add(data.getCalculator().getResult().get(i));
+					customTarget.add(data.getCalculator().getSkinningVertexs().get(i).getTargetClothIndex());
+				}
+			}
+			
+			int pinSize=generalPinVectors.size();
+			
+			int cw=data.getCloth().w/(pinSize-1);//TODO method
 			
 			Vector3 diff=THREE.Vector3();
 			for(int i=0;i<pinSize;i++){
-				Vector3 v1=data.getCalculator().getResult().get(i);
+				Vector3 v1=generalPinVectors.get(i);//data.getCalculator().getResult().get(i);
 				
 				int index=cw*i;
 				
@@ -136,8 +157,9 @@ public class ClothControler {
 					diff.copy(data.getCloth().particles.get(0).position).sub(v1);
 				}
 				
-				data.getCloth().particles.get(index).setAllPosition(v1);
-				
+				if(data.getCloth().isPinned(index)){
+					data.getCloth().particles.get(index).setAllPosition(v1);
+				}
 				//LogUtils.log("main:"+index);
 				
 				
@@ -150,7 +172,10 @@ public class ClothControler {
 						int multiple=j;
 						int at=index+j;
 						Vector3 v=sub.clone().multiplyScalar(multiple).add(v1);
-						data.getCloth().particles.get(at).setAllPosition(v);
+						
+						if(data.getCloth().isPinned(at)){
+							data.getCloth().particles.get(at).setAllPosition(v);
+						}
 						
 						//LogUtils.log("sub:"+at);
 					}
@@ -158,8 +183,8 @@ public class ClothControler {
 				}
 			}
 			
-			//complete sync
 			
+			//complete sync
 			if(data.getCloth().syncMove){
 				for(int i=cw;i<data.getCloth().particles.size();i++){
 					data.getCloth().particles.get(i).position.sub(diff);
@@ -167,10 +192,21 @@ public class ClothControler {
 				}
 			}
 			
+			//custom - update
+			
+			for(int i=0;i<customlVector.size();i++){
+				Vector3 v=customlVector.get(i);
+				
+				if(data.getCloth().isPinned(customTarget.get(i))){
+					data.getCloth().particles.get(customTarget.get(i)).setAllPosition(v);
+				}
+			}
 			
 		}
 		//for(int i=0;i<data.getCalculator().g)
 	}
+	
+	
 
 	private boolean wind;
 	public void setWind(boolean value){

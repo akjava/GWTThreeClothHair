@@ -190,6 +190,14 @@ public void setHairPins(List<HairPin> hairPins) {
 
 
 	public static class HairPin{
+		private int targetClothIndex=-1;
+		
+		public int getTargetClothIndex() {
+			return targetClothIndex;
+		}
+		public void setTargetClothIndex(int targetClothIndex) {
+			this.targetClothIndex = targetClothIndex;
+		}
 		private int faceIndex;
 		public HairPin(int faceIndex, int vertexOfFaceIndex) {
 			super();
@@ -240,6 +248,9 @@ public void setHairPins(List<HairPin> hairPins) {
 					.add("faceIndex", faceIndex)
 					.add("vertexOfFaceIndex", vertexOfFaceIndex)
 					.toString();
+		}
+		public boolean isCustomPin() {
+			return targetClothIndex!=-1;
 		}
 	}
 	

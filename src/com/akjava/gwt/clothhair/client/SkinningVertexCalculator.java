@@ -37,11 +37,12 @@ public class SkinningVertexCalculator {
 	}
 
 	//add from skinnedMesh vertex
-	public void addByVertexIndex(int index){
+	public void addByVertexIndex(int index,int targetClothIndex){
 		Vector4 skinIndices =skinnedMesh.getGeometry().getSkinIndices().get(index);
 		Vector4 skinWeights =skinnedMesh.getGeometry().getSkinWeights().get(index);
 		Vector3 vertex =skinnedMesh.getGeometry().getVertices().get(index).clone();
 		SkinningVertex skinningVertex=new SkinningVertex(vertex, skinIndices, skinWeights);
+		skinningVertex.setTargetClothIndex(targetClothIndex);
 		add(skinningVertex);
 	}
 	
@@ -51,6 +52,7 @@ public class SkinningVertexCalculator {
 	
 	public void add(SkinningVertex vertex){
 		skinningVertexs.add(vertex);
+		
 		result.add(THREE.Vector3());
 	}
 	
@@ -130,6 +132,16 @@ public class SkinningVertexCalculator {
 		}
 		private Vector4 skinIndices;//usually from origin don't modify
 		private Vector4 skinWeights;//usually from origin don't modify
+		
+		
+		//for custom cloth mapping
+		private int targetClothIndex=-1;
+		public int getTargetClothIndex() {
+			return targetClothIndex;
+		}
+		public void setTargetClothIndex(int targetClothIndex) {
+			this.targetClothIndex = targetClothIndex;
+		}
 	}
 	
 	

@@ -54,7 +54,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		xRange.getRange().setWidth("220px");
 		
 		
-		yRange = new LabeledInputRangeWidget2("y", defaultValue.getY()-.8,  defaultValue.getY()+.4, .001);
+		yRange = new LabeledInputRangeWidget2("y", defaultValue.getY()-1.2,  defaultValue.getY()+.4, .001);
 		this.add(yRange);
 		yRange.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override

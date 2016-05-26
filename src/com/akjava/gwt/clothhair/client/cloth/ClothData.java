@@ -32,7 +32,7 @@ public SkinningVertexCalculator getCalculator() {
 public ClothData(HairData hairData,SkinnedMesh mesh){
 	cloth=new HairCloth(hairData,mesh);
 	cloth.wind=false;
-	cloth.pins=cloth.pinsFormation.get(4);//first and last
+	cloth.setPinAll();
 	
 	clothGeometry = THREE.ParametricGeometry( cloth.clothFunction, cloth.w, cloth.h );
 	clothGeometry.setDynamic(true);
@@ -42,7 +42,8 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 	for(HairPin pin:hairData.getHairPins()){
 		Face3 face=mesh.getGeometry().getFaces().get(pin.getFaceIndex());
 		int vertexIndex=face.gwtGet(pin.getVertexOfFaceIndex());
-		calculator.addByVertexIndex(vertexIndex);
+		calculator.addByVertexIndex(vertexIndex,pin.getTargetClothIndex());
+		//TODO support direct point
 	}
 }
 

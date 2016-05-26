@@ -46,7 +46,18 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			return hairTextureDataEditor;
 		}
 
-		private SimpleEditor<List<HairPin>> hairPinEditor;
+		//private SimpleEditor<List<HairPin>> hairPinEditor;
+		
+		private HairPinPanel hairPinPanel;//maybe no need;
+		
+		public HairPinPanel getHairPinPanel() {
+			return hairPinPanel;
+		}
+
+		public void setHairPinPanel(HairPinPanel hairPinPanel) {
+			this.hairPinPanel = hairPinPanel;
+		}
+
 		private LabeledInputRangeWidget2 uSize;
 		private LabeledInputRangeWidget2 vSize;
 		private CheckBox cutCheck;
@@ -76,7 +87,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		
 		public HairDataEditor(final HairDataPanel hairDataPanel){
 			this.hairDataPanel=hairDataPanel;
-			hairPinEditor=SimpleEditor.of();
+			//hairPinEditor=SimpleEditor.of();
 			
 			uSize = new LabeledInputRangeWidget2("U-Size(W)", 0, 80, 1);
 			this.add(uSize);
@@ -257,5 +268,11 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					LogUtils.log("no hairTextureDataEditor");
 				}
 				hairTextureDataEditor.setValue(value.getHairTextureData());
+				
+				if(hairPinPanel==null){
+					LogUtils.log("no hairPinPanel");
+				}
+				
+				//hairPinPanel.setHairPins(value.getHairPins());
 			}
 	}

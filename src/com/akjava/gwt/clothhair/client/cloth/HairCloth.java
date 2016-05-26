@@ -5,11 +5,13 @@ import java.util.List;
 
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairDataUtils;
+import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
@@ -77,7 +79,17 @@ public class HairCloth {
 	
 	double TIMESTEP_SQ = TIMESTEP * TIMESTEP;
 
-	int[] pins;
+	private int[] pins;
+
+
+	public int[] getPins() {
+		return pins;
+	}
+	
+	
+	public void setPins(int[] pins) {
+		this.pins = pins;
+	}
 
 
 	boolean wind = true;
@@ -208,9 +220,9 @@ public class HairCloth {
 	
 	
 	public void initPins(){//this is initialized based on Cloth's xSegs TODO link
-		int center=w/2+1;
+		int center=w/2+1;//horizontal-center
 		
-		//0
+		//0 center only
 		pins= new int[]{center};
 		pinsFormation.add( pins );
 
@@ -240,6 +252,15 @@ public class HairCloth {
 		pins=pinsFormation.get(4);
 	}
 	
+	public boolean isPinned(int index){
+		for(int i=0;i<pins.length;i++){
+			if(pins[i]==index){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	//compatible
 	/*
 	public Cloth2(int w,int h){
@@ -247,11 +268,34 @@ public class HairCloth {
 	}
 	*/
 	
+	private boolean loopHorizontal;
 	
+	
+	public static int calcurateParticleSize(List<HairPin> pins,int sizeOfU,int sizeOfH){
+		int normalPin=0;
+		for(HairPin pin:pins){
+			if(!pin.isCustomPin()){
+				normalPin++;
+			}
+		}
+		int w=(normalPin-1)*sizeOfU+1;
+		return w*(sizeOfH+1);
+	}
 	public HairCloth(HairData hairData,Mesh mesh){
 			
+		List<HairPin> normalPin=Lists.newArrayList();//trying cutom pin
+		List<HairPin> customPin=Lists.newArrayList();
+		
+		for(HairPin pin:hairData.getHairPins()){
+			if(pin.getTargetClothIndex()==-1){
+				normalPin.add(pin);
+			}else{
+				customPin.add(pin);
+			}
+		}
+		
 			//TODO support 0 sizeOfU
-			this.w = (hairData.getHairPins().size()-1)*hairData.getSizeOfU();
+			this.w = (normalPin.size()-1)*hairData.getSizeOfU();
 			
 			this.h = hairData.getSizeOfV();
 			
@@ -316,6 +360,9 @@ public class HairCloth {
 				
 			}
 			
+		
+			
+			
 			//TODO effect cut
 			for (int u=w, v=0;v<h;v++) {
 				
@@ -334,6 +381,18 @@ public class HairCloth {
 				}
 			}
 
+			
+			
+			//loop-horizontal
+			if(loopHorizontal){
+			for (int v=0;v<=h;v++) {
+				int u=w;
+				constrains.add(
+						new Constrain(particles.get(index(u,v)), particles.get(index(0,v)), distance)
+						);
+			}
+			}
+			
 			
 			//trying last one edging
 			if(hairData.getEdgeMode()!=0){

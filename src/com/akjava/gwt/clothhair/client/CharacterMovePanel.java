@@ -247,7 +247,7 @@ public class CharacterMovePanel extends VerticalPanel{
 	private int boneIndex;
 	private void resetAnimation(){
 		GWTThreeClothHair.INSTANCE.stopAnimation();
-		GWTThreeClothHair.INSTANCE.startAnimation(boneIndex,0,0,0);
+		GWTThreeClothHair.INSTANCE.startAnimation(boneIndex,0,0,0,false,false);
 	}
 	double animationX;
 	double animationY;
@@ -260,7 +260,7 @@ public class CharacterMovePanel extends VerticalPanel{
 	}
 
 	public void startAnimation() {
-		GWTThreeClothHair.INSTANCE.startAnimation(boneIndex,Math.toRadians(animationX), Math.toRadians(animationY), Math.toRadians(animationZ),bothCheck.getValue());
+		GWTThreeClothHair.INSTANCE.startAnimation(boneIndex,Math.toRadians(animationX), Math.toRadians(animationY), Math.toRadians(animationZ),bothCheck.getValue(),true);
 	}
 	
 	public void setSkelton(Skeleton skeleton) {

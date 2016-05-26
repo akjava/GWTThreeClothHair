@@ -4,21 +4,35 @@ import javax.annotation.Nullable;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.HairStorageKeys;
+import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
+import com.akjava.gwt.html5.client.download.HTML5Download;
+import com.akjava.gwt.html5.client.file.File;
+import com.akjava.gwt.html5.client.file.FileUploadForm;
+import com.akjava.gwt.html5.client.file.FileUtils;
+import com.akjava.gwt.html5.client.file.FileUtils.DataURLListener;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
+import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.math.THREEMath;
+import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Skeleton;
+import com.akjava.lib.common.utils.CSVUtils;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class SphereDataPanel extends VerticalPanel{
@@ -28,7 +42,7 @@ public class SphereDataPanel extends VerticalPanel{
 	 
 	SphereDataControler controler;
 	SphereData defaultValue;
-	
+	private SphereDataConverter sphereDataConverter=new SphereDataConverter();
 	 public SphereDataPanel(final SphereDataControler controler,final SphereData defaultValue){
 		 this.controler=controler;
 		 this.defaultValue=defaultValue;
@@ -40,6 +54,29 @@ public class SphereDataPanel extends VerticalPanel{
 		 driver.edit(null);
 		 
 		
+		 Button test=new Button("test",new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				Vector3 axis = THREE.Vector3( 1, 0, 0 );
+				double angle = Math.toRadians( -90 );
+				
+				SphereData data=cellObjects.getSelection();
+				double radius=data.getSize();
+				Vector3 center=data.getPosition().clone();
+				for(int i=0;i<360;i+=30){
+					double rad=Math.toRadians(i);
+					double x=radius*Math.cos(rad);
+					double y=radius*Math.sin(rad);
+					Vector3 pt=THREE.Vector3(x, y, 0);
+					pt.applyAxisAngle( axis, angle );
+					
+					
+				}
+			}
+		});
+		 this.add(test);
+		 
 		 
 		 SimpleCellTable<SphereData> table=new SimpleCellTable<SphereData>() {
 				@Override
@@ -113,6 +150,40 @@ public class SphereDataPanel extends VerticalPanel{
 				}
 			});
 			buttons.add(addBt);
+			
+			Button copyBt=new Button("copy",new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					SphereData selection=cellObjects.getSelection();
+					if(selection==null){
+						return;
+					}
+					SphereData newData=new SphereDataConverter().copy(selection);
+					addSpereData(newData);
+					cellObjects.setSelected(newData, true);
+					
+				}
+			});
+			buttons.add(copyBt);
+			
+			Button copyHBt=new Button("copy H",new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					SphereData selection=cellObjects.getSelection();
+					if(selection==null){
+						return;
+					}
+					SphereData newData=new SphereDataConverter().copy(selection);
+					newData.setX(newData.getX()*-1);
+					addSpereData(newData);
+					cellObjects.setSelected(newData, true);
+					
+				}
+			});
+			buttons.add(copyHBt);
+			
 			Button removeBt=new Button("remove",new ClickHandler() {
 				
 				@Override
@@ -123,12 +194,79 @@ public class SphereDataPanel extends VerticalPanel{
 				}
 			});
 			buttons.add(removeBt);
-			//make controls
 			
+			Button removeAll=new Button("remove ll",new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					boolean confirm=Window.confirm("remove all?");
+					if(!confirm){
+						return;
+					}
+					clearAllSphereData();
+				}
+			});
+			buttons.add(removeAll);
+			//make controls
+
+			 HorizontalPanel uploadPanel=new HorizontalPanel();
+			 uploadPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+			 final ListBox uploadModeBox=new ListBox();
+			 uploadModeBox.addItem("Replace");
+			 uploadModeBox.addItem("Import");
+			 uploadPanel.add(uploadModeBox);
+			 uploadModeBox.setSelectedIndex(0);
+			 
+			 FileUploadForm upload=FileUtils.createSingleTextFileUploadForm(new DataURLListener() {
+				
+				@Override
+				public void uploaded(File file, String text) {
+					if(uploadModeBox.getSelectedIndex()==0){
+						clearAllSphereData();
+					}
+					//todo check validate
+					
+					 Iterable<SphereData> newDatas=sphereDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+					 for(SphereData newData:newDatas){
+						 addSpereData(newData);
+						 cellObjects.setSelected(newData, true);//maybe last selected
+					 }
+					 
+					
+				}
+			}, true, "UTF-8");
+			 upload.setAccept(".csv");
+			 uploadPanel.add(upload);
+			 
+			 //downloads
+			 HorizontalPanel downloadPanels=new HorizontalPanel();
+			 downloadPanels.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+			 final HorizontalPanel download=new HorizontalPanel();
+			 
+			 Button downloadBt=new Button("download",new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					download.clear();
+					String text=toStoreText();
+					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "spheres.csv", "click to download",true);
+					download.add(a);
+				}
+			});
+			 downloadPanels.add(downloadBt);
+			 downloadPanels.add(download);
+			 
+			 this.add(uploadPanel);
+			 this.add(downloadPanels);
 			
 	 }
 	 
-	 private SphereDataConverter converter=new SphereDataConverter();
+	 protected void clearAllSphereData() {
+		 for(SphereData data:ImmutableList.copyOf(cellObjects.getDatas())){
+				removeSpereData(data);
+			}
+	}
+
+	private SphereDataConverter converter=new SphereDataConverter();
 	 private StorageControler storageControler=new StorageControler();
 	private SphereDataEditor sphereDataEditor;
 	 public void onFlushed(){
@@ -136,13 +274,17 @@ public class SphereDataPanel extends VerticalPanel{
 		 GWTThreeClothHair.INSTANCE.syncSphereDataAndSkinningVertexCalculator(sphereDataEditor.getValue());
 		 
 		 //store data
-		 String lines=Joiner.on("\r\n").join(converter.convertAll(cellObjects.getDatas()));
+		 String lines=toStoreText();
 		 try {
 			storageControler.setValue(HairStorageKeys.KEY_SPHERES, lines);
 		} catch (StorageException e) {
 			//possible quote error
 			LogUtils.log(e.getMessage());
 		}
+	 }
+	 
+	 public String toStoreText(){
+		return Joiner.on("\r\n").join(converter.convertAll(cellObjects.getDatas()));
 	 }
 	 
 	 public void addSpereData(SphereData data){

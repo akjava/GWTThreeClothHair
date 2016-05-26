@@ -1,7 +1,7 @@
 package com.akjava.gwt.clothhair.client.deprecated;
 
-import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.renderers.WebGLRendererParameter;
+import com.akjava.gwt.three.client.java.ui.AbstractThreeApp;
 import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.cameras.PerspectiveCamera;

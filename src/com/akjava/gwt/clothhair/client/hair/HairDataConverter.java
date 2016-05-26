@@ -23,10 +23,12 @@ public class HairDataConverter extends Converter<HairData,String> {
 		Joiner joiner=Joiner.on(":");
 		List<Integer> faceIndex=Lists.newArrayList();
 		List<Integer> vertexIndex=Lists.newArrayList();
+		List<Integer> targetIndex=Lists.newArrayList();
 		for(int i=0;i<data.getHairPins().size();i++){
 			HairPin pin=data.getHairPins().get(i);
 			faceIndex.add(pin.getFaceIndex());
 			vertexIndex.add(pin.getVertexOfFaceIndex());
+			targetIndex.add(pin.getTargetClothIndex());
 		}
 		csv.add(joiner.join(faceIndex));//1 face index
 		csv.add(joiner.join(vertexIndex));//2 vertex index
@@ -49,6 +51,7 @@ public class HairDataConverter extends Converter<HairData,String> {
 		
 		csv.add(converter.convert(data.getHairTextureData()));//11
 		
+		csv.add(joiner.join(targetIndex));//12 targetIndex
 		
 		return Joiner.on(",").join(csv);
 	}
@@ -120,6 +123,15 @@ public class HairDataConverter extends Converter<HairData,String> {
 		}
 		if(csv.length>11){
 			data.setHairTextureData(converter.reverse().convert(csv[11]));
+		}
+		if(csv.length>12){
+			List<Integer> targetIndex= FluentIterable.from(Arrays.asList(csv[12].split(":"))).transform(StringToPrimitiveFunctions.toInteger()).toList();
+			if(targetIndex.size()!=data.getHairPins().size()){
+				LogUtils.log("invalid target index size");
+			}
+			for(int i=0;i<data.getHairPins().size();i++){
+				data.getHairPins().get(i).setTargetClothIndex(targetIndex.get(i));
+			}
 		}
 		
 		return data;

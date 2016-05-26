@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.HairStorageKeys;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
+import com.akjava.gwt.clothhair.client.cloth.HairCloth;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataFunctions.HairPinToVertex;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
@@ -31,7 +32,6 @@ import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.BufferAttribute;
 import com.akjava.gwt.three.client.js.core.BufferGeometry;
 import com.akjava.gwt.three.client.js.core.Face3;
-import com.akjava.gwt.three.client.js.loaders.TextureLoader;
 import com.akjava.gwt.three.client.js.loaders.ImageLoader.ImageLoadHandler;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Matrix3;
@@ -62,12 +62,14 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -79,6 +81,8 @@ public class HairDataPanel extends VerticalPanel{
 
 	private SkinnedMesh characterMesh;
 
+	private HairPinPanel hairPinPanel;
+	
 	public HairCellObjectData getSelection(){
 		return cellObjects.getSelection();
 	}
@@ -86,9 +90,9 @@ public class HairDataPanel extends VerticalPanel{
 		return cellObjects.getDatas();
 	}
 	private Label verticalDistanceLabel;
-	public HairDataPanel(final SkinnedMesh characterMesh,HairTextureDataEditor hairTextureDataEditor){
+	public HairDataPanel(final SkinnedMesh characterMesh,HairTextureDataEditor hairTextureDataEditor,HairPinPanel hairPinPanel){
 		this.characterMesh=characterMesh;
-		
+		this.hairPinPanel=hairPinPanel;
 		
 		HorizontalPanel h1=new HorizontalPanel();
 		h1.add(new Label("Global Color"));
@@ -168,6 +172,7 @@ public class HairDataPanel extends VerticalPanel{
 
 		editor = new HairDataEditor(this);
 		editor.setHairTextureDataEditor(hairTextureDataEditor);
+		editor.setHairPinPanel(hairPinPanel);
 		driver.initialize(editor);
 		
 		
@@ -177,15 +182,15 @@ public class HairDataPanel extends VerticalPanel{
 		HorizontalPanel distancePanel=new HorizontalPanel();
 		hairPanel.add(distancePanel);
 		pinsLabel=new Label("Pins:");
-		pinsLabel.setWidth("50px");
+		pinsLabel.setWidth("110px");
 		distancePanel.add(pinsLabel);
 		
 		horizontalDistanceLabel = new Label("H:");
-		horizontalDistanceLabel.setWidth("130px");
+		horizontalDistanceLabel.setWidth("100px");
 		distancePanel.add(horizontalDistanceLabel);
 		
 		verticalDistanceLabel = new Label("V:");
-		verticalDistanceLabel.setWidth("130px");
+		verticalDistanceLabel.setWidth("100px");
 		distancePanel.add(verticalDistanceLabel);
 		
 		driver.edit(new HairData());//new data
@@ -288,7 +293,7 @@ public class HairDataPanel extends VerticalPanel{
 							hairPins.add(pin);
 						}
 					}
-					
+					updateHairPinPanel();
 					//LogUtils.log(hairDataConverter.convert(data.getHairData()));
 					updateHairDataLine();
 					
@@ -353,17 +358,39 @@ public class HairDataPanel extends VerticalPanel{
 		 String text=storageControler.getValue(HairStorageKeys.temp_hairset, null);
 		 if(text!=null && !text.isEmpty()){
 			 Iterable<HairData> hairDatas=hairDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
-			 for(HairData hairData:hairDatas){
-				 addCloth(hairData,false);//reading no need store
-			 }
+			 final List<HairData> loadingDatas=Lists.newArrayList(hairDatas);
+			 //this initial load make problem,without sync because of sharing canvas(without share,crash lack of memory)
+			 new Timer(){
+				@Override
+				public void run() {
+					if(!GWTThreeClothHair.INSTANCE.isUpdatingHairTextureMap()){
+						HairData hairData=loadingDatas.remove(0);
+						addCloth(hairData,false);//reading no need store
+						if(loadingDatas.isEmpty()){
+							cancel();
+						}
+					}
+				}
+				 
+			 }.scheduleRepeating(10);
 		 }
 		
+		 
+		 HorizontalPanel uploadPanel=new HorizontalPanel();
+		 uploadPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+		 final ListBox uploadModeBox=new ListBox();
+		 uploadModeBox.addItem("Replace");
+		 uploadModeBox.addItem("Import");
+		 uploadPanel.add(uploadModeBox);
+		 uploadModeBox.setSelectedIndex(0);
 		 
 		 FileUploadForm upload=FileUtils.createSingleTextFileUploadForm(new DataURLListener() {
 			
 			@Override
 			public void uploaded(File file, String text) {
-				clearAllHairData();
+				if(uploadModeBox.getSelectedIndex()==0){
+					clearAllHairData();
+				}
 				//todo check validate
 				
 				 Iterable<HairData> hairDatas=hairDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
@@ -375,10 +402,11 @@ public class HairDataPanel extends VerticalPanel{
 			}
 		}, true, "UTF-8");
 		 upload.setAccept(".csv");
-		 hairPanel.add(upload);
+		 uploadPanel.add(upload);
 		 
+		 //downloads
 		 HorizontalPanel downloadPanels=new HorizontalPanel();
-		 hairPanel.add(downloadPanels);
+		 downloadPanels.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 		 final HorizontalPanel download=new HorizontalPanel();
 		 
 		 Button downloadBt=new Button("download",new ClickHandler() {
@@ -393,6 +421,17 @@ public class HairDataPanel extends VerticalPanel{
 		});
 		 downloadPanels.add(downloadBt);
 		 downloadPanels.add(download);
+		 
+		 
+		 
+		 
+		 //add
+		 hairPanel.add(uploadPanel);
+		 hairPanel.add(downloadPanels);
+	}
+	
+	public void updateHairPinPanel(){
+		hairPinPanel.setHairPins(hairPins);
 	}
 	
 	public static class HairCellObjectData{
@@ -512,6 +551,7 @@ private void createClothPanel(Panel parent){
 			@Override
 			public void onClick(ClickEvent event) {
 				hairPins.add(0,currentSelection);
+				updateHairPinPanel();
 				updateHairDataLine();
 			}
 		});
@@ -523,20 +563,35 @@ private void createClothPanel(Panel parent){
 				if(hairPins.size()>0){
 					hairPins.remove(hairPins.size()-1);
 				}
-				
+				updateHairPinPanel();
 				updateHairDataLine();
 			}
 		});
 		h3.add(removeLastPoint);
 		
+		
 		Button removeSelectedPoint=new Button("remove selection",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				/*
+				 * it's hard to re-select same face by hand
+				 */
+				
+				/*
+				LogUtils.log("selection:"+currentSelection);
+				for(HairPin pin:hairPins){
+					LogUtils.log("contain:"+pin);
+				}
+				*/
+				
 				hairPins.remove(currentSelection);
 				updateHairDataLine();
 			}
 		});
-		h3.add(removeSelectedPoint);
+		//stop using here
+		//h3.add(removeSelectedPoint);
+		
+		
 		
 		Button removeAllPoint=new Button("remove all point",new ClickHandler() {
 			@Override
@@ -563,9 +618,15 @@ public void executeAddPoint(){
 	if(currentSelection==null){
 		return;
 	}
+	addPin(currentSelection);
+}
+
+public void addPin(HairPin pin){
 	hairPins.add(currentSelection);
 	updateHairDataLine();
+	updateHairPinPanel();
 }
+
 
 private void clearAllPoints(){
 	firstSelection=null;
@@ -576,6 +637,7 @@ private void clearAllPoints(){
 		GWTThreeClothHair.INSTANCE.getScene().remove(hairDataLine);
 		hairDataLine=null;
 	}
+	updateHairPinPanel();
 }
 
 	void updateDistanceLabel(){
@@ -587,14 +649,14 @@ private void clearAllPoints(){
 			}
 		}
 		
-		pinsLabel.setText("Pins:"+pins.size());
+		pinsLabel.setText("Pins:"+pins.size()+" p="+HairCloth.calcurateParticleSize(pins,editor.getSizeOfU(),editor.getSizeOfV()));
 		
 		double distance=HairDataUtils.getTotalPinDistance(pins, characterMesh, false);
 		horizontalDistanceLabel.setText(
 				("H:"+distance).substring(0,7)
 						);
 		//no need * scaleof u
-		
+		//update and make method
 		int w = (pins.size()-1)*editor.getSizeOfU();
 		int h= editor.getSizeOfV();
 		
@@ -652,7 +714,9 @@ private void clearAllPoints(){
 		
 		selectedLine=line;
 		
-		GWTThreeClothHair.INSTANCE.getScene().add(selectedLine);
+		if(line!=null){
+			GWTThreeClothHair.INSTANCE.getScene().add(selectedLine);
+		}
 	}
 
 	
@@ -745,6 +809,8 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 		vertex=mesh.getGeometry().getVertices().get(face.getC());
 	}
 	
+	//TODO support direct point
+	
 	if(applyMatrix4){
 	return vertex.clone().applyMatrix4( mesh.getMatrixWorld());
 	}else{
@@ -825,7 +891,12 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 	
 		//indivisual haiar material
 		
-		Texture texture=THREE.TextureLoader().load("models/mbl3d/bump2c.png");
+		Texture texture=THREE.TextureLoader().load(
+				//"models/mbl3d/bump2c.png"
+				"/hairpattern/hairpattern1.png"
+				);
+		
+		
 		texture.setFlipY(false);
 		texture.setNeedsUpdate(true);
 		
@@ -841,7 +912,8 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 				//.specular(0xffffff)
 				.shininess(5) //switch default same as texture otherwise not good at connection
 				//.wireframe(true)
-				//.specular(0xffffff)//TODO move editor
+				.specular(0xffffff)//TODO move editor
+				.specularMap(texture)
 				//.shininess(15)
 				
 				
@@ -851,8 +923,8 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 				.displacementBias(4)
 				*/
 				
-				//.bumpMap(texture)
-				//.bumpScale(16)
+				.bumpMap(texture)
+				.bumpScale(0.5)
 				
 				//.di
 				);
@@ -902,17 +974,29 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 		
 		}else{
 			int cw=hairData.getSizeOfU();
-			for(int i=0;i<hairData.getHairPins().size();i++){
-				Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(i),true);
+			
+			List<HairPin> normalPin=Lists.newArrayList();
+			List<HairPin> customPin=Lists.newArrayList();
+			
+			for(HairPin pin:hairData.getHairPins()){
+				if(pin.getTargetClothIndex()==-1){
+					normalPin.add(pin);
+				}else{
+					customPin.add(pin);
+				}
+			}
+			
+			for(int i=0;i<normalPin.size();i++){
+				Vector3 v1=hairPinToVertex(characterMesh,normalPin.get(i),true);
 				int index=hairData.getSizeOfU()*i;
 				data.getCloth().particles.get(index).setAllPosition(v1);
 				
 				//LogUtils.log("main:"+index);
 				
 				
-				if(i!=hairData.getHairPins().size()-1){
+				if(i!=normalPin.size()-1){
 					//has next;
-					Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(i+1),true);
+					Vector3 v2=hairPinToVertex(characterMesh,normalPin.get(i+1),true);
 					Vector3 sub=v2.clone().sub(v1).divideScalar(cw);
 					
 					for(int j=1;j<cw;j++){
@@ -938,6 +1022,11 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 				data.getCloth().particles.get(j).setAllPosition(pos);
 			}
 			
+			for(HairPin pin:customPin){
+				Vector3 v=hairPinToVertex(characterMesh,pin,true);
+				data.getCloth().particles.get(pin.getTargetClothIndex()).setAllPosition(v);
+			}
+			
 			
 			/*
 			for(int i=0;i<cw*(hairData.getHairPins().size()-1);i++){
@@ -945,7 +1034,39 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 			}
 			*/
 			
+			int w=data.getCloth().getW()+1;
+			int[] newPins=new int[w+customPin.size()];
+			for(int i=0;i<w;i++){
+				newPins[i]=i;
+			}
+			for(int i=0;i<customPin.size();i++){
+				newPins[w+i]=customPin.get(i).getTargetClothIndex();
+			}
+			data.getCloth().setPins(newPins);
 			
+			/*
+			LogUtils.log("pins");
+			for(int i=0;i<newPins.length;i++){
+				LogUtils.log(newPins[i]);
+			}
+			*/
+		
+			/*
+			if(customPin.size()>0){
+			int[] newPins=new int[customPin.size()];
+			for(int i=0;i<customPin.size();i++){
+				newPins[i]=customPin.get(i).getTargetClothIndex();
+			}
+			data.getCloth().setPins(newPins);
+			
+			LogUtils.log("pins");
+			for(int i=0;i<newPins.length;i++){
+				LogUtils.log(newPins[i]);
+			}
+			
+			
+			}
+			*/
 			
 		}
 		
@@ -989,7 +1110,7 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 	private Label horizontalDistanceLabel;
 	private Label pinsLabel;
 	private HairDataEditor editor;
-
+	
 	private void clearAllHairData(){
 		for(HairCellObjectData data:ImmutableList.copyOf(cellObjects.getDatas())){
 			removeHairData(data);
