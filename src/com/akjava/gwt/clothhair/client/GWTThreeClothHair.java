@@ -589,7 +589,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		if(data.isCopyHorizontal()){
 			SphereData data2=data.clone();
-			data2.setX(data2.getX()*-1);
+			updateHorizontalMirror(data2);
 			mirrorMap.put(data, data2);
 			initSphereCalculatorAndMesh(data2,0x880000);
 		}
@@ -618,7 +618,58 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	public void updateHorizontalMirror(SphereData data){
 		data.setX(data.getX()*-1);
 		//boneName
+		String boneName=characterMesh.getSkeleton().getBones().get(data.getBoneIndex()).getName();
+		String mirrowName=getMirroredBoneName(boneName);
+		if(mirrowName!=null){
+			int index=-1;
+			for(int i=0;i<characterMesh.getSkeleton().getBones().length();i++){
+				String name=characterMesh.getSkeleton().getBones().get(i).getName();
+				if(name.equals(mirrowName)){
+					index=i;
+					break;
+				}
+			}
+			if(index!=-1){
+				data.setBoneIndex(index);
+			}
+			LogUtils.log(mirrowName+","+index);
+		}
 	}
+	
+	//TODO make method
+	protected String getMirroredBoneName(String name) {
+		if(name.endsWith("_R")){
+			return name.replace("_R", "_L");
+		}
+		if(name.endsWith("_L")){
+			return name.replace("_L", "_R");
+		}
+		
+		if(name.indexOf("Right")!=-1){
+			return name.replace("Right", "Left");
+		}
+		if(name.indexOf("right")!=-1){
+			return name.replace("right", "left");
+		}
+		if(name.indexOf("Left")!=-1){
+			return name.replace("Left", "Right");
+		}
+		if(name.indexOf("left")!=-1){
+			return name.replace("left", "right");
+		}
+		//makehuman 19 bones
+		/*
+		if(name.startsWith("r")){
+			return "l"+name.substring(1);
+		}
+		else if(name.startsWith("l")){
+			return "r"+name.substring(1);
+		}
+		*/
+		
+		return null;
+	}
+	
 	/*
 	 * called when flushed
 	 */
@@ -640,7 +691,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				//create here
 				data2=data.clone();
 				
-				data2.setX(data2.getX()*-1);
+				updateHorizontalMirror(data2);
 				//TODO change bone name & make method
 				mirrorMap.put(data, data2);
 			}else{

@@ -134,7 +134,9 @@ public class HairDataPanel extends VerticalPanel{
 						//extremly slow
 						for(HairCellObjectData cellData:cellObjects.getDatas()){
 							//TODO check use local or not
+							if(!cellData.getHairData().getHairTextureData().isUseLocalColor()){
 							GWTThreeClothHair.INSTANCE.updateHairTextureColor(cellData,colorValue);
+							}
 						}
 					}
 					
