@@ -649,7 +649,9 @@ private void clearAllPoints(){
 			}
 		}
 		
-		pinsLabel.setText("Pins:"+pins.size()+" p="+HairCloth.calcurateParticleSize(pins,editor.getSizeOfU(),editor.getSizeOfV()));
+		pinsLabel.setText("Pins:"+pins.size()+" p="+HairCloth.calcurateParticleSize(pins,editor.getSizeOfU(),editor.getSizeOfV())
+				+",w="+HairCloth.calcurateWSize(pins,editor.getSizeOfU())
+				);
 		
 		double distance=HairDataUtils.getTotalPinDistance(pins, characterMesh, false);
 		horizontalDistanceLabel.setText(

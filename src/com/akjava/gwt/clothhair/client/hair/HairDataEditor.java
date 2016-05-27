@@ -202,12 +202,12 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			
 			HorizontalPanel syncPanel=new HorizontalPanel();
 			syncPanel.setVerticalAlignment(ALIGN_MIDDLE);
-			syncPanel.add(createLabel("sync:"));
+			syncPanel.add(new Label("sync:"));
 			this.add(syncPanel);
 			syncCheck = new CheckBox();
 			syncPanel.add(syncCheck);
 			
-			syncPanel.add(createLabel("connectHorizontal:"));
+			syncPanel.add(new Label("connectHorizontal:"));
 			
 			connectHorizontalCheck = new CheckBox();
 			syncPanel.add(connectHorizontalCheck);

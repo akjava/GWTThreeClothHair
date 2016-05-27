@@ -6,6 +6,14 @@ import com.akjava.gwt.three.client.js.math.Vector3;
 public class SphereData {
 private Vector3 position=THREE.Vector3();
 private boolean enabled;
+private boolean copyHorizontal;
+public boolean isCopyHorizontal() {
+	return copyHorizontal;
+}
+
+public void setCopyHorizontal(boolean copyHorizontal) {
+	this.copyHorizontal = copyHorizontal;
+}
 
 private int channel;
 public int getChannel() {
@@ -29,7 +37,18 @@ public Vector3 getPosition() {
 }
 
 public SphereData clone(){
-	return new SphereData(position.getX(),position.getY(), position.getZ(), size, enabled,boneIndex);
+	return copyTo(new SphereData());
+}
+
+public SphereData copyTo(SphereData data){
+	data.set(this.getX(),this.getY(),this.getZ());
+	data.setSize(this.getSize());
+	data.setEnabled(enabled);
+	data.setBoneIndex(boneIndex);
+	data.setChannel(channel);
+	data.setCopyHorizontal(copyHorizontal);
+	
+	return data;
 }
 
 public SphereData(double x, double y, double z, double size,boolean enabled,int boneIndex) {
@@ -38,6 +57,9 @@ public SphereData(double x, double y, double z, double size,boolean enabled,int 
 	this.size = size;
 	this.enabled=enabled;
 	this.boneIndex=boneIndex;
+}
+public SphereData(){
+	super();
 }
 
 private int boneIndex;
@@ -48,6 +70,9 @@ public int getBoneIndex() {
 
 public void setBoneIndex(int boneIndex) {
 	this.boneIndex = boneIndex;
+}
+public void set(double x,double y,double z){
+	position.set(x, y, z);
 }
 
 public double getX() {

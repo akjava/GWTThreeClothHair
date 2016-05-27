@@ -21,6 +21,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.text.shared.Renderer;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -158,6 +159,18 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 				flush();
 			}
 		});
+		
+		copyHorizontalCheck = new CheckBox("copy horizontal");
+		channelPanel.add(copyHorizontalCheck);
+		copyHorizontalCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				flush();
+			}
+			
+		});
+		
 	}
 	
 
@@ -182,6 +195,8 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			value.setBoneIndex(boneIndexBox.getValue().getIndex());
 			
 			value.setChannel(channelBox.getSelectedIndex());
+			
+			value.setCopyHorizontal(copyHorizontalCheck.getValue());
 			//sync here?
 			panel.onFlushed();
 		}
@@ -246,6 +261,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		private ValueListBox<BoneData> boneIndexBox;
 		private List<BoneData> boneDatas;
 		private ListBox channelBox;
+		private CheckBox copyHorizontalCheck;
 		@Override
 		public void setValue(SphereData value) {
 			this.value=value;
@@ -283,6 +299,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			
 			channelBox.setSelectedIndex(value.getChannel());
 			
+			copyHorizontalCheck.setValue(value.isCopyHorizontal());
 		}
 		
 		public static interface SphereUpdateListener{

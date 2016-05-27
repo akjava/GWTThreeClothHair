@@ -278,6 +278,9 @@ public class HairCloth {
 		this.connectHorizontal = loopHorizontal;
 	}
 	public static int calcurateParticleSize(List<HairPin> pins,int sizeOfU,int sizeOfH){
+		return calcurateWSize(pins,sizeOfU)*(sizeOfH+1);
+	}
+	public static int calcurateWSize(List<HairPin> pins,int sizeOfU){
 		int normalPin=0;
 		for(HairPin pin:pins){
 			if(!pin.isCustomPin()){
@@ -285,7 +288,7 @@ public class HairCloth {
 			}
 		}
 		int w=(normalPin-1)*sizeOfU+1;
-		return w*(sizeOfH+1);
+		return w;
 	}
 	public HairCloth(HairData hairData,Mesh mesh){
 			

@@ -557,11 +557,20 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	
 	
-	@Override
-	public void removeSphereData(SphereData data){
+	private void removeSphereMesh(SphereData data){
 		Mesh sphere=sphereMeshMap.get(data).getMesh();
 		clothControls.removeSphere(sphere);
 		scene.remove(sphere);
+	}
+	@Override
+	public void removeSphereData(SphereData data){
+		removeSphereMesh(data);
+		
+		SphereData data2=mirrorMap.get(data);
+		if(data2!=null){
+			removeSphereMesh(data2);
+			mirrorMap.remove(data);
+		}
 	}
 	@Override
 	public void addSphereData(SphereData data){
@@ -577,8 +586,42 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		
 		sphereMeshMap.put(data, new SphereCalculatorAndMesh(characterMesh, data.getBoneIndex(), sphere));
+		
+		if(data.isCopyHorizontal()){
+			SphereData data2=data.clone();
+			data2.setX(data2.getX()*-1);
+			mirrorMap.put(data, data2);
+			initSphereCalculatorAndMesh(data2,0x880000);
+		}
+		
 	}
 	
+	private Map<SphereData,SphereData> mirrorMap=Maps.newHashMap();
+	
+	private SphereCalculatorAndMesh initSphereCalculatorAndMesh(SphereData data,int color){
+		MeshPhongMaterial ballMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(color).side(THREE.DoubleSide).wireframe(true));
+		
+		Mesh sphere = THREE.Mesh( ballGeo, ballMaterial );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
+		scene.add( sphere );
+		
+		sphere.getScale().setScalar(data.getSize());
+		
+		clothControls.addSphere(sphere,data.getChannel());
+		
+		SphereCalculatorAndMesh calculatorAndMesh=new SphereCalculatorAndMesh(characterMesh, data.getBoneIndex(), sphere);
+		sphereMeshMap.put(data, calculatorAndMesh);
+		return calculatorAndMesh;
+	}
+	
+	
+	
+	public void updateHorizontalMirror(SphereData data){
+		data.setX(data.getX()*-1);
+		//boneName
+	}
+	/*
+	 * called when flushed
+	 */
 	public void syncSphereDataAndSkinningVertexCalculator(SphereData data){
 		if(data==null){
 			return;
@@ -590,6 +633,44 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//plus sync channel
 		clothControls.updateSphere(sphereMeshMap.get(data).getMesh(), data.getChannel());
+		
+		if(data.isCopyHorizontal()){
+			SphereData data2=mirrorMap.get(data);
+			if(data2==null){
+				//create here
+				data2=data.clone();
+				
+				data2.setX(data2.getX()*-1);
+				//TODO change bone name & make method
+				mirrorMap.put(data, data2);
+			}else{
+				//copy
+				data.copyTo(data2);
+				updateHorizontalMirror(data2);
+			}
+			
+			if(sphereMeshMap.get(data2)==null){
+				initSphereCalculatorAndMesh(data2,0x880000).getCalculator();;
+			}
+			
+			SkinningVertexCalculator calculator2=sphereMeshMap.get(data2).getCalculator();
+			
+			for(SkinningVertex vertex:calculator2.getSkinningVertexs()){
+				vertex.getSkinIndices().setX(data2.getBoneIndex());
+			}
+			
+			//plus sync channel
+			clothControls.updateSphere(sphereMeshMap.get(data2).getMesh(), data2.getChannel());
+			
+		}else{
+			//no need
+			SphereData data2=mirrorMap.get(data);
+			if(data2!=null){
+				removeSphereMesh(data2);
+				mirrorMap.remove(data);
+			}
+		}
+		
 	}
 	
 	public void updateSphereMeshs(){
@@ -933,8 +1014,23 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	HairDataPanel hairDataPanel;
 	private Panel createHairDataPanel(HairTextureDataEditor editor,HairPinPanel hairPinPanel){
+		VerticalPanel panel=new VerticalPanel();
+		HorizontalPanel buttons=new HorizontalPanel();
+		
+		Button showSphere=new Button("show/hide sphere",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				updateSphereVisible(!isSphereVisible());
+			}
+		});
+		buttons.add(showSphere);
+		panel.add(buttons);
+		
+		
 		hairDataPanel= new HairDataPanel(characterMesh,editor,hairPinPanel);
-		return hairDataPanel;
+		panel.add(hairDataPanel);
+		
+		return panel;
 	}
 	
 	private Panel createTexturePanel(){
@@ -999,6 +1095,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		hairMaterial.setNeedsUpdate(true);
 	}
 	
+	private boolean isSphereVisible(){
+		boolean visible=false;
+		for(SphereCalculatorAndMesh smesh:sphereMeshMap.values()){
+			visible=smesh.getMesh().isVisible();
+		}
+		return visible;
+	}
 	private void updateSphereVisible(boolean visible){
 		for(SphereCalculatorAndMesh smesh:sphereMeshMap.values()){
 			smesh.getMesh().setVisible(visible);
@@ -1021,17 +1124,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		HorizontalPanel controler=new HorizontalPanel();
 		panel.add(controler);
-		CheckBox visibleAllCheck=new CheckBox("visible all");
-		visibleAllCheck.setValue(true);
-		visibleAllCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				updateSphereVisible(event.getValue());
-			}
-			
-		});
-		controler.add(visibleAllCheck);
+		
 	
 		sphereDataPanel = new SphereDataPanel(this, firstOne);
 	
