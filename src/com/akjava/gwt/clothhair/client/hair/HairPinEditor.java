@@ -11,6 +11,7 @@ import com.google.gwt.editor.client.ValueAwareEditor;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.text.shared.Renderer;
+import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.ValueListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -23,28 +24,10 @@ public class HairPinEditor extends VerticalPanel implements Editor<HairPin>,Valu
 		for(int i=0;i<=31;i++){
 			values.add(i-1);
 		}
-		indexBox = new ValueListBox<Integer>(new Renderer<Integer>() {
-
-			@Override
-			public String render(Integer object) {
-				if(object==null){
-					return null;
-				}
-				if(object==-1){
-					return "Auto";
-				}
-				return String.valueOf(object);
-			}
-
-			@Override
-			public void render(Integer object, Appendable appendable) throws IOException {
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		indexBox = new IntegerBox();
 		add(indexBox);
-		indexBox.setValue(-1);
-		indexBox.setAcceptableValues(values);
+		indexBox.setValue(-1);//TODO change checkbox?
+		
 		indexBox.addValueChangeHandler(new ValueChangeHandler<Integer>() {
 			
 			@Override
@@ -55,7 +38,7 @@ public class HairPinEditor extends VerticalPanel implements Editor<HairPin>,Valu
 	}
 
 	private HairPin value;
-	private ValueListBox<Integer> indexBox;
+	private IntegerBox indexBox;
 	
 	
 @Override

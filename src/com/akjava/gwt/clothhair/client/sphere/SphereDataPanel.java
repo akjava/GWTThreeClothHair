@@ -298,6 +298,7 @@ public class SphereDataPanel extends VerticalPanel{
 		 }
 		 cellObjects.removeItem(data);
 		 controler.removeSphereData(data);
+		 sphereDataEditor.setValue(null);
 		 onFlushed();
 	 }
 	 

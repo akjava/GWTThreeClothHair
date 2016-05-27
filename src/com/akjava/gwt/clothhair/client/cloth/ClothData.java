@@ -3,6 +3,7 @@ package com.akjava.gwt.clothhair.client.cloth;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
@@ -34,9 +35,18 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 	cloth.wind=false;
 	cloth.setPinAll();
 	
-	clothGeometry = THREE.ParametricGeometry( cloth.clothFunction, cloth.w, cloth.h );
+	int slices=cloth.w;
+	if(cloth.isConnectHorizontal()){
+		slices++;
+	}
+	
+	clothGeometry = THREE.ParametricGeometry( cloth.clothFunction, slices, cloth.h );
 	clothGeometry.setDynamic(true);
 	clothGeometry.computeFaceNormals();
+	
+	//LogUtils.log("p-size:"+cloth.particles.size());
+	//LogUtils.log("g-size:"+clothGeometry.getVertices().length());
+	
 	
 	calculator=new SkinningVertexCalculator(mesh);
 	for(HairPin pin:hairData.getHairPins()){

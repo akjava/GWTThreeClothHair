@@ -53,6 +53,8 @@ public class HairDataConverter extends Converter<HairData,String> {
 		
 		csv.add(joiner.join(targetIndex));//12 targetIndex
 		
+		csv.add(String.valueOf(data.isConnectHorizontal()));//13
+		
 		return Joiner.on(",").join(csv);
 	}
 
@@ -132,6 +134,10 @@ public class HairDataConverter extends Converter<HairData,String> {
 			for(int i=0;i<data.getHairPins().size();i++){
 				data.getHairPins().get(i).setTargetClothIndex(targetIndex.get(i));
 			}
+		}
+		
+		if(csv.length>13){
+			data.setConnectHorizontal(Boolean.valueOf(csv[13]));
 		}
 		
 		return data;

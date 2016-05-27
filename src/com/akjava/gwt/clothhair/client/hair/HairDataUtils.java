@@ -18,7 +18,7 @@ public class HairDataUtils {
 	public static double getTotalPinDistance(List<HairPin> pins,Mesh mesh,boolean applymatrix){
 		double distance=0;
 		HairPinToVertex hairPinToVertex= new HairPinToVertex(mesh,applymatrix);
-		List<Vector3> vecs=FluentIterable.from(pins).transform(hairPinToVertex).toList();
+		List<Vector3> vecs=FluentIterable.from(pins).filter(HairPinPredicates.NoTargetOnly()).transform(hairPinToVertex).toList();
 		for(int i=0;i<vecs.size()-1;i++){
 			double d=vecs.get(i).distanceTo(vecs.get(i+1));
 			distance+=d;

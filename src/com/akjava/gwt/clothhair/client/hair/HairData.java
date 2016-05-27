@@ -9,6 +9,15 @@ import com.google.common.collect.Lists;
 public class HairData {
 	
 private boolean visible;
+private boolean connectHorizontal;
+public boolean isConnectHorizontal() {
+	return connectHorizontal;
+}
+
+public void setConnectHorizontal(boolean connectHorizontal) {
+	this.connectHorizontal = connectHorizontal;
+}
+
 //not store
 public boolean isVisible() {
 	return visible;

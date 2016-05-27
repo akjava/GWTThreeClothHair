@@ -70,6 +70,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private ListBox edgeMode;
 		private ListBox channelBox;
 		private CheckBox syncCheck;
+		private CheckBox connectHorizontalCheck;
 		
 		private HairDataPanel hairDataPanel;
 		private LabeledInputRangeWidget2 mass;
@@ -206,6 +207,11 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			syncCheck = new CheckBox();
 			syncPanel.add(syncCheck);
 			
+			syncPanel.add(createLabel("connectHorizontal:"));
+			
+			connectHorizontalCheck = new CheckBox();
+			syncPanel.add(connectHorizontalCheck);
+			
 		}
 		private Label createLabel(String name){
 			Label label=new Label(name);
@@ -234,7 +240,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setSyncMove(syncCheck.getValue());
 				value.setMass(mass.getValue());
 				value.setDamping(damping.getValue());
-				
+				value.setConnectHorizontal(connectHorizontalCheck.getValue());
 				//no need getHairTextureData update,because these value are updated dynamic
 			}
 
@@ -263,6 +269,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				syncCheck.setValue(value.isSyncMove());
 				mass.setValue(value.getMass());
 				damping.setValue(value.getDamping());
+				connectHorizontalCheck.setValue(value.isConnectHorizontal());
 				
 				if(hairTextureDataEditor==null){
 					LogUtils.log("no hairTextureDataEditor");

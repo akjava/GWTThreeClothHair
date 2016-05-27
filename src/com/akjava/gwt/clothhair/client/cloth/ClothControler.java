@@ -38,6 +38,7 @@ public class ClothControler {
 	
 	public void addSphere(Mesh data,int channel){
 		getSphereList(channel).add(data);
+		//LogUtils.log("added  ch:"+channel+"="+getSphereList(channel).size());
 	}
 	
 	public void updateSphere(Mesh data,int channel){
@@ -60,9 +61,13 @@ public class ClothControler {
 	}
 	
 	public void update(double time){
+		
 		syncPins();
-		animateCloth(time);
+		
+		animateCloth(time);//TODO fix wind
+		
 		renderCloth();
+		
 	}
 	
 	private void syncPins() {
@@ -259,6 +264,7 @@ public class ClothControler {
 	}
 	*/
 	
+	boolean debugfirstTime=false;
 	public void renderCloth(){
 		for(ClothData data:cloths){
 			HairCloth cloth=data.getCloth();
@@ -266,10 +272,40 @@ public class ClothControler {
 			
 			List<HairCloth.Particle> p = cloth.particles;
 
+			
+			
+			if(cloth.isConnectHorizontal()){
+			for(int x=0;x<=cloth.w;x++){
+				for(int y=0;y<=cloth.h;y++){
+					
+					
+					
+					int pIndex=(cloth.w+1)*y+x;
+					int gIndex=(cloth.w+1+1)*y+x;//some remains
+					
+					if(!debugfirstTime){
+						Map<String,Integer> debugMap=Maps.newLinkedHashMap();
+						debugMap.put("x", x);
+						debugMap.put("y", y);
+						debugMap.put("pIndex", pIndex);
+						debugMap.put("gIndex", gIndex);
+						}
+					
+					
+					clothGeometry.getVertices().get(gIndex).copy( p.get(pIndex).position);
+				}
+			}
+			for(int y=0;y<=cloth.h;y++){
+				int pIndex=(cloth.w+1)*y;
+				int gIndex=(cloth.w+1+1)*y+cloth.w+1;//extra
+				clothGeometry.getVertices().get(gIndex).copy( p.get(pIndex).position);
+			}
+			}else{
 			for ( int i = 0, il = p.size(); i < il; i ++ ) {
-
+				
 				clothGeometry.getVertices().get(i).copy( p.get(i).position);
 
+			}
 			}
 			
 			//try edging,not so good than expected
@@ -293,11 +329,17 @@ public class ClothControler {
 			
 			//sphere.getPosition().copy( cloth.ballPosition );//sphere.position.copy( ballPosition );
 		}
+		
+		debugfirstTime=true;
 	}
 
 	public void removeSphere(Mesh data) {
 		for(Integer key:spheresMap.keySet()){
-			spheresMap.get(key).remove(data);//if exist
+			boolean result=spheresMap.get(key).remove(data);//if exist
+			if(result){
+				//LogUtils.log("sphere-removed-ch="+key);
+			}
+			//LogUtils.log("ch:"+key+"="+getSphereList(key).size());
 		}
 	}
 }

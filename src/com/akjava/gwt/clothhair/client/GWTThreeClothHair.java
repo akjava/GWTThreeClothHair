@@ -169,6 +169,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		if(clothControls!=null){
 			updateSphereMeshs();//sphere first
+			
 			clothControls.update(timestamp);
 			
 			
@@ -276,6 +277,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	public String textureUrl;
 	@Override
 	public void onInitializedThree() {
+		//setDebugAnimateCount(100);
 		final String modelUrl=GWTHTMLUtils.getInputValueById("model", "model11.json");
 		textureUrl=GWTHTMLUtils.getInputValueById("texture", "models/mbl3d/simpleeye-2kbluexxx-extendhead.png");
 		LogUtils.log("model-texture:"+modelUrl+","+textureUrl);
@@ -697,6 +699,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 	}
 		
+	
 	public void unselectVertex(){
 		hairDataPanel.setNewLine(null);
 		hairDataPanel.setCurrentSelection(null);

@@ -268,9 +268,15 @@ public class HairCloth {
 	}
 	*/
 	
-	private boolean loopHorizontal;
+	private boolean connectHorizontal=false;
 	
 	
+	public boolean isConnectHorizontal() {
+		return connectHorizontal;
+	}
+	public void setConnectHorizontal(boolean loopHorizontal) {
+		this.connectHorizontal = loopHorizontal;
+	}
 	public static int calcurateParticleSize(List<HairPin> pins,int sizeOfU,int sizeOfH){
 		int normalPin=0;
 		for(HairPin pin:pins){
@@ -293,6 +299,8 @@ public class HairCloth {
 				customPin.add(pin);
 			}
 		}
+		
+		this.connectHorizontal=hairData.isConnectHorizontal();
 		
 			//TODO support 0 sizeOfU
 			this.w = (normalPin.size()-1)*hairData.getSizeOfU();
@@ -384,7 +392,7 @@ public class HairCloth {
 			
 			
 			//loop-horizontal
-			if(loopHorizontal){
+			if(connectHorizontal){
 			for (int v=0;v<=h;v++) {
 				int u=w;
 				constrains.add(
@@ -445,6 +453,7 @@ public class HairCloth {
 
 		// Aerodynamics forces
 		if (wind) {
+			
 			Face3 face;
 			JsArray<Face3> faces = clothGeometry.getFaces();
 			Vector3 normal;
@@ -455,10 +464,17 @@ public class HairCloth {
 				normal = face.getNormal();
 
 				tmpForce.copy(normal).normalize().multiplyScalar(normal.dot(windForce));
+				if(face.getA()<particles.size()){
 				particles.get(face.getA()).addForce(tmpForce);
+				}
+				if(face.getB()<particles.size()){
 				particles.get(face.getB()).addForce(tmpForce);
+				}
+				if(face.getC()<particles.size()){
 				particles.get(face.getC()).addForce(tmpForce);
+				}
 			}
+			
 		}
 		
 		for (int i=0, il = particles.size()
