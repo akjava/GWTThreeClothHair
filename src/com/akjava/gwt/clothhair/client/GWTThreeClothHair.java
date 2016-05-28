@@ -111,7 +111,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 
 	
-	double cameraY=700;
+	double cameraY=1400;//TODO
 	private OrbitControls controls;
 
 
@@ -193,7 +193,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	private SkeletonHelper skeltonHelper;
 
-	private double GROUND=-750;
+	private double GROUND=0;
 	
 	/**
 	 * @deprecated
@@ -371,11 +371,12 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				geometry.computeBoundingBox();
 				BoundingBox bb = geometry.getBoundingBox();
-				//LogUtils.log(bb);
 				//double x=-20, y=-1270,z= -300,s= 800;
 
 				double x=-0, y=-0,z= -0,s= 1000;
-				y=-bb.getMax().getY()/2*s;
+				//y=-bb.getMax().getY()/2*s;
+				y=bb.getMin().getY()*s;
+				
 				
 				/*
 				for(int i=0;i<materials.length();i++){
@@ -744,7 +745,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	public PerspectiveCamera createCamera(){
 		
 		PerspectiveCamera camera=THREE.PerspectiveCamera(45, getWindowInnerWidth()/getWindowInnerHeight(), 10, 20000);
-		camera.getPosition().set(0, cameraY, 500);
+		camera.getPosition().set(0, cameraY, 1000);
 		return camera;
 	}
 	
