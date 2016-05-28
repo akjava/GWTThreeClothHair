@@ -340,7 +340,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		
 		
-		MeshPhongMaterial groundMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0x888888).specular(0x111111)
+		MeshPhongMaterial groundMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0xaaaaaa).specular(0x111111)
 				.transparent(true).opacity(0.5).side(THREE.DoubleSide));
 		
 		groundMesh = THREE.Mesh( THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
@@ -1424,10 +1424,46 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	
 
+		public void playAnimation(AnimationClip clip,boolean facialAnimation) {
+			mixer.stopAllAction();
+			mixer.uncacheClip(clip);//reset can cache
+			mixer.clipAction(clip).play();
+			initMorph();
+			if(facialAnimation && facialAnimationClip!=null){
+				mixer.uncacheClip(facialAnimationClip);//same name cache that.
+				mixer.clipAction(facialAnimationClip).play();
+			}
+		}
 	
 		public void startAnimation(int boneIndex,double x,double y,double z){
 			startAnimation(boneIndex,x,y,z,true,true);
 		}
+		
+		public void resetAnimation(){
+			if(mixer==null){
+				return;
+			}
+			JsArray<KeyframeTrack> tracks=JavaScriptObject.createArray().cast();
+			Quaternion q=THREE.Quaternion();
+			for(int i=0;i<characterMesh.getSkeleton().getBones().length();i++){
+				JsArrayNumber times=JavaScriptObject.createArray().cast();
+				times.push(0);
+				
+				JsArrayNumber values=JsArray.createArray().cast();
+				concat(values,q.toArray());
+				QuaternionKeyframeTrack track=THREE.QuaternionKeyframeTrack(".bones["+i+"].quaternion", times, values);
+				tracks.push(track);
+			}
+			AnimationClip clip=THREE.AnimationClip("reset", -1, tracks);
+			//LogUtils.log(track.validate());
+			
+			mixer.stopAllAction();
+			//mixer.uncacheClip(clip);//reset can cache
+			mixer.clipAction(clip).play();
+			
+			initMorph();
+		}
+			
 	public void startAnimation(int boneIndex,double x,double y,double z,boolean both,boolean facialAnimation){
 		if(mixer==null){
 			return;

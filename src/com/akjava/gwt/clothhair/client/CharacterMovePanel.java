@@ -4,14 +4,28 @@ import java.io.IOException;
 import java.util.List;
 
 import com.akjava.gwt.clothhair.client.SkeletonUtils.BoneData;
+import com.akjava.gwt.html5.client.file.File;
+import com.akjava.gwt.html5.client.file.FileUploadForm;
+import com.akjava.gwt.html5.client.file.FileUtils;
+import com.akjava.gwt.html5.client.file.FileUtils.DataURLListener;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
+import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.animation.AnimationClip;
+import com.akjava.gwt.three.client.js.animation.KeyframeTrack;
+import com.akjava.gwt.three.client.js.animation.tracks.VectorKeyframeTrack;
 import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
+import com.akjava.lib.common.utils.FileNames;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.text.shared.Renderer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -23,7 +37,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class CharacterMovePanel extends VerticalPanel{
 
 	private SkinnedMesh mesh;
-
+	private AnimationClip animationClip;
 	public CharacterMovePanel(final SkinnedMesh mesh) {
 		super();
 		this.mesh = mesh;
@@ -114,10 +128,88 @@ public class CharacterMovePanel extends VerticalPanel{
 		
 		
 		
+		HorizontalPanel loadAnimationPanel=new HorizontalPanel();
+		this.add(loadAnimationPanel);
+		final Label nameLabel=new Label();
+		FileUploadForm upload=FileUtils.createSingleTextFileUploadForm(new DataURLListener() {
+			
+
+			@Override
+			public void uploaded(File file, String text) {
+				nameLabel.setText(FileNames.getRemovedExtensionName(file.getFileName()));
+				JSONValue object=JSONParser.parseStrict(text);
+				JavaScriptObject js=object.isObject().getJavaScriptObject();
+				animationClip = AnimationClip.parse(js);
+				
+				//maybe pose editor problem
+				JsArray<KeyframeTrack> tracks=JsArray.createArray().cast();
+				
+				for(int i=0;i<animationClip.getTracks().length();i++){
+					KeyframeTrack track=animationClip.getTracks().get(i);
+					
+					/*
+					if(track.getName().endsWith(".position")){
+						
+						if(track.getName().equals(".bones[0].position")){
+							//root position
+							//tracks.push(track);
+							LogUtils.log("root-move-track");
+							LogUtils.log(track);
+							
+							JsArrayNumber times=JsArray.createArray().cast();
+							JsArrayNumber values=JsArray.createArray().cast();
+							
+							for(int j=0;j<track.getTimes().length();j++){
+								times.push(track.getTimes().get(j));
+							}
+							for(int j=0;j<track.getValues().length();j++){
+								double v=track.getValues().get(j);
+								v/=10;
+								values.push(v);
+							}
+							
+							VectorKeyframeTrack newtrack=THREE.VectorKeyframeTrack(track.getName(), times, values);
+							tracks.push(newtrack);
+						}
+						
+					
+						
+						//remoe position.TODO fix scalling
+					}else{
+						tracks.push(track);
+					}
+					*/
+					tracks.push(track);
+				}
+				
+				AnimationClip clip=THREE.AnimationClip("play", -1, tracks);
+				
+				
+				GWTThreeClothHair.INSTANCE.playAnimation(clip,true);
+				
+			}
+		}, true);
+		upload.setAccept(FileUploadForm.ACCEPT_JSON);
+		loadAnimationPanel.add(upload);
+		
+		HorizontalPanel a2=new HorizontalPanel();
+		this.add(a2);
+		Button play=new Button("play",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if(animationClip==null){
+					return;
+				}
+				GWTThreeClothHair.INSTANCE.playAnimation(animationClip,true);
+			}
+		});
+		a2.add(play);
+		
+		
 		HorizontalPanel animationPanel=new HorizontalPanel();
 		animationPanel.setVerticalAlignment(ALIGN_MIDDLE);
 		this.add(animationPanel);
-		animationPanel.add(new Label("Animation-"));
+		animationPanel.add(new Label("Quick Animation-"));
 		
 		boneIndexBox = new ValueListBox<BoneData>(new Renderer<BoneData>() {
 
@@ -243,11 +335,12 @@ public class CharacterMovePanel extends VerticalPanel{
 		this.add(new FacialAnimationPanel(this));
 		
 	}
+	
 	private int lastBoneIndex;
 	private int boneIndex;
 	private void resetAnimation(){
 		GWTThreeClothHair.INSTANCE.stopAnimation();
-		GWTThreeClothHair.INSTANCE.startAnimation(boneIndex,0,0,0,false,false);
+		GWTThreeClothHair.INSTANCE.resetAnimation();
 	}
 	double animationX;
 	double animationY;

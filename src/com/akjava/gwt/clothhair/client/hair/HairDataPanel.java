@@ -159,7 +159,7 @@ public class HairDataPanel extends VerticalPanel{
 		
 		HorizontalPanel showHairPanel=new HorizontalPanel();
 		hairPanel.add(showHairPanel);
-		CheckBox showHair=new CheckBox("show hairs");
+		showHair = new CheckBox("show hairs");
 		showHair.setValue(true);
 		showHairPanel.add(showHair);
 		showHair.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -168,6 +168,17 @@ public class HairDataPanel extends VerticalPanel{
 				for(HairCellObjectData data:cellObjects.getDatas()){
 					data.getMesh().setVisible(event.getValue());
 				}
+			}
+		});
+		
+		showSelectionHair = new CheckBox("show selection only");
+		
+		showHairPanel.add(showSelectionHair);
+		showSelectionHair.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				updateSelectionHairVisible(event.getValue());
+	
 			}
 		});
 		
@@ -346,6 +357,9 @@ public class HairDataPanel extends VerticalPanel{
 		cellObjects = new EasyCellTableObjects<HairCellObjectData>(table){
 			@Override
 			public void onSelect(HairCellObjectData selection) {
+				
+				updateSelectionHairVisible(showSelectionHair.getValue());
+				
 				if(selection==null){
 					editor.getHairTextureDataEditor().setValue(null);
 					return;
@@ -432,6 +446,24 @@ public class HairDataPanel extends VerticalPanel{
 		 hairPanel.add(downloadPanels);
 	}
 	
+	protected void updateSelectionHairVisible(Boolean value) {
+		if(!value){
+			for(HairCellObjectData data:cellObjects.getDatas()){
+				data.getMesh().setVisible(showHair.getValue());
+			}
+		}else{
+			HairCellObjectData selection=cellObjects.getSelection();
+			
+			
+			for(HairCellObjectData data:cellObjects.getDatas()){
+				if(data==selection){
+					data.getMesh().setVisible(true);
+				}else{
+					data.getMesh().setVisible(false);
+				}
+			}
+		}
+	}
 	public void updateHairPinPanel(){
 		hairPinPanel.setHairPins(hairPins);
 	}
@@ -1114,6 +1146,10 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 	private Label horizontalDistanceLabel;
 	private Label pinsLabel;
 	private HairDataEditor editor;
+
+	private CheckBox showSelectionHair;
+
+	private CheckBox showHair;
 	
 	private void clearAllHairData(){
 		for(HairCellObjectData data:ImmutableList.copyOf(cellObjects.getDatas())){
