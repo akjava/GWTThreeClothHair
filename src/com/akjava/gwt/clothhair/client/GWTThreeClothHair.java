@@ -194,6 +194,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	private SkeletonHelper skeltonHelper;
 
 	private double GROUND=0;
+	private double characterScale;
 	
 	/**
 	 * @deprecated
@@ -341,7 +342,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		
 		MeshPhongMaterial groundMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0xaaaaaa).specular(0x111111)
-				.transparent(true).opacity(0.5).side(THREE.DoubleSide));
+				.transparent(true).opacity(1)
+				.side(THREE.DoubleSide)
+				);
 		
 		groundMesh = THREE.Mesh( THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
 		groundMesh.getPosition().setY(GROUND);//mesh.position.y = -250;
@@ -359,9 +362,12 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//String url= "models/mbl3d/model11-eyelid-extendhead.json"; //tmp9xxx3-front4
 		
 		//String url="models/mbl3d/model8-hair-color-expand-bone.json"; //no-morph over 40fps
-		new Mbl3dLoader().load(modelUrl,new JSONLoadHandler() {
+		Mbl3dLoader loader=new Mbl3dLoader();
+		loader.needFix=false;//for test
+		loader.load(modelUrl,new JSONLoadHandler() {
 			
 			private MultiMaterial multiMaterials;
+		
 			
 
 			@Override
@@ -373,9 +379,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				BoundingBox bb = geometry.getBoundingBox();
 				//double x=-20, y=-1270,z= -300,s= 800;
 
-				double x=-0, y=-0,z= -0,s= 1000;
+				double x=-0, y=-0,z= -0;
+				characterScale = 1000;
 				//y=-bb.getMax().getY()/2*s;
-				y=bb.getMin().getY()*s;
+				y=bb.getMin().getY()*characterScale;
 				
 				
 				/*
@@ -454,7 +461,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				characterMesh.setName("model");//mesh.setName("model");//mesh.setName("model");//mesh.name = "model";
 				//mesh.getPosition().set( x, y - bb.getMin().getY() * s, z );//mesh.getPosition().set( x, y - bb.getMin().y * s, z );//mesh.getPosition().set( x, y - bb.getMin().y * s, z );//mesh.position.set( x, y - bb.min.y * s, z );
 				characterMesh.getPosition().set(x, y, z);
-				characterMesh.getScale().set( s, s, s );//mesh.getScale().set( s, s, s );//mesh.getScale().set( s, s, s );//mesh.scale.set( s, s, s );
+				characterMesh.getScale().set( characterScale, characterScale, characterScale );//mesh.getScale().set( s, s, s );//mesh.getScale().set( s, s, s );//mesh.scale.set( s, s, s );
 				scene.add( characterMesh );
 				
 				
@@ -528,6 +535,18 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	//List<SkinningVertexCalculator> skinningVertexCalculators=Lists.newArrayList();
 	
 
+	
+	public Mesh getSphereMesh(SphereData data){
+		return sphereMeshMap.get(data).getMesh();
+	}
+	public Mesh getMirrorSphereMesh(SphereData data){
+		SphereData mirror=mirrorMap.get(data);
+		if(mirror!=null){
+		return sphereMeshMap.get(mirror).getMesh();
+		}else{
+			return null;
+		}
+	}
 	
 	
 	Map<SphereData,SphereCalculatorAndMesh> sphereMeshMap=Maps.newHashMap();
@@ -1155,8 +1174,12 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		return visible;
 	}
 	private void updateSphereVisible(boolean visible){
+		if(visible){
+			sphereDataPanel.updateSphereVisible();
+		}else{
 		for(SphereCalculatorAndMesh smesh:sphereMeshMap.values()){
 			smesh.getMesh().setVisible(visible);
+		}
 		}
 	}
 	
@@ -1171,7 +1194,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//TODO find better index by automatic
 		
-		SphereData firstOne=new SphereData(0, characterMesh.getPosition().getY()/characterMesh.getScale().getX()*-1+0.75, 0, ballSize, true,60);//hard code 60 is head
+		//TODO relative
+		SphereData firstOne=new SphereData(0, 1.2, 0, ballSize, true,60);//hard code 60 is head
 		//addSphereData(firstOne);
 		
 		HorizontalPanel controler=new HorizontalPanel();

@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.HairStorageKeys;
-import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.html5.client.download.HTML5Download;
 import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileUploadForm;
@@ -15,15 +14,15 @@ import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
-import com.akjava.gwt.three.client.js.THREE;
-import com.akjava.gwt.three.client.js.math.THREEMath;
-import com.akjava.gwt.three.client.js.math.Vector3;
+import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.akjava.lib.common.utils.CSVUtils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -43,6 +42,12 @@ public class SphereDataPanel extends VerticalPanel{
 	SphereDataControler controler;
 	SphereData defaultValue;
 	private SphereDataConverter sphereDataConverter=new SphereDataConverter();
+	
+	public static final int FILTER_ALL=0;
+	public static final int FILTER_CHANNEL=1;
+	public static final int FILTER_SELECTION=2;
+	private int filterMode;
+	
 	 public SphereDataPanel(final SphereDataControler controler,final SphereData defaultValue){
 		 this.controler=controler;
 		 this.defaultValue=defaultValue;
@@ -54,6 +59,8 @@ public class SphereDataPanel extends VerticalPanel{
 		 driver.edit(null);
 		 
 		
+		 /*
+		  * trying add cloth via sphere
 		 Button test=new Button("test",new ClickHandler() {
 			
 			@Override
@@ -76,7 +83,21 @@ public class SphereDataPanel extends VerticalPanel{
 			}
 		});
 		 this.add(test);
-		 
+		 */
+		 final ListBox filterBox=new ListBox();
+		 filterBox.addItem("All");
+		 filterBox.addItem("Selected Channel Only");
+		 filterBox.addItem("Selection Only");
+		 filterBox.setSelectedIndex(0);
+		 filterBox.addChangeHandler(new ChangeHandler() {
+			
+			@Override
+			public void onChange(ChangeEvent event) {
+				filterMode=filterBox.getSelectedIndex();
+				updateSphereVisible();
+			}
+		});
+		 this.add(filterBox);
 		 
 		 SimpleCellTable<SphereData> table=new SimpleCellTable<SphereData>() {
 				@Override
@@ -133,6 +154,7 @@ public class SphereDataPanel extends VerticalPanel{
 					
 					controler.onSelectSphere(selection);
 					
+					updateSphereVisible();
 				}};
 				
 			this.add(table);
@@ -260,7 +282,35 @@ public class SphereDataPanel extends VerticalPanel{
 			
 	 }
 	 
-	 protected void clearAllSphereData() {
+	 public void updateSphereVisible() {
+		 SphereData selection=cellObjects.getSelection();
+		 for(SphereData data:cellObjects.getDatas()){
+			 Mesh mesh=GWTThreeClothHair.INSTANCE.getSphereMesh(data);
+			 Mesh mirror=GWTThreeClothHair.INSTANCE.getMirrorSphereMesh(data);
+			 boolean visible=false;
+				if(filterMode==FILTER_ALL){
+					visible=true;
+				}else if(filterMode==FILTER_CHANNEL){
+					if(selection!=null){
+						if(data.getChannel()==selection.getChannel()){
+							visible=true;
+						}
+					}
+				}else if(filterMode==FILTER_SELECTION){
+					if(selection!=null){
+						if(data==selection){
+							visible=true;
+						}
+					}
+				}
+				mesh.setVisible(visible);
+				if(mirror!=null){
+					mirror.setVisible(visible);
+				}
+			}
+	}
+
+	protected void clearAllSphereData() {
 		 for(SphereData data:ImmutableList.copyOf(cellObjects.getDatas())){
 				removeSpereData(data);
 			}
