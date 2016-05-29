@@ -1478,12 +1478,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				concat(values,q.toArray());
 				QuaternionKeyframeTrack track=THREE.QuaternionKeyframeTrack(".bones["+i+"].quaternion", times, values);
 				tracks.push(track);
+				//TODO position?
 			}
 			AnimationClip clip=THREE.AnimationClip("reset", -1, tracks);
 			//LogUtils.log(track.validate());
 			
 			mixer.stopAllAction();
-			//mixer.uncacheClip(clip);//reset can cache
+			mixer.uncacheClip(clip);//reset can cache?
 			mixer.clipAction(clip).play();
 			
 			initMorph();
