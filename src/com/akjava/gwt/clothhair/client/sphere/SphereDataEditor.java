@@ -97,7 +97,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		
 		h1.add(reset);
 		
-		scaleRange = new LabeledInputRangeWidget2("scale", .001, 0.2, .001);
+		scaleRange = new LabeledInputRangeWidget2("scale", .001, 0.4, .001);
 		scaleRange.getLabel().setWidth("40px");
 		scaleRange.getRange().setWidth("220px");
 		
