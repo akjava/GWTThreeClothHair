@@ -1,5 +1,7 @@
 #GWTThreeClothHair
 
+for GWT-expert so far.
+
 trying use cloth example  as character hair and cloth.
 but not good than expected.
 
