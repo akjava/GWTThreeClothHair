@@ -6,7 +6,7 @@ import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.google.common.base.Function;
 
-public class HairDataFunctions {
+public class HairPinDataFunctions {
 
 	
 	
@@ -38,6 +38,23 @@ public class HairDataFunctions {
 			return vertex.clone();
 		}
 		
+		}
+	}
+	
+	public static class HairPinToNormal implements Function<HairPin,Vector3>{
+		private Mesh mesh;
+		public HairPinToNormal(Mesh mesh) {
+			super();
+			this.mesh = mesh;
+		}
+
+		private boolean applyWorldMatrix;
+		
+		@Override
+		public Vector3 apply(HairPin hairPin) {
+			Face3 face=mesh.getGeometry().getFaces().get(hairPin.getFaceIndex());
+			Vector3 normal=face.getVertexNormals().get(hairPin.getVertexOfFaceIndex());
+			return normal.clone();
 		}
 	}
 }

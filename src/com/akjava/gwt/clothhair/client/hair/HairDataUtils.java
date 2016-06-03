@@ -3,7 +3,7 @@ package com.akjava.gwt.clothhair.client.hair;
 import java.util.List;
 
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
-import com.akjava.gwt.clothhair.client.hair.HairDataFunctions.HairPinToVertex;
+import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToVertex;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.google.common.collect.FluentIterable;

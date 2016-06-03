@@ -12,7 +12,7 @@ import com.akjava.gwt.clothhair.client.HairStorageKeys;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
 import com.akjava.gwt.clothhair.client.cloth.HairCloth;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
-import com.akjava.gwt.clothhair.client.hair.HairDataFunctions.HairPinToVertex;
+import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToVertex;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
 import com.akjava.gwt.html5.client.download.HTML5Download;
 import com.akjava.gwt.html5.client.file.File;
