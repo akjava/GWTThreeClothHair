@@ -167,10 +167,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//ThreeLog.log(camera.getPosition());
 		
-		if(clothControls!=null){
+		if(clothControler!=null){
 			updateSphereMeshs();//sphere first
 			
-			clothControls.update(timestamp);
+			clothControler.update(timestamp);
 			
 			
 			
@@ -475,8 +475,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				
 				
-				clothControls=new ClothControler();
-				clothControls.setFloorModifier(new GroundYFloor(GROUND));
+				clothControler=new ClothControler();
+				clothControler.setFloorModifier(new GroundYFloor(GROUND));
 				
 				
 				//sphere.getScale().setScalar(clothControls.getBallSize());
@@ -490,7 +490,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				sphereDataPanel.setSkelton(characterMesh.getSkeleton());
 				characterMovePanel.setSkelton(characterMesh.getSkeleton());
 				
-				clothControls.setWind(true);
+				clothControler.setWind(true);
 				
 				
 				/* for test
@@ -579,7 +579,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	private void removeSphereMesh(SphereData data){
 		Mesh sphere=sphereMeshMap.get(data).getMesh();
-		clothControls.removeSphere(sphere);
+		clothControler.removeSphere(sphere);
 		scene.remove(sphere);
 	}
 	@Override
@@ -601,7 +601,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		sphere.getScale().setScalar(data.getSize());
 		
-		clothControls.addSphere(sphere,data.getChannel());
+		clothControler.addSphere(sphere,data.getChannel());
 		
 		
 		
@@ -626,7 +626,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		sphere.getScale().setScalar(data.getSize());
 		
-		clothControls.addSphere(sphere,data.getChannel());
+		clothControler.addSphere(sphere,data.getChannel());
 		
 		SphereCalculatorAndMesh calculatorAndMesh=new SphereCalculatorAndMesh(characterMesh, data.getBoneIndex(), sphere);
 		sphereMeshMap.put(data, calculatorAndMesh);
@@ -703,7 +703,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		}
 		
 		//plus sync channel
-		clothControls.updateSphere(sphereMeshMap.get(data).getMesh(), data.getChannel());
+		clothControler.updateSphere(sphereMeshMap.get(data).getMesh(), data.getChannel());
 		
 		if(data.isCopyHorizontal()){
 			SphereData data2=mirrorMap.get(data);
@@ -731,7 +731,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			}
 			
 			//plus sync channel
-			clothControls.updateSphere(sphereMeshMap.get(data2).getMesh(), data2.getChannel());
+			clothControler.updateSphere(sphereMeshMap.get(data2).getMesh(), data2.getChannel());
 			
 		}else{
 			//no need
@@ -769,7 +769,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	
 
-	ClothControler clothControls;
+	ClothControler clothControler;
 
 	//private int hairColor=0x553817;//brown
 	
@@ -904,7 +904,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 
 	public ClothControler getClothControler(){
-		return clothControls;
+		return clothControler;
 	}
 
 	public Scene getScene(){
@@ -946,7 +946,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				clothControls.setWind(event.getValue());
+				clothControler.setWind(event.getValue());
 			}
 		});
 		basicPanel.add(windCheck);
@@ -962,7 +962,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
 				
 				groundMesh.setVisible(event.getValue());
-				clothControls.getFloorModifier().setEnabled(event.getValue());
+				clothControler.getFloorModifier().setEnabled(event.getValue());
 			}
 		});
 		groundCheck.setValue(true);
