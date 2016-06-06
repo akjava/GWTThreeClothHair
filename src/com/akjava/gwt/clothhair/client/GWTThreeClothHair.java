@@ -98,6 +98,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
@@ -964,9 +965,13 @@ private CannonControler cannonControler;
 	
 	private Panel createBasicPanel(){
 		VerticalPanel basicPanel=new VerticalPanel();
-
-		basicPanel.add(new Label("Wind"));
-		CheckBox windCheck=new CheckBox();
+		
+		HorizontalPanel h1=new HorizontalPanel();
+		basicPanel.add(h1);
+		
+		h1.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+		basicPanel.add(new Label("Visible"));
+		CheckBox windCheck=new CheckBox("Wind");
 		windCheck.setValue(true);
 		windCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
@@ -975,12 +980,10 @@ private CannonControler cannonControler;
 				clothControls.setWind(event.getValue());
 			}
 		});
-		basicPanel.add(windCheck);
+		h1.add(windCheck);
 		
-		basicPanel.add(new Label("Ground"));
-		HorizontalPanel groundPanel=new HorizontalPanel();
-		basicPanel.add(groundPanel);
-		CheckBox groundCheck=new CheckBox();
+		
+		CheckBox groundCheck=new CheckBox("Ground");
 		
 		groundCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
@@ -992,7 +995,7 @@ private CannonControler cannonControler;
 			}
 		});
 		groundCheck.setValue(true);
-		basicPanel.add(groundCheck);
+		h1.add(groundCheck);
 		groundCheck.setValue(false,true);
 		
 		basicPanel.add(new Label("Camera"));
@@ -1012,9 +1015,7 @@ private CannonControler cannonControler;
 		near.setValue(camera.getNear());
 		
 		//vertex
-		basicPanel.add(new Label("Vertex"));
-		HorizontalPanel h0=new HorizontalPanel();
-		CheckBox visibleVertexCheck=new CheckBox("visible");
+		CheckBox visibleVertexCheck=new CheckBox("Vertex");
 		visibleVertexCheck.setValue(true);
 		visibleVertexCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
@@ -1022,8 +1023,8 @@ private CannonControler cannonControler;
 				updateVertexVisible(event.getValue());
 			}
 		});
-		h0.add(visibleVertexCheck);
-		basicPanel.add(h0);
+		h1.add(visibleVertexCheck);
+		
 		
 		Button test=new Button("test",new ClickHandler() {
 			
@@ -1076,7 +1077,34 @@ private CannonControler cannonControler;
 			
 			
 		});
-		basicPanel.add(test);
+		//basicPanel.add(test);
+		
+		//cannon controling
+		basicPanel.add(new HTML("<h4>Cannon</h4>"));
+		HorizontalPanel h2=new HorizontalPanel();
+		h2.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+		CheckBox cannonStopCheck=new CheckBox("stop");
+		
+		cannonStopCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				GWTThreeClothHair.INSTANCE.getCannonControler().setStopped(event.getValue());
+			}
+			
+		});
+		h2.add(cannonStopCheck);
+		Button step=new Button("step",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				GWTThreeClothHair.INSTANCE.getCannonControler().getWorld().step(1.0/60);
+			}
+		});
+		h2.add(step);
+		basicPanel.add(h2);
+		
+		//mixer time
+		
 		return basicPanel;
 	}
 	

@@ -20,7 +20,19 @@ import com.google.gwt.core.client.JsArray;
 public class CannonControler {
 	private World world;
 	
-	private boolean creating;
+	private boolean creating;//tested
+	
+	private boolean stopped;
+
+	public boolean isStopped() {
+		return stopped;
+	}
+
+
+	public void setStopped(boolean stopped) {
+		this.stopped = stopped;
+	}
+
 
 	public boolean isCreating() {
 		return creating;
@@ -28,7 +40,7 @@ public class CannonControler {
 
 
 public boolean isEnabled(){
-	return !creating;
+	return !creating && !stopped;
 }
 
 
@@ -134,7 +146,7 @@ public boolean isEnabled(){
 		for(int i=0;i<data.getConstraints().length();i++){
 			world.removeConstraint(data.getConstraints().get(i));
 		}
-		LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
+		//LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
 	}
 	public ParticleBodyData getCannonData(HairCloth hairCloth){
 		return particleMap.get(hairCloth);
