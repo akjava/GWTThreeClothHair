@@ -38,6 +38,9 @@ public class HairCloth {
 	 * @param GRAVITY 981 * 1.4
 	 */
 	
+	
+
+	
 	/*
 	 * somehow it's break ,shoudl re-add
 	 */
