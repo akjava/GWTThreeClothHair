@@ -136,7 +136,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	@Override
 	public void animate(double timestamp) {
 		
-		//double delta=clock.getDelta();
+		double delta=clock.getDelta();
 		
 		
 		/* for test
@@ -191,8 +191,12 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//mixer first,this make animation
 				if(mixer!=null){
-					
-					mixer.update(1.0/60); //fixed dt //TODO make option
+					if(useFixedFrame){
+						mixer.update(1.0/mixerFrixedFrameNumber);
+					}else{
+						mixer.update(delta);
+					}
+					 //fixed dt //TODO make option
 					//mixer.update(clock.getDelta());
 				}
 		
@@ -1103,12 +1107,31 @@ private CannonControler cannonControler;
 		h2.add(step);
 		basicPanel.add(h2);
 		
+		
+		
+		
 		//mixer time
 		
 		return basicPanel;
 	}
 	
+	private int mixerFrixedFrameNumber=60;
+	public int getMixerFrixedFrameNumber() {
+		return mixerFrixedFrameNumber;
+	}
+	public void setMixerFrixedFrameNumber(int mixerFrixedFrameNumber) {
+		this.mixerFrixedFrameNumber = mixerFrixedFrameNumber;
+	}
+
+	private boolean useFixedFrame=true;
 	
+	public boolean isUseFixedFrame() {
+		return useFixedFrame;
+	}
+	public void setUseFixedFrame(boolean useFixedFrame) {
+		this.useFixedFrame = useFixedFrame;
+	}
+
 	/*
 	 * these value for reduce instances time
 	 */

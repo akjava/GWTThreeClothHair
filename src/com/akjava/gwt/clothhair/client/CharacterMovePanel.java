@@ -28,7 +28,9 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.text.shared.Renderer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ValueListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -40,6 +42,43 @@ public class CharacterMovePanel extends VerticalPanel{
 	public CharacterMovePanel(final SkinnedMesh mesh) {
 		super();
 		this.mesh = mesh;
+		
+		this.add(new HTML("<h4>Mixer fps control</h4>"));
+		HorizontalPanel h1=new HorizontalPanel();
+		h1.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+		this.add(h1);
+		
+		CheckBox fixedFpsCheck=new CheckBox("fixed fps");
+		h1.add(fixedFpsCheck);
+		fixedFpsCheck.setValue(GWTThreeClothHair.INSTANCE.isUseFixedFrame());
+		fixedFpsCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				GWTThreeClothHair.INSTANCE.setUseFixedFrame(event.getValue());
+			}
+		});
+		
+		IntegerBox frameBox=new IntegerBox();
+		frameBox.setWidth("40px");
+		frameBox.setValue(GWTThreeClothHair.INSTANCE.getMixerFrixedFrameNumber());
+		frameBox.addValueChangeHandler(new ValueChangeHandler<Integer>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Integer> event) {
+				GWTThreeClothHair.INSTANCE.setMixerFrixedFrameNumber(event.getValue());
+			}
+		});
+		
+		
+		h1.add(new Label("frame"));
+		
+		h1.add(frameBox);
+		
+		
+		
+		
+		
+		
 		
 		this.add(new Label("Position"));
 		LabeledInputRangeWidget2 xPos=new LabeledInputRangeWidget2("x", -900, 900, 1);
