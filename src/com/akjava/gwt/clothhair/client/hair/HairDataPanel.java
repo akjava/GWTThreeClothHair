@@ -29,7 +29,6 @@ import com.akjava.gwt.lib.client.experimental.ImageDataUtils;
 import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
-import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.BufferAttribute;
 import com.akjava.gwt.three.client.js.core.BufferGeometry;
@@ -355,6 +354,21 @@ public class HairDataPanel extends VerticalPanel{
 		});
 		editPanel.add(removeAll);
 		
+		Button reload=new Button("Reload",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				List<HairData> oldData=Lists.newArrayList();
+				for(HairCellObjectData data:ImmutableList.copyOf(cellObjects.getDatas())){
+					oldData.add(data.getHairData());
+				}
+				clearAllHairData();
+				loadHairDataSync(oldData);
+			}
+		});
+		editPanel.add(reload);
+		reload.setTitle("reload cloths without reload page");
+		
+		
 		
 		cellObjects = new EasyCellTableObjects<HairCellObjectData>(table){
 			@Override
@@ -438,6 +452,9 @@ public class HairDataPanel extends VerticalPanel{
 	 */
 	private void loadHairDataSync(String text){
 		Iterable<HairData> hairDatas=hairDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+		loadHairDataSync(hairDatas);
+	}
+	private void loadHairDataSync(Iterable<HairData> hairDatas){
 		 final List<HairData> loadingDatas=Lists.newArrayList(hairDatas);
 		 //this initial load make problem,without sync because of sharing canvas(without share,crash lack of memory)
 		 new Timer(){
