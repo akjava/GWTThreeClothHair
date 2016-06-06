@@ -157,6 +157,24 @@ public class HairCloth {
 		private Particle p1;
 		private Particle p2;
 		private double distance;
+		public Particle getP1() {
+			return p1;
+		}
+		public void setP1(Particle p1) {
+			this.p1 = p1;
+		}
+		public Particle getP2() {
+			return p2;
+		}
+		public void setP2(Particle p2) {
+			this.p2 = p2;
+		}
+		public double getDistance() {
+			return distance;
+		}
+		public void setDistance(double distance) {
+			this.distance = distance;
+		}
 		public Constrain(Particle p1, Particle p2, double distance) {
 			super();
 			this.p1 = p1;
@@ -521,6 +539,20 @@ public class HairCloth {
 		
 	}
 	
+	public boolean isHorizontalConstraints(Constrain constrain){
+		int atX1=getAtX(constrain.p1);
+		int atX2=getAtX(constrain.p2);
+		if(atX1!=atX2){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	
+	public List<Constrain> getConstrains() {
+		return constrains;
+	}
 	private int getAtX(Particle p){
 		int index=particles.indexOf(p);
 		if(index==-1){

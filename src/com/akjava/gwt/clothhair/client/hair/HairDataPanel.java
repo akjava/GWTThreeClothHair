@@ -29,6 +29,7 @@ import com.akjava.gwt.lib.client.experimental.ImageDataUtils;
 import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
+import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.BufferAttribute;
 import com.akjava.gwt.three.client.js.core.BufferGeometry;
@@ -374,22 +375,7 @@ public class HairDataPanel extends VerticalPanel{
 		//
 		 String text=storageControler.getValue(HairStorageKeys.temp_hairset, null);
 		 if(text!=null && !text.isEmpty()){
-			 Iterable<HairData> hairDatas=hairDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
-			 final List<HairData> loadingDatas=Lists.newArrayList(hairDatas);
-			 //this initial load make problem,without sync because of sharing canvas(without share,crash lack of memory)
-			 new Timer(){
-				@Override
-				public void run() {
-					if(!GWTThreeClothHair.INSTANCE.isUpdatingHairTextureMap()){
-						HairData hairData=loadingDatas.remove(0);
-						addCloth(hairData,false);//reading no need store
-						if(loadingDatas.isEmpty()){
-							cancel();
-						}
-					}
-				}
-				 
-			 }.scheduleRepeating(10);
+			 loadHairDataSync(text);
 		 }
 		
 		 
@@ -413,10 +399,7 @@ public class HairDataPanel extends VerticalPanel{
 				}
 				//todo check validate
 				
-				 Iterable<HairData> hairDatas=hairDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
-				 for(HairData hairData:hairDatas){
-					 addCloth(hairData);
-				 }
+				loadHairDataSync(text);
 				 
 				
 			}
@@ -449,6 +432,29 @@ public class HairDataPanel extends VerticalPanel{
 		 hairPanel.add(uploadPanel);
 		 hairPanel.add(downloadPanels);
 	}
+	
+	/*
+	 * must wait hair texture update
+	 */
+	private void loadHairDataSync(String text){
+		Iterable<HairData> hairDatas=hairDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+		 final List<HairData> loadingDatas=Lists.newArrayList(hairDatas);
+		 //this initial load make problem,without sync because of sharing canvas(without share,crash lack of memory)
+		 new Timer(){
+			@Override
+			public void run() {
+				if(!GWTThreeClothHair.INSTANCE.isUpdatingHairTextureMap()){
+					HairData hairData=loadingDatas.remove(0);
+					addCloth(hairData,false);//reading no need store
+					if(loadingDatas.isEmpty()){
+						cancel();
+					}
+				}
+			}
+			 
+		 }.scheduleRepeating(10);
+	}
+	
 	
 	protected void updateSelectionHairVisible(Boolean value) {
 		if(!value){
@@ -927,7 +933,7 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 		ClothData data=new ClothData(hairData,characterMesh);
 		
 		
-		data.getCloth().setPinAll();
+		data.getCloth().setPinAll();//force pin all
 		
 		
 		//data.getCloth().ballSize=clothControls.getBallSize();
@@ -1091,6 +1097,8 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 			
 			//LogUtils.log("normal-test"+normalSize+","+pinNormals.size()+","+(data.getCloth().getW()+1));
 			pinNormals=normals;
+			//LogUtils.log("normal-pos:"+normals.size()+",pin "+pinNormals.size()+"append:"+normalSize);
+			
 			
 			//init other posisions
 			for(int j=data.getCloth().getW()+1;j<data.getCloth().particles.size();j++){
@@ -1202,6 +1210,13 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 		
 		//works fine?I'm not sure,howwver anyway narrow is not work fine so far
 		//data.getCloth().recalcurateHorizontalConstraintsDistance();
+		
+		//LogUtils.log("constraints-distance");
+		for(int i=0;i<data.getCloth().getConstrains().size();i++){
+			if(!data.getCloth().isHorizontalConstraints(data.getCloth().getConstrains().get(i))){
+			//	LogUtils.log(i+","+data.getCloth().getConstrains().get(i).getDistance());
+			}
+		}
 		
 		
 		//add data do everything fixed
