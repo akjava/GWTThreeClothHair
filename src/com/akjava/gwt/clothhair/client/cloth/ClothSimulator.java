@@ -7,6 +7,7 @@ import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.cannon.CannonControler;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
+import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
 import com.akjava.gwt.three.client.js.THREE;
@@ -15,6 +16,7 @@ import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
+import com.akjava.lib.common.utils.CSVUtils;
 import com.google.common.collect.Maps;
 
 public class ClothSimulator  {
@@ -221,6 +223,14 @@ public class ClothSimulator  {
 		}
 	}
 
+	//direct load from text
+	public void loadSphereDatas(String text){
+		Iterable<SphereData> newDatas=new SphereDataConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+		 for(SphereData newData:newDatas){
+			 addSphereData(newData);
+		 }
+	}
+	
 	public void addSphereData(SphereData data){
 		MeshPhongMaterial ballMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0x888888).side(THREE.DoubleSide).wireframe(true));
 		
