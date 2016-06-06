@@ -13,13 +13,12 @@ import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.animation.AnimationClip;
 import com.akjava.gwt.three.client.js.animation.KeyframeTrack;
-import com.akjava.gwt.three.client.js.animation.tracks.VectorKeyframeTrack;
+import com.akjava.gwt.three.client.js.loaders.XHRLoader.XHRLoadHandler;
 import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.lib.common.utils.FileNames;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -205,6 +204,42 @@ public class CharacterMovePanel extends VerticalPanel{
 		});
 		a2.add(play);
 		
+		Button test1=new Button("test1",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				testAnimation("animation/anime_test1.json");
+			}
+		});
+		a2.add(test1);
+		Button test2=new Button("test2",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				testAnimation("animation/anime_test2.json");
+			}
+		});
+		a2.add(test2);
+		Button test3=new Button("test3",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				testAnimation("animation/anime_test3.json");
+			}
+		});
+		a2.add(test3);
+		Button test4=new Button("test4",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				testAnimation("animation/anime_test4.json");
+			}
+		});
+		a2.add(test4);
+		Button test5=new Button("test5",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				testAnimation("animation/anime_test5.json");
+			}
+		});
+		a2.add(test5);
+		
 		
 		HorizontalPanel animationPanel=new HorizontalPanel();
 		animationPanel.setVerticalAlignment(ALIGN_MIDDLE);
@@ -347,6 +382,19 @@ public class CharacterMovePanel extends VerticalPanel{
 	double animationZ;
 	private ValueListBox<BoneData> boneIndexBox;
 	private CheckBox bothCheck;
+	
+	private void testAnimation(String name){
+		THREE.XHRLoader().load(name, new XHRLoadHandler() {
+			@Override
+			public void onLoad(String text) {
+				JSONValue object=JSONParser.parseStrict(text);
+				JavaScriptObject js=object.isObject().getJavaScriptObject();
+				animationClip = AnimationClip.parse(js);
+				GWTThreeClothHair.INSTANCE.playAnimation(animationClip,true);
+			}
+		});
+		
+	}
 	
 	public void stopAnimation(){
 		GWTThreeClothHair.INSTANCE.stopAnimation();	

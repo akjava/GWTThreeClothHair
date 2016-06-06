@@ -37,13 +37,13 @@ public class SkinningVertexCalculator {
 	}
 
 	//add from skinnedMesh vertex
-	public void addByVertexIndex(int index,int targetClothIndex){
+	public SkinningVertex createSkinningVertex(int index,int targetClothIndex){
 		Vector4 skinIndices =skinnedMesh.getGeometry().getSkinIndices().get(index);
 		Vector4 skinWeights =skinnedMesh.getGeometry().getSkinWeights().get(index);
 		Vector3 vertex =skinnedMesh.getGeometry().getVertices().get(index).clone();
 		SkinningVertex skinningVertex=new SkinningVertex(vertex, skinIndices, skinWeights);
 		skinningVertex.setTargetClothIndex(targetClothIndex);
-		add(skinningVertex);
+		return skinningVertex;
 	}
 	
 	public int size(){

@@ -3,20 +3,34 @@ package com.akjava.gwt.clothhair.client.cloth;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
+import com.akjava.gwt.clothhair.client.cannon.CannonControler.ParticleBodyData;
+import com.akjava.gwt.clothhair.client.cannon.CannonControler.SphereBodyData;
 import com.akjava.gwt.clothhair.client.hair.HairData;
-import com.akjava.gwt.clothhair.client.hair.HairDataUtils;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
+import com.akjava.gwt.clothhair.client.hair.HairDataUtils;
+import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
+import com.github.gwtcannonjs.client.CANNON;
+import com.github.gwtcannonjs.client.constraints.DistanceConstraint;
+import com.github.gwtcannonjs.client.math.Vec3;
+import com.github.gwtcannonjs.client.objects.Body;
+import com.github.gwtcannonjs.client.shapes.Sphere;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 
 
-
+/**
+ * THIS is CANNON SUPPORT VERSION
+ * @author aki
+ *
+ */
 public class HairCloth {
 	/*
 	 * Cloth Simulation using a relaxed constrains solver
@@ -31,15 +45,19 @@ public class HairCloth {
 	// Real-time Cloth Animation http://www.darwin3d.com/gamedev/articles/col0599.pdf
 
 	
+	
+	public static final int PHYSICS_CANNON=0;
+	public static final int PHYSICS_CLOTH=1;
+	
+	private int physicsMode;
+	
+	
 	/**
 	 * 
 	 * @param DAMPING 0.03
 	 * @param MASS .1
 	 * @param GRAVITY 981 * 1.4
 	 */
-	
-	
-
 	
 	/*
 	 * somehow it's break ,shoudl re-add
@@ -63,6 +81,11 @@ public class HairCloth {
 	double DRAG = 1.0 - DAMPING;
 	double MASS = .1;
 	double restDistance = 25;
+
+
+	public double getRestDistance() {
+		return restDistance;
+	}
 
 
 	private static int xSegs = 10; //
@@ -143,6 +166,10 @@ public class HairCloth {
 	}
 	public class Particle{
 		Vector3 position;
+		public Vector3 getPosition() {
+			return position;
+		}
+
 		Vector3 previous;
 		private Vector3 original;
 		//for after modify
@@ -263,6 +290,10 @@ public class HairCloth {
 		}
 		return false;
 	}
+	public int getVerticaPosition(int index){
+		return index/(w+1);
+	}
+
 	
 	//compatible
 	/*
@@ -293,6 +324,8 @@ public class HairCloth {
 		int w=(normalPin-1)*sizeOfU+1;
 		return w;
 	}
+	
+	private int sizeOfU;
 	public HairCloth(HairData hairData,Mesh mesh){
 			
 		List<HairPin> normalPin=Lists.newArrayList();//trying cutom pin
@@ -305,11 +338,19 @@ public class HairCloth {
 				customPin.add(pin);
 			}
 		}
+		/*
+		 * 
+		 * when small cut u setted, sometime connection seems faild.
+		 * 
+		 */
 		
 		this.connectHorizontal=hairData.isConnectHorizontal();
+		//LogUtils.log("connect-horizontal:"+connectHorizontal);
+		
 		
 			//TODO support 0 sizeOfU
 			this.w = (normalPin.size()-1)*hairData.getSizeOfU();
+			sizeOfU=hairData.getSizeOfU();
 			
 			this.h = hairData.getSizeOfV();
 			
@@ -353,21 +394,33 @@ public class HairCloth {
 			double distance=restDistance;
 			for (int v=0;v<h;v++) {
 				for (int u=0;u<w;u++) {
-					
+					//add vertical constraint
 					constrains.add(
 							new Constrain(particles.get(index(u,v)), particles.get(index(u,v+1)), distance)
 							);
 					
-					if(!hairData.isCutU() || v<hairData.getStartCutUIndexV()){
-					constrains.add(
-							new Constrain(particles.get(index(u,v)), particles.get(index(u+1,v)), distance)
-							);
+					//add horizontal constraint
+					//first one skipped to reduce constraint count,i think not so differenct
+					if(v!=0 && (!hairData.isCutU() || v<hairData.getStartCutUIndexV())){
+						//if(v%2==1){ // i tried mutually add,and faild
+						addConstrain(particles.get(index(u,v)), particles.get(index(u+1,v)), distance);
+							
+						//}
+					}else{
+						
+						//i tried but not so good
+						/*
+						if(v==h-1){//try h-1
+							constrains.add(
+									new Constrain(particles.get(index(u,v)), particles.get(index(u+1,v)), distance));
+						}*/
 					}
+					
 					
 
 				}
 				
-				//narrow mode
+				//narrow mode,however usually make problem
 				if(hairData.isDoNarrow()){
 					distance*=hairData.getNarrowScale();
 				}
@@ -377,21 +430,23 @@ public class HairCloth {
 		
 			
 			
-			//TODO effect cut
+			
 			for (int u=w, v=0;v<h;v++) {
 				
-				constrains.add(
-						new Constrain(particles.get(index(u,v)), particles.get(index(u,v+1)), distance)
-						);
+				addConstrain(particles.get(index(u,v)), particles.get(index(u,v+1)), distance);
 			}
 			
 			
+			/*
+			 * if add last one always some kind of unstable
+			 */
 			
 			for (int v=h, u=0;u<w;u++) {
-				if(!hairData.isCutU() || v<hairData.getStartCutUIndexV()){
-				constrains.add(
-						new Constrain(particles.get(index(u,v)), particles.get(index(u+1,v)), distance)
-						);
+				if((!hairData.isCutU() || v<hairData.getStartCutUIndexV())){
+				//	if(v%2==1){
+					addConstrain(particles.get(index(u,v)), particles.get(index(u+1,v)), distance);
+						
+				//	}
 				}
 			}
 
@@ -401,9 +456,9 @@ public class HairCloth {
 			if(connectHorizontal){
 			for (int v=0;v<=h;v++) {
 				int u=w;
-				constrains.add(
-						new Constrain(particles.get(index(u,v)), particles.get(index(0,v)), distance)
-						);
+				
+				addConstrain(particles.get(index(u,v)), particles.get(index(0,v)), distance);
+						
 			}
 			}
 			
@@ -432,6 +487,48 @@ public class HairCloth {
 			
 		
 	}
+	
+	private void addConstrain(Particle p1,Particle p2,double distance){
+		//change correct distance
+		//distance=p1.getOriginal().distanceTo(p2.getOriginal());
+		
+		constrains.add(
+				new Constrain(p1, p2, distance)
+				);
+	}
+	
+	//only effect before cannon constraints created
+	/*
+	 * however same grid seems much better
+	 */
+	public void recalcurateHorizontalConstraintsDistance(){
+		
+		for(Constrain con:constrains){
+			int atX1=getAtX(con.p1);
+			int atX2=getAtX(con.p2);
+			if(atX1!=atX2){//horizontal connection
+				
+			double distance=particles.get(atX1).getOriginal().distanceTo(particles.get(atX2).getOriginal());
+					
+			//con.p1.getOriginal().distanceTo(con.p2.getOriginal());
+			if(distance==0){
+				distance=restDistance;
+			}
+			
+			con.distance=distance;
+			}
+		}
+		
+	}
+	
+	private int getAtX(Particle p){
+		int index=particles.indexOf(p);
+		if(index==-1){
+			return -1;
+		}
+		return index%(w+1);
+	}
+	
 	private int index(int u,int v){
 		return u + v * (w + 1);
 	}
@@ -450,7 +547,10 @@ public class HairCloth {
 	boolean syncMove=false;
 	int channel;//for sphere;
 	
-	public void simulate(double time,Geometry clothGeometry,List<Mesh> spheres) {
+	
+	
+	
+	public void simulateCloth(double time,Geometry clothGeometry,List<Mesh> spheres) {
 		if (lastTime==null) {
 			lastTime = time;
 			return;
@@ -566,8 +666,212 @@ public class HairCloth {
 			p.previous.copy(p.original);
 		}
 	}
+	public void simulate(double time,Geometry clothGeometry,List<Mesh> spheres) {
+		//simulate by group means,no grouping support yet
+		//not support Wind yet
+		if(!isConnectHorizontal()){
+			physicsMode=PHYSICS_CLOTH;
+		}
+		
+		if(physicsMode==PHYSICS_CLOTH){
+			simulateCloth(time,clothGeometry,spheres);
+			return;
+		}else{//CANNON.js
+			simulateCannon(time,clothGeometry,spheres);
+		}
+		
+	}
 
+	private void simulateCannon(double time, Geometry clothGeometry, List<Mesh> spheres) {
 
+		//default simulate cannon
+		
+		Stopwatch watch=Stopwatch.createStarted();
+		
+		boolean needInitSphere=false;
+		if(!GWTThreeClothHair.INSTANCE.getCannonControler().isExistSphereData(channel)){
+			needInitSphere=true;
+		}else{
+		SphereBodyData cannonSpheres=GWTThreeClothHair.INSTANCE.getCannonControler().getSphereData(channel);
+		if(spheres.size()!=cannonSpheres.getCannonSpheres().length()){
+			needInitSphere=true;
+			GWTThreeClothHair.INSTANCE.getCannonControler().removeSphereData(channel);
+			}
+			
+		}
+		
+		
+		if(needInitSphere){
+			JsArray<Body> cannonSpheres=JavaScriptUtils.createJSArray();
+			for(int i=0;i<spheres.size();i++){
+				Mesh sphereMesh=spheres.get(i);
+				Body body=createSphereBody(sphereMesh.getPosition().clone().divideScalar(1000),sphereMesh.getScale().getX()/1000);
+				cannonSpheres.push(body);	
+			}
+			
+			GWTThreeClothHair.INSTANCE.getCannonControler().setSphereData(channel,new SphereBodyData(cannonSpheres));
+			
+		}else{
+			SphereBodyData data=GWTThreeClothHair.INSTANCE.getCannonControler().getSphereData(channel);
+			JsArray<Body> cannonSpheres=data.getCannonSpheres();
+			for(int i=0;i<spheres.size();i++){
+				Vector3 threePos=spheres.get(i).getPosition().clone().divideScalar(1000);
+				cannonSpheres.get(i).getPosition().set(threePos.getX(),threePos.getY(),threePos.getZ());
+				double radius=spheres.get(i).getScale().getX()/1000;
+				for(int j=0;j<cannonSpheres.get(i).getShapes().length();j++){
+					Sphere sphere=cannonSpheres.get(i).getShapes().get(j).cast();
+					sphere.setRadius(radius);
+				}
+				//cannonSpheres.get(i).set
+				//sadly not support size yet
+			}
+		}
+		
+		if(!GWTThreeClothHair.INSTANCE.getCannonControler().isExistParticleData(this)){
+			
+			
+			JsArray<Body> cannonParticles=JavaScriptUtils.createJSArray();
+			JsArray<DistanceConstraint> cannonConstraints=JavaScriptUtils.createJSArray();
+			for(int i=0;i<particles.size();i++){
+				Particle particle=particles.get(i);
+				int v=i/(w+1);
+				//this effect small,TODO more check
+				double baseMass=0.1;
+				
+				/*
+				 * trid last one is heavy,but not so good
+				if(v==h){
+					baseMass=1.2;
+				}
+				*/
+				
+				double mass=isPinned(i)?0:baseMass;
+				
+				/*
+				 * noeffect,try to less pin and keep loose
+				mass=baseMass;//test no pin
+				if(i%sizeOfU==0 && isPinned(i)){//try to loose
+					mass=0;
+				}
+				*/
+				
+				Body p=createParticle(particle.getOriginal().clone().divideScalar(1000), mass);
+				cannonParticles.push(p);
+			}
+			
+			
+			for(int i=0;i<constrains.size();i++){
+				Constrain con=constrains.get(i);
+				int p1=particles.indexOf(con.p1);
+				int p2=particles.indexOf(con.p2);
+				//max force is no effect?.at least set 1 or Too gravity.
+				cannonConstraints.push(CANNON.newDistanceConstraint(cannonParticles.get(p1),cannonParticles.get(p2),con.distance/1000));
+			}
+			
+			
+			
+			
+			GWTThreeClothHair.INSTANCE.getCannonControler().setParticleData(this, new ParticleBodyData(cannonParticles,cannonConstraints));
+		}else{
+			ParticleBodyData data=GWTThreeClothHair.INSTANCE.getCannonControler().getCannonData(this);
+			JsArray<Body> cannonParticles=data.getCannonParticles();
+			
+			//basically never changed length
+			for(int i=0;i<cannonParticles.length();i++){
+				if(isPinned(i)){
+					Vector3 threePos=particles.get(i).getOriginal().clone().divideScalar(1000);
+					cannonParticles.get(i).getPosition().set(threePos.getX(),threePos.getY(),threePos.getZ());
+				}else{
+					Vec3 cannonPos=cannonParticles.get(i).getPosition();
+					particles.get(i).position.set(cannonPos.getX(),cannonPos.getY(),cannonPos.getZ()).multiplyScalar(1000);
+				}
+			}
+			
+			
+			
+			
+		}
+		
+		
+		
+		//sphere out,not work so good
+		//TODO switch
+		
+		/*
+		 * Vector3 diff = THREE.Vector3();
+		for (int i=0;i<particles.size();i++) {
+			if(isPinned(i)){
+				continue;
+			}
+			Particle particle = particles.get(i);
+			Vector3 pos = particle.getPosition();
+			
+			for(Mesh mesh:spheres){
+				diff.subVectors(pos, mesh.getPosition());
+				if (diff.length() < mesh.getScale().getX()) {
+					String before=ThreeLog.get(pos);
+					diff.normalize().multiplyScalar(mesh.getScale().getX());
+					
+					
+					pos.copy(mesh.getPosition()).add(diff);
+					String after=ThreeLog.get(pos);
+					LogUtils.log(i+","+before+","+after);
+					//pos.copy(mesh.getPosition()).add(diff);
+					//LogUtils.log("scale-out");
+					//break;//?
+				}
+				
+			}
+		}
+		*/
+		
+		//around 0-1 ms
+		
+		//LogUtils.log("simulate-time:"+watch.elapsed(TimeUnit.MILLISECONDS)+" ms");
+		
+	}
+	protected Body createSphereBody(Vector3 position, double size) {
+		
+		com.github.gwtcannonjs.client.shapes.Sphere sphereShape = CANNON.newSphere(size);
+		
+		//need more try and error,not good at cloth,not smooth
+		//com.github.gwtcannonjs.client.shapes.Box sphereShape = CANNON.newBox(CANNON.newVec3(size, size, size));
+		
+		Body sphereBody  = CANNON.newBody(CANNON.newBodyOptions().withMass(0)
+				.withMaterial(GWTThreeClothHair.INSTANCE.getCannonControler().getSphereMaterial())
+				);
+		
+		sphereBody.addShape(sphereShape);
+		
+		
+		sphereBody.getPosition().set(position.getX(),position.getY(),position.getZ());//sphereBody.position.set(0,0,0);
+		return sphereBody;
+		
+	}
+
+	private Body createParticle(Vector3 p,double mass){
+		Body particle = CANNON.newBody(CANNON.newBodyOptions().withMass(mass)
+				.withMaterial(GWTThreeClothHair.INSTANCE.getCannonControler().getClothMaterial())
+		
+				);
+		//seems impossible
+		//particle.addShape(CANNON.newSphere(restDistance/100));
+		particle.addShape(CANNON.newParticle());
+		
+		
+		//this seems works when extremly dynamic movement
+		particle.setAngularDamping(0.99);
+		particle.setLinearDamping(0.99);
+		
+		//particle.linearDamping = 0.5;
+		particle.getPosition().set(//particle.position.set(
+		p.getX(),
+		p.getY(),
+		p.getZ()
+		);
+		
+		return particle;
+	}
 	
 
 }

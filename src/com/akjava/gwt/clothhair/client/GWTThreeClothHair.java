@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
+import com.akjava.gwt.clothhair.client.cannon.CannonControler;
 import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
@@ -45,9 +46,11 @@ import com.akjava.gwt.three.client.js.animation.AnimationClip;
 import com.akjava.gwt.three.client.js.animation.AnimationMixer;
 import com.akjava.gwt.three.client.js.animation.KeyframeTrack;
 import com.akjava.gwt.three.client.js.animation.tracks.QuaternionKeyframeTrack;
+import com.akjava.gwt.three.client.js.animation.tracks.VectorKeyframeTrack;
 import com.akjava.gwt.three.client.js.cameras.PerspectiveCamera;
 import com.akjava.gwt.three.client.js.core.BufferAttribute;
 import com.akjava.gwt.three.client.js.core.BufferGeometry;
+import com.akjava.gwt.three.client.js.core.Clock;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.core.Raycaster;
@@ -127,9 +130,12 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		return GWTParamUtils.WebGLRenderer().preserveDrawingBuffer(false).logarithmicDepthBuffer(false);
 	}
 	
+	Clock clock;
+	
 	@Override
 	public void animate(double timestamp) {
 		
+		//double delta=clock.getDelta();
 		
 		
 		/* for test
@@ -145,10 +151,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		}
 		*/
 		
-		//mixer first,this make animation
-		if(mixer!=null){
-			mixer.update(clock.getDelta());//shoud i?
-		}
+		
 		
 		
 		
@@ -167,19 +170,30 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//ThreeLog.log(camera.getPosition());
 		
-		if(clothControler!=null){
+		if(clothControls!=null){
 			updateSphereMeshs();//sphere first
 			
-			clothControler.update(timestamp);
-			
-			
-			
+			clothControls.update(timestamp);
+		}
+		//LogUtils.log(delta);
+		if(cannonControler.isEnabled()){//TODO move setting
+			int iteration=1; //iteration totally kill fps,but reduce shaking
+			for(int i=0;i<iteration;i++)
+			cannonControler.getWorld().step(1.0/60);//sphere first
 		}
 		
+		if(clothControls!=null){//i'm not sure no need?
+			clothControls.update(timestamp);//back to physics
+		}
 		//logarithmicDepthBuffer
 		renderer.render(scene, camera);//render last,very important
 		
-		
+		//mixer first,this make animation
+				if(mixer!=null){
+					
+					mixer.update(1.0/60); //fixed dt //TODO make option
+					//mixer.update(clock.getDelta());
+				}
 		
 		if(stats!=null){
 			stats.update();
@@ -276,8 +290,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 
 	public String textureUrl;
+
 	@Override
 	public void onInitializedThree() {
+		clock=THREE.Clock();
 		//setDebugAnimateCount(100);
 		final String modelUrl=GWTHTMLUtils.getInputValueById("model", "model11.json");
 		textureUrl=GWTHTMLUtils.getInputValueById("texture", "models/mbl3d/simpleeye-2kbluexxx-extendhead.png");
@@ -367,6 +383,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		loader.load(modelUrl,new JSONLoadHandler() {
 			
 			private MultiMaterial multiMaterials;
+			
 		
 			
 
@@ -374,7 +391,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			public void loaded(Geometry geometry,JsArray<Material> m) {
 				
 				//materials=fixMaterial(materials);
-				
+				characterGeometry=geometry;
 				geometry.computeBoundingBox();
 				BoundingBox bb = geometry.getBoundingBox();
 				//double x=-20, y=-1270,z= -300,s= 800;
@@ -424,7 +441,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						.morphTargets(true)
 						.skinning(true)
 						.transparent(true)
-						
+						.alphaTest(0.5)
 						//.emissiveMap(THREE.TextureLoader().load("models/mbl3d/emissive.png"))
 						//.specularMap(THREE.TextureLoader().load("models/mbl3d/specular.png"))
 						//.specular(0xffffff)//specular(0xffffff)// ff is for map ,11 is skin
@@ -435,10 +452,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						//.specular(1).shininess(1)
 						.map(mapTexture)
 						
-						.bumpMap(THREE.TextureLoader().load("models/mbl3d/simpleeye-2kbluexxx-extendhead-bump.png"))
+						//.bumpMap(THREE.TextureLoader().load("models/mbl3d/simpleeye-2kbluexxx-extendhead-bump.png"))
 						.bumpScale(0.5)
-						.specular(0xffffff)
-						.specularMap(THREE.TextureLoader().load("models/mbl3d/simpleeye-2kbluexxx-extendhead-bump.png"))
+						//.specular(0xffffff)
+						//.specularMap(THREE.TextureLoader().load("models/mbl3d/simpleeye-2kbluexxx-extendhead-bump.png"))
 						
 						//.map(THREE.TextureLoader().load("models/mbl3d/simpleeye2.png"))
 						);
@@ -475,13 +492,15 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				
 				
-				clothControler=new ClothControler();
-				clothControler.setFloorModifier(new GroundYFloor(GROUND));
+				clothControls=new ClothControler();
+				clothControls.setFloorModifier(new GroundYFloor(GROUND));
 				
 				
 				//sphere.getScale().setScalar(clothControls.getBallSize());
 				
 				
+				
+				characterMesh.getSkeleton().getBones().get(0).getPosition();
 				
 				
 				createControler();
@@ -490,7 +509,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				sphereDataPanel.setSkelton(characterMesh.getSkeleton());
 				characterMovePanel.setSkelton(characterMesh.getSkeleton());
 				
-				clothControler.setWind(true);
+				clothControls.setWind(true);
 				
 				
 				/* for test
@@ -529,13 +548,20 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				);
 		
 		
+		cannonControler=new CannonControler();
 		
 	}
 	
 	//List<SkinningVertexCalculator> skinningVertexCalculators=Lists.newArrayList();
 	
+private CannonControler cannonControler;
 
 	
+
+
+	public CannonControler getCannonControler() {
+	return cannonControler;
+}
 	public Mesh getSphereMesh(SphereData data){
 		return sphereMeshMap.get(data).getMesh();
 	}
@@ -579,7 +605,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	private void removeSphereMesh(SphereData data){
 		Mesh sphere=sphereMeshMap.get(data).getMesh();
-		clothControler.removeSphere(sphere);
+		clothControls.removeSphere(sphere);
 		scene.remove(sphere);
 	}
 	@Override
@@ -601,7 +627,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		sphere.getScale().setScalar(data.getSize());
 		
-		clothControler.addSphere(sphere,data.getChannel());
+		clothControls.addSphere(sphere,data.getChannel());
 		
 		
 		
@@ -626,7 +652,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		sphere.getScale().setScalar(data.getSize());
 		
-		clothControler.addSphere(sphere,data.getChannel());
+		clothControls.addSphere(sphere,data.getChannel());
 		
 		SphereCalculatorAndMesh calculatorAndMesh=new SphereCalculatorAndMesh(characterMesh, data.getBoneIndex(), sphere);
 		sphereMeshMap.put(data, calculatorAndMesh);
@@ -703,7 +729,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		}
 		
 		//plus sync channel
-		clothControler.updateSphere(sphereMeshMap.get(data).getMesh(), data.getChannel());
+		clothControls.updateSphere(sphereMeshMap.get(data).getMesh(), data.getChannel());
 		
 		if(data.isCopyHorizontal()){
 			SphereData data2=mirrorMap.get(data);
@@ -731,7 +757,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			}
 			
 			//plus sync channel
-			clothControler.updateSphere(sphereMeshMap.get(data2).getMesh(), data2.getChannel());
+			clothControls.updateSphere(sphereMeshMap.get(data2).getMesh(), data2.getChannel());
 			
 		}else{
 			//no need
@@ -769,7 +795,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	
 
-	ClothControler clothControler;
+	ClothControler clothControls;
 
 	//private int hairColor=0x553817;//brown
 	
@@ -904,7 +930,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 
 	public ClothControler getClothControler(){
-		return clothControler;
+		return clothControls;
 	}
 
 	public Scene getScene(){
@@ -946,7 +972,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				clothControler.setWind(event.getValue());
+				clothControls.setWind(event.getValue());
 			}
 		});
 		basicPanel.add(windCheck);
@@ -962,7 +988,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
 				
 				groundMesh.setVisible(event.getValue());
-				clothControler.getFloorModifier().setEnabled(event.getValue());
+				clothControls.getFloorModifier().setEnabled(event.getValue());
 			}
 		});
 		groundCheck.setValue(true);
@@ -1369,6 +1395,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		
 	}
+	private Geometry characterGeometry;
 	
 	public void updateHairTextureData(boolean updateHairTextureMap){
 		//get hair data selection
@@ -1478,7 +1505,17 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				concat(values,q.toArray());
 				QuaternionKeyframeTrack track=THREE.QuaternionKeyframeTrack(".bones["+i+"].quaternion", times, values);
 				tracks.push(track);
-				//TODO position?
+				
+				
+				
+				//TODO  make method
+				JsArrayNumber times2=JavaScriptObject.createArray().cast();
+				times2.push(0);
+				
+				JsArrayNumber values2=JsArray.createArray().cast();
+				concat(values2,characterGeometry.getBones().get(i).getPos());
+				VectorKeyframeTrack track2=THREE.VectorKeyframeTrack(".bones["+i+"].position", times2, values2);
+				tracks.push(track2);
 			}
 			AnimationClip clip=THREE.AnimationClip("reset", -1, tracks);
 			//LogUtils.log(track.validate());

@@ -1,12 +1,14 @@
 package com.akjava.gwt.clothhair.client.cloth;
 
+import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
+import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
-import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
-import com.akjava.gwt.lib.client.LogUtils;
+import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToNormal;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
+import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 
 public class ClothData {
@@ -48,11 +50,25 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 	//LogUtils.log("g-size:"+clothGeometry.getVertices().length());
 	
 	
+	HairPinToNormal hairPinToNormal=new HairPinToNormal(mesh);
+	
 	calculator=new SkinningVertexCalculator(mesh);
 	for(HairPin pin:hairData.getHairPins()){
 		Face3 face=mesh.getGeometry().getFaces().get(pin.getFaceIndex());
 		int vertexIndex=face.gwtGet(pin.getVertexOfFaceIndex());
-		calculator.addByVertexIndex(vertexIndex,pin.getTargetClothIndex());
+		//TODO make function
+		SkinningVertex svertex=calculator.createSkinningVertex(vertexIndex,pin.getTargetClothIndex());
+		calculator.add(
+				svertex
+		);
+		//TODO add option
+		//if extend outside,extend-ratio
+		double extendRatio=0.5;
+		Vector3 normal=hairPinToNormal.apply(pin);
+		double distance=cloth.getRestDistance()/mesh.getScale().getX()*extendRatio;
+		Vector3 appendPos=normal.normalize().multiplyScalar(distance);
+		svertex.getVertex().add(appendPos);
+		
 		//TODO support direct point
 	}
 }

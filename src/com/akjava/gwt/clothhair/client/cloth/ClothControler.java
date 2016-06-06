@@ -27,7 +27,7 @@ public class ClothControler {
 	//private Mesh sphere;//TODO multiple
 	
 	
-	private List<Mesh> getSphereList(int channel){
+	public List<Mesh> getSphereList(int channel){
 		List<Mesh> list=spheresMap.get(channel);
 		if(list==null){
 			list=Lists.newArrayList();
