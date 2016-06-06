@@ -43,13 +43,25 @@ public class CharacterMovePanel extends VerticalPanel{
 		super();
 		this.mesh = mesh;
 		
-		this.add(new HTML("<h4>Mixer fps control</h4>"));
+		this.add(new HTML("<h4>Animation Mixer fps control</h4>"));
 		HorizontalPanel h1=new HorizontalPanel();
 		h1.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
 		this.add(h1);
+		final IntegerBox frameBox=new IntegerBox();
 		
-		CheckBox fixedFpsCheck=new CheckBox("fixed fps");
+		CheckBox fixedFpsCheck=new CheckBox();
 		h1.add(fixedFpsCheck);
+		h1.add(new Label("fixed fps"));
+		fixedFpsCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				frameBox.setEnabled(event.getValue());
+			}
+			
+		});
+		
+		
 		fixedFpsCheck.setValue(GWTThreeClothHair.INSTANCE.isUseFixedFrame());
 		fixedFpsCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
@@ -58,7 +70,7 @@ public class CharacterMovePanel extends VerticalPanel{
 			}
 		});
 		
-		IntegerBox frameBox=new IntegerBox();
+		
 		frameBox.setWidth("40px");
 		frameBox.setValue(GWTThreeClothHair.INSTANCE.getMixerFrixedFrameNumber());
 		frameBox.addValueChangeHandler(new ValueChangeHandler<Integer>() {
