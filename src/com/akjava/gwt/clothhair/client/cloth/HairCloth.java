@@ -698,7 +698,14 @@ public class HairCloth {
 			p.previous.copy(p.original);
 		}
 	}
-	public void simulate(double time,Geometry clothGeometry,List<Mesh> spheres) {
+	//before simulate
+	
+	public void beforeSimulate(Geometry clothGeometry,List<Mesh> spheres){
+		//made cannon object or sync cannon-object position
+	}
+	
+	//call after simulate
+	public void afterSimulate(double time,Geometry clothGeometry,List<Mesh> spheres) {
 		//simulate by group means,no grouping support yet
 		//not support Wind yet
 		if(!isConnectHorizontal()){

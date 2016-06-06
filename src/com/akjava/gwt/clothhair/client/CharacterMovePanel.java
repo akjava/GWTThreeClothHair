@@ -45,6 +45,7 @@ public class CharacterMovePanel extends VerticalPanel{
 		
 		this.add(new HTML("<h4>Animation Mixer fps control</h4>"));
 		HorizontalPanel h1=new HorizontalPanel();
+		h1.setSpacing(4);
 		h1.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
 		this.add(h1);
 		final IntegerBox frameBox=new IntegerBox();

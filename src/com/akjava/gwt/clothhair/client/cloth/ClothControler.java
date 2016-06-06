@@ -60,13 +60,46 @@ public class ClothControler {
 		cloths.remove(data);
 	}
 	
-	public void update(double time){
-		
+	//made before update
+	public void beforeSimulate(){
 		syncPins();
 		
-		animateCloth(time);//TODO fix wind
+		for(ClothData data:cloths){
+			HairCloth cloth=data.getCloth();
+			Geometry clothGeometry=data.getClothGeometry();
+			
+			cloth.beforeSimulate(clothGeometry,getSphereList(cloth.channel));//set otherwhere?
+			}
+	}
+	
+	public void afterSimulate(double time){
 		
-		renderCloth();
+		double windStrength= Math.cos( time / 7000 ) * 20 + 40;;
+		
+		Vector3 windForce=THREE.Vector3().set(Math.sin( time / 2000 ), Math.cos( time / 3000 ), Math.sin( time / 1000 ) ).normalize().multiplyScalar( windStrength );
+		for(ClothData data:cloths){
+			HairCloth cloth=data.getCloth();
+			//cloth.wind=true;
+			Geometry clothGeometry=data.getClothGeometry();
+			
+			
+			//skinning-pin
+			
+			
+			cloth.windStrength =windStrength;
+			cloth.windForce.copy(windForce);
+			
+			
+			//arrow.setLength( cloth.windStrength );
+			//arrow.setDirection( cloth.windForce );
+			
+			//support-matrix4
+			
+			//should switch to sphere
+			cloth.afterSimulate(time,clothGeometry,getSphereList(cloth.channel));//set otherwhere?
+		}
+		
+		renderCloth();//cloth-vertex to three.js object
 		
 	}
 	
@@ -224,31 +257,8 @@ public class ClothControler {
 	
 	
 	
-	public void animateCloth(double time){
-		double windStrength= Math.cos( time / 7000 ) * 20 + 40;;
+	public void afterSimulatex(double time){
 		
-		Vector3 windForce=THREE.Vector3().set(Math.sin( time / 2000 ), Math.cos( time / 3000 ), Math.sin( time / 1000 ) ).normalize().multiplyScalar( windStrength );
-		for(ClothData data:cloths){
-			HairCloth cloth=data.getCloth();
-			//cloth.wind=true;
-			Geometry clothGeometry=data.getClothGeometry();
-			
-			
-			//skinning-pin
-			
-			
-			cloth.windStrength =windStrength;
-			cloth.windForce.copy(windForce);
-			
-			
-			//arrow.setLength( cloth.windStrength );
-			//arrow.setDirection( cloth.windForce );
-			
-			//support-matrix4
-			
-			//should switch to sphere
-			cloth.simulate(time,clothGeometry,getSphereList(cloth.channel));//set otherwhere?
-		}
 	}
 	
 	//temporaly

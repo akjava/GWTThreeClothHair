@@ -1,9 +1,8 @@
 package com.akjava.gwt.clothhair.client.sphere;
 
-import javax.annotation.Nullable;
-
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.HairStorageKeys;
+import com.akjava.gwt.clothhair.client.cloth.SphereDataControler;
 import com.akjava.gwt.html5.client.download.HTML5Download;
 import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileUploadForm;
@@ -285,8 +284,8 @@ public class SphereDataPanel extends VerticalPanel{
 	 public void updateSphereVisible() {
 		 SphereData selection=cellObjects.getSelection();
 		 for(SphereData data:cellObjects.getDatas()){
-			 Mesh mesh=GWTThreeClothHair.INSTANCE.getSphereMesh(data);
-			 Mesh mirror=GWTThreeClothHair.INSTANCE.getMirrorSphereMesh(data);
+			 Mesh mesh=GWTThreeClothHair.INSTANCE.getClothSimulator().getSphereMesh(data);
+			 Mesh mirror=GWTThreeClothHair.INSTANCE.getClothSimulator().getMirrorSphereMesh(data);
 			 boolean visible=false;
 				if(filterMode==FILTER_ALL){
 					visible=true;
@@ -321,7 +320,7 @@ public class SphereDataPanel extends VerticalPanel{
 	private SphereDataEditor sphereDataEditor;
 	 public void onFlushed(){
 		//
-		 GWTThreeClothHair.INSTANCE.syncSphereDataAndSkinningVertexCalculator(sphereDataEditor.getValue());
+		 GWTThreeClothHair.INSTANCE.getClothSimulator().syncSphereDataAndSkinningVertexCalculator(sphereDataEditor.getValue());
 		 
 		 //store data
 		 String lines=toStoreText();
@@ -353,11 +352,7 @@ public class SphereDataPanel extends VerticalPanel{
 	 }
 	 
 	 
-		public static interface SphereDataControler{
-			public void removeSphereData(SphereData data);
-			public void addSphereData(SphereData data);
-			public void onSelectSphere(@Nullable SphereData data);
-		}
+
 
 
 		public void setSkelton(Skeleton skeleton) {

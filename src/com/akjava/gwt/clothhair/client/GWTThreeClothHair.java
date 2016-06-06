@@ -1,13 +1,13 @@
 package com.akjava.gwt.clothhair.client;
 
-import java.util.Map;
-
 import javax.annotation.Nullable;
 
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.cannon.CannonControler;
 import com.akjava.gwt.clothhair.client.cloth.ClothControler;
+import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
 import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
+import com.akjava.gwt.clothhair.client.cloth.SphereDataControler;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairCellObjectData;
@@ -15,7 +15,6 @@ import com.akjava.gwt.clothhair.client.hair.HairPinPanel;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataPanel;
-import com.akjava.gwt.clothhair.client.sphere.SphereDataPanel.SphereDataControler;
 import com.akjava.gwt.clothhair.client.texture.HairPatternDataEditor;
 import com.akjava.gwt.clothhair.client.texture.HairPatternDataUtils;
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
@@ -74,7 +73,6 @@ import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.lib.common.utils.CSVUtils;
-import com.google.common.collect.Maps;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d.Composite;
 import com.google.gwt.canvas.dom.client.ImageData;
@@ -132,7 +130,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	
 	Clock clock;
-	
+	private ClothSimulator clothSimulator;
+	public ClothSimulator getClothSimulator() {
+		return clothSimulator;
+	}
 	@Override
 	public void animate(double timestamp) {
 		
@@ -169,23 +170,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			skeltonHelper.update();
 		}
 		
-		//ThreeLog.log(camera.getPosition());
-		
-		if(clothControls!=null){
-			updateSphereMeshs();//sphere first
-			
-			clothControls.update(timestamp);
-		}
-		//LogUtils.log(delta);
-		if(cannonControler.isEnabled()){//TODO move setting
-			int iteration=1; //iteration totally kill fps,but reduce shaking
-			for(int i=0;i<iteration;i++)
-			cannonControler.getWorld().step(1.0/60);//sphere first
+		if(clothSimulator!=null){
+			clothSimulator.update(timestamp);
 		}
 		
-		if(clothControls!=null){//i'm not sure no need?
-			clothControls.update(timestamp);//back to physics
-		}
+		
 		//logarithmicDepthBuffer
 		renderer.render(scene, camera);//render last,very important
 		
@@ -492,16 +481,16 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				//scene.add(THREE.VertexNormalsHelper(mesh, 0.2, 0x0000ff, 3));//can overwrite
 			
 				
-				ballGeo = THREE.SphereGeometry( 1, 20, 20 );
 				
 				
 				
 				
-				clothControls=new ClothControler();
-				clothControls.setFloorModifier(new GroundYFloor(GROUND));
+				clothSimulator=new ClothSimulator(scene,characterMesh);
+				
+				clothSimulator.getClothControler().setFloorModifier(new GroundYFloor(GROUND));
 				
 				
-				//sphere.getScale().setScalar(clothControls.getBallSize());
+				//sphere.getScale().setScalar(clothSimulator.getClothControler().getBallSize());
 				
 				
 				
@@ -514,7 +503,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				sphereDataPanel.setSkelton(characterMesh.getSkeleton());
 				characterMovePanel.setSkelton(characterMesh.getSkeleton());
 				
-				clothControls.setWind(true);
+				clothSimulator.getClothControler().setWind(true);
 				
 				
 				/* for test
@@ -553,34 +542,24 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				);
 		
 		
-		cannonControler=new CannonControler();
+		
 		
 	}
 	
 	//List<SkinningVertexCalculator> skinningVertexCalculators=Lists.newArrayList();
 	
-private CannonControler cannonControler;
+//private CannonControler cannonControler;
 
 	
 
 
 	public CannonControler getCannonControler() {
-	return cannonControler;
+	return clothSimulator.getCannonControler();
 }
-	public Mesh getSphereMesh(SphereData data){
-		return sphereMeshMap.get(data).getMesh();
-	}
-	public Mesh getMirrorSphereMesh(SphereData data){
-		SphereData mirror=mirrorMap.get(data);
-		if(mirror!=null){
-		return sphereMeshMap.get(mirror).getMesh();
-		}else{
-			return null;
-		}
-	}
+
 	
 	
-	Map<SphereData,SphereCalculatorAndMesh> sphereMeshMap=Maps.newHashMap();
+	
 	
 	public static class SphereCalculatorAndMesh{
 		private Mesh mesh;
@@ -608,186 +587,16 @@ private CannonControler cannonControler;
 	}
 	
 	
-	private void removeSphereMesh(SphereData data){
-		Mesh sphere=sphereMeshMap.get(data).getMesh();
-		clothControls.removeSphere(sphere);
-		scene.remove(sphere);
-	}
-	@Override
-	public void removeSphereData(SphereData data){
-		removeSphereMesh(data);
-		
-		SphereData data2=mirrorMap.get(data);
-		if(data2!=null){
-			removeSphereMesh(data2);
-			mirrorMap.remove(data);
-		}
-	}
-	@Override
-	public void addSphereData(SphereData data){
-		MeshPhongMaterial ballMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0x888888).side(THREE.DoubleSide).wireframe(true));
-		
-		Mesh sphere = THREE.Mesh( ballGeo, ballMaterial );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
-		scene.add( sphere );
-		
-		sphere.getScale().setScalar(data.getSize());
-		
-		clothControls.addSphere(sphere,data.getChannel());
-		
-		
-		
-		sphereMeshMap.put(data, new SphereCalculatorAndMesh(characterMesh, data.getBoneIndex(), sphere));
-		
-		if(data.isCopyHorizontal()){
-			SphereData data2=data.clone();
-			updateHorizontalMirror(data2);
-			mirrorMap.put(data, data2);
-			initSphereCalculatorAndMesh(data2,0x880000);
-		}
-		
-	}
-	
-	private Map<SphereData,SphereData> mirrorMap=Maps.newHashMap();
-	
-	private SphereCalculatorAndMesh initSphereCalculatorAndMesh(SphereData data,int color){
-		MeshPhongMaterial ballMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(color).side(THREE.DoubleSide).wireframe(true));
-		
-		Mesh sphere = THREE.Mesh( ballGeo, ballMaterial );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
-		scene.add( sphere );
-		
-		sphere.getScale().setScalar(data.getSize());
-		
-		clothControls.addSphere(sphere,data.getChannel());
-		
-		SphereCalculatorAndMesh calculatorAndMesh=new SphereCalculatorAndMesh(characterMesh, data.getBoneIndex(), sphere);
-		sphereMeshMap.put(data, calculatorAndMesh);
-		return calculatorAndMesh;
-	}
+
+
 	
 	
 	
-	public void updateHorizontalMirror(SphereData data){
-		data.setX(data.getX()*-1);
-		//boneName
-		String boneName=characterMesh.getSkeleton().getBones().get(data.getBoneIndex()).getName();
-		String mirrowName=getMirroredBoneName(boneName);
-		if(mirrowName!=null){
-			int index=-1;
-			for(int i=0;i<characterMesh.getSkeleton().getBones().length();i++){
-				String name=characterMesh.getSkeleton().getBones().get(i).getName();
-				if(name.equals(mirrowName)){
-					index=i;
-					break;
-				}
-			}
-			if(index!=-1){
-				data.setBoneIndex(index);
-			}
-			LogUtils.log(mirrowName+","+index);
-		}
-	}
+
 	
-	//TODO make method
-	protected String getMirroredBoneName(String name) {
-		if(name.endsWith("_R")){
-			return name.replace("_R", "_L");
-		}
-		if(name.endsWith("_L")){
-			return name.replace("_L", "_R");
-		}
-		
-		if(name.indexOf("Right")!=-1){
-			return name.replace("Right", "Left");
-		}
-		if(name.indexOf("right")!=-1){
-			return name.replace("right", "left");
-		}
-		if(name.indexOf("Left")!=-1){
-			return name.replace("Left", "Right");
-		}
-		if(name.indexOf("left")!=-1){
-			return name.replace("left", "right");
-		}
-		//makehuman 19 bones
-		/*
-		if(name.startsWith("r")){
-			return "l"+name.substring(1);
-		}
-		else if(name.startsWith("l")){
-			return "r"+name.substring(1);
-		}
-		*/
-		
-		return null;
-	}
+
 	
-	/*
-	 * called when flushed
-	 */
-	public void syncSphereDataAndSkinningVertexCalculator(SphereData data){
-		if(data==null){
-			return;
-		}
-		SkinningVertexCalculator calculator=sphereMeshMap.get(data).getCalculator();
-		for(SkinningVertex vertex:calculator.getSkinningVertexs()){
-			vertex.getSkinIndices().setX(data.getBoneIndex());
-		}
-		
-		//plus sync channel
-		clothControls.updateSphere(sphereMeshMap.get(data).getMesh(), data.getChannel());
-		
-		if(data.isCopyHorizontal()){
-			SphereData data2=mirrorMap.get(data);
-			if(data2==null){
-				//create here
-				data2=data.clone();
-				
-				updateHorizontalMirror(data2);
-				//TODO change bone name & make method
-				mirrorMap.put(data, data2);
-			}else{
-				//copy
-				data.copyTo(data2);
-				updateHorizontalMirror(data2);
-			}
-			
-			if(sphereMeshMap.get(data2)==null){
-				initSphereCalculatorAndMesh(data2,0x880000).getCalculator();;
-			}
-			
-			SkinningVertexCalculator calculator2=sphereMeshMap.get(data2).getCalculator();
-			
-			for(SkinningVertex vertex:calculator2.getSkinningVertexs()){
-				vertex.getSkinIndices().setX(data2.getBoneIndex());
-			}
-			
-			//plus sync channel
-			clothControls.updateSphere(sphereMeshMap.get(data2).getMesh(), data2.getChannel());
-			
-		}else{
-			//no need
-			SphereData data2=mirrorMap.get(data);
-			if(data2!=null){
-				removeSphereMesh(data2);
-				mirrorMap.remove(data);
-			}
-		}
-		
-	}
-	
-	public void updateSphereMeshs(){
-		for(SphereData data:sphereMeshMap.keySet()){
-			SphereCalculatorAndMesh sphereCalculatorAndMesh=sphereMeshMap.get(data);
-			sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(0).getVertex().copy(data.getPosition());
-			sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(1).getVertex().copy(data.getPosition()).gwtIncrementX(data.getSize());
-			sphereCalculatorAndMesh.getCalculator().update();
-			
-			double size=sphereCalculatorAndMesh.getCalculator().getResult().get(0).distanceTo(sphereCalculatorAndMesh.getCalculator().getResult().get(1));
-			//update sphere
-			sphereCalculatorAndMesh.getMesh().getScale().setScalar(size);
-			sphereCalculatorAndMesh.getMesh().getPosition().copy(sphereCalculatorAndMesh.getCalculator().getResult().get(0));
-		}
-	}
+
 	
 	
 	
@@ -800,7 +609,7 @@ private CannonControler cannonControler;
 	}
 	
 
-	ClothControler clothControls;
+	//ClothControler clothControls;
 
 	//private int hairColor=0x553817;//brown
 	
@@ -935,7 +744,7 @@ private CannonControler cannonControler;
 	}
 
 	public ClothControler getClothControler(){
-		return clothControls;
+		return clothSimulator.getClothControler();
 	}
 
 	public Scene getScene(){
@@ -981,7 +790,7 @@ private CannonControler cannonControler;
 
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				clothControls.setWind(event.getValue());
+				clothSimulator.getClothControler().setWind(event.getValue());
 			}
 		});
 		h1.add(windCheck);
@@ -995,7 +804,7 @@ private CannonControler cannonControler;
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
 				
 				groundMesh.setVisible(event.getValue());
-				clothControls.getFloorModifier().setEnabled(event.getValue());
+				clothSimulator.getClothControler().getFloorModifier().setEnabled(event.getValue());
 			}
 		});
 		groundCheck.setValue(true);
@@ -1245,7 +1054,7 @@ private CannonControler cannonControler;
 	
 	private boolean isSphereVisible(){
 		boolean visible=false;
-		for(SphereCalculatorAndMesh smesh:sphereMeshMap.values()){
+		for(SphereCalculatorAndMesh smesh:clothSimulator.getSphereMeshMap().values()){
 			visible=smesh.getMesh().isVisible();
 		}
 		return visible;
@@ -1254,7 +1063,7 @@ private CannonControler cannonControler;
 		if(visible){
 			sphereDataPanel.updateSphereVisible();
 		}else{
-		for(SphereCalculatorAndMesh smesh:sphereMeshMap.values()){
+		for(SphereCalculatorAndMesh smesh:clothSimulator.getSphereMeshMap().values()){
 			smesh.getMesh().setVisible(visible);
 		}
 		}
@@ -1357,12 +1166,12 @@ private CannonControler cannonControler;
 		if(selectedSphere==null){
 			return;
 		}
-		MeshPhongMaterial material=sphereMeshMap.get(selectedSphere).getMesh().getMaterial().gwtCastMeshPhongMaterial();
+		MeshPhongMaterial material=clothSimulator.getSphereMeshMap().get(selectedSphere).getMesh().getMaterial().gwtCastMeshPhongMaterial();
 		material.getColor().setHex(0x0000ff);
 	}
 	
 	private void unselectShpere(SphereData selectedSphere) {
-		MeshPhongMaterial material=sphereMeshMap.get(selectedSphere).getMesh().getMaterial().gwtCastMeshPhongMaterial();
+		MeshPhongMaterial material=clothSimulator.getSphereMeshMap().get(selectedSphere).getMesh().getMaterial().gwtCastMeshPhongMaterial();
 		material.getColor().setHex(0x888888);
 	}
 	
@@ -1693,5 +1502,13 @@ private CannonControler cannonControler;
 	
 	public void addHairPin(HairPin pin){
 		hairDataPanel.addPin(pin);
+	}
+	@Override
+	public void removeSphereData(SphereData data) {
+		clothSimulator.removeSphereData(data);
+	}
+	@Override
+	public void addSphereData(SphereData data) {
+		clothSimulator.addSphereData(data);
 	}
 }
