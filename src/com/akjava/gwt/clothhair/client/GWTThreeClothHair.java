@@ -10,7 +10,7 @@ import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
 import com.akjava.gwt.clothhair.client.cloth.SphereDataControler;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel;
-import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairCellObjectData;
+import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
 import com.akjava.gwt.clothhair.client.hair.HairPinPanel;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
@@ -1191,7 +1191,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		return updatingHairTextureMap;
 	}
 
-	public void updateHairTextureMap(final HairCellObjectData selection){
+	public void updateHairTextureMap(final HairMixedData selection){
 		updatingHairTextureMap=true;
 		if(selection==null){
 			LogUtils.log("updateHairTextureData:null selection");
@@ -1259,20 +1259,20 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	public void updateHairTextureData(boolean updateHairTextureMap){
 		//get hair data selection
-		HairCellObjectData selection=hairDataPanel.getSelection();
+		HairMixedData selection=hairDataPanel.getSelection();
 		updateHairTextureData(selection,updateHairTextureMap);
 		
 	}
 	
 	public void updateHairTextureMap(Texture texture){
 		//get hair data selection
-		for(HairCellObjectData selection:hairDataPanel.getDatas()){
+		for(HairMixedData selection:hairDataPanel.getDatas()){
 			updateHairTextureMap(selection,texture);
 		}
 	}
 	
 	
-	public void updateHairTextureMap(HairCellObjectData selection,Texture texture){
+	public void updateHairTextureMap(HairMixedData selection,Texture texture){
 		if(selection==null){
 			LogUtils.log("updateHairTextureData:null selection");
 			return;
@@ -1285,7 +1285,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		material.setMap(texture);
 	}
 	
-	public void updateHairTextureColor(HairCellObjectData selection,int colorValue){
+	public void updateHairTextureColor(HairMixedData selection,int colorValue){
 		if(selection==null){
 			LogUtils.log("updateHairTextureData:null selection");
 			return;
@@ -1298,7 +1298,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		material.setColor(THREE.Color(colorValue));
 	}
 		
-		public void updateHairTextureData(HairCellObjectData selection,boolean updateHairTextureMap){
+		public void updateHairTextureData(HairMixedData selection,boolean updateHairTextureMap){
 		if(selection==null){
 			LogUtils.log("updateHairTextureData:null selection");
 			return;

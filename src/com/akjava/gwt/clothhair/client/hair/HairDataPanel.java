@@ -78,16 +78,16 @@ public class HairDataPanel extends VerticalPanel{
 	 interface Driver extends SimpleBeanEditorDriver< HairData,  HairDataEditor> {}
 	 Driver driver = GWT.create(Driver.class);
 	 
-	private EasyCellTableObjects<HairCellObjectData> cellObjects;
+	private EasyCellTableObjects<HairMixedData> cellObjects;
 
 	private SkinnedMesh characterMesh;
 
 	private HairPinPanel hairPinPanel;
 	
-	public HairCellObjectData getSelection(){
+	public HairMixedData getSelection(){
 		return cellObjects.getSelection();
 	}
-	public List<HairCellObjectData> getDatas(){
+	public List<HairMixedData> getDatas(){
 		return cellObjects.getDatas();
 	}
 	private Label verticalDistanceLabel;
@@ -133,7 +133,7 @@ public class HairDataPanel extends VerticalPanel{
 						GWTThreeClothHair.INSTANCE.getBodyMaterial().setMap(texture);
 						LogUtils.log("make texture:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						//extremly slow
-						for(HairCellObjectData cellData:cellObjects.getDatas()){
+						for(HairMixedData cellData:cellObjects.getDatas()){
 							//TODO check use local or not
 							if(!cellData.getHairData().getHairTextureData().isUseLocalColor()){
 							GWTThreeClothHair.INSTANCE.updateHairTextureColor(cellData,colorValue);
@@ -166,7 +166,7 @@ public class HairDataPanel extends VerticalPanel{
 		showHair.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				for(HairCellObjectData data:cellObjects.getDatas()){
+				for(HairMixedData data:cellObjects.getDatas()){
 					data.getMesh().setVisible(event.getValue());
 				}
 			}
@@ -210,21 +210,21 @@ public class HairDataPanel extends VerticalPanel{
 		driver.edit(new HairData());//new data
 		
 		
-		SimpleCellTable<HairCellObjectData> table=new SimpleCellTable<HairCellObjectData>() {
+		SimpleCellTable<HairMixedData> table=new SimpleCellTable<HairMixedData>() {
 			@Override
-			public void addColumns(CellTable<HairCellObjectData> table) {
-				TextColumn<HairCellObjectData> channelColumn=new TextColumn<HairCellObjectData>() {
+			public void addColumns(CellTable<HairMixedData> table) {
+				TextColumn<HairMixedData> channelColumn=new TextColumn<HairMixedData>() {
 					@Override
-					public String getValue(HairCellObjectData object) {
+					public String getValue(HairMixedData object) {
 						return String.valueOf(object.getHairData().getChannel());
 						//return hairDataConverter.convert(object.getHairData());
 					}
 				};
 				table.addColumn(channelColumn,"CH");
 				
-				TextColumn<HairCellObjectData> pinsColumn=new TextColumn<HairCellObjectData>() {
+				TextColumn<HairMixedData> pinsColumn=new TextColumn<HairMixedData>() {
 					@Override
-					public String getValue(HairCellObjectData object) {
+					public String getValue(HairMixedData object) {
 						
 						return String.valueOf(object.getHairData().getHairPins().size());
 						//return hairDataConverter.convert(object.getHairData());
@@ -233,9 +233,9 @@ public class HairDataPanel extends VerticalPanel{
 				table.addColumn(pinsColumn,"pin");
 				
 				
-				TextColumn<HairCellObjectData> distanceColumn=new TextColumn<HairCellObjectData>() {
+				TextColumn<HairMixedData> distanceColumn=new TextColumn<HairMixedData>() {
 					@Override
-					public String getValue(HairCellObjectData object) {
+					public String getValue(HairMixedData object) {
 						double width=HairDataUtils.getTotalPinDistance(object.getHairData(), characterMesh,false);
 						String text=String.valueOf(width);
 						
@@ -244,9 +244,9 @@ public class HairDataPanel extends VerticalPanel{
 				};
 				table.addColumn(distanceColumn,"distance");
 				
-				TextColumn<HairCellObjectData> nameColumn=new TextColumn<HairCellObjectData>() {
+				TextColumn<HairMixedData> nameColumn=new TextColumn<HairMixedData>() {
 					@Override
-					public String getValue(HairCellObjectData object) {
+					public String getValue(HairMixedData object) {
 						
 						return Strings.padStart(String.valueOf(object.getHairData().getSizeOfU()),2,'0')+","+
 								Strings.padStart(String.valueOf(object.getHairData().getSizeOfV()),2,'0')+","+
@@ -256,9 +256,9 @@ public class HairDataPanel extends VerticalPanel{
 				};
 				table.addColumn(nameColumn,"UVS");
 				
-				TextColumn<HairCellObjectData> syncColumn=new TextColumn<HairCellObjectData>() {
+				TextColumn<HairMixedData> syncColumn=new TextColumn<HairMixedData>() {
 					@Override
-					public String getValue(HairCellObjectData object) {
+					public String getValue(HairMixedData object) {
 						
 						return String.valueOf(object.getHairData().isSyncMove());
 						//return hairDataConverter.convert(object.getHairData());
@@ -289,7 +289,7 @@ public class HairDataPanel extends VerticalPanel{
 		Button edit=new Button("remove & edit",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				HairCellObjectData data=cellObjects.getSelection();
+				HairMixedData data=cellObjects.getSelection();
 				if(data!=null){
 					removeHairData(data);
 					
@@ -321,7 +321,7 @@ public class HairDataPanel extends VerticalPanel{
 		Button copy=new Button("Copy",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				HairCellObjectData data=cellObjects.getSelection();
+				HairMixedData data=cellObjects.getSelection();
 				if(data!=null){
 					HairData copied=data.getHairData().clone();
 					driver.edit(copied);
@@ -334,7 +334,7 @@ public class HairDataPanel extends VerticalPanel{
 		Button remove=new Button("remove",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				HairCellObjectData data=cellObjects.getSelection();
+				HairMixedData data=cellObjects.getSelection();
 				if(data!=null){
 					removeHairData(data);
 				}
@@ -358,7 +358,7 @@ public class HairDataPanel extends VerticalPanel{
 			@Override
 			public void onClick(ClickEvent event) {
 				List<HairData> oldData=Lists.newArrayList();
-				for(HairCellObjectData data:ImmutableList.copyOf(cellObjects.getDatas())){
+				for(HairMixedData data:ImmutableList.copyOf(cellObjects.getDatas())){
 					oldData.add(data.getHairData());
 				}
 				clearAllHairData();
@@ -370,9 +370,9 @@ public class HairDataPanel extends VerticalPanel{
 		
 		
 		
-		cellObjects = new EasyCellTableObjects<HairCellObjectData>(table){
+		cellObjects = new EasyCellTableObjects<HairMixedData>(table){
 			@Override
-			public void onSelect(HairCellObjectData selection) {
+			public void onSelect(HairMixedData selection) {
 				
 				updateSelectionHairVisible(showSelectionHair.getValue());
 				
@@ -475,14 +475,14 @@ public class HairDataPanel extends VerticalPanel{
 	
 	protected void updateSelectionHairVisible(Boolean value) {
 		if(!value){
-			for(HairCellObjectData data:cellObjects.getDatas()){
+			for(HairMixedData data:cellObjects.getDatas()){
 				data.getMesh().setVisible(showHair.getValue());
 			}
 		}else{
-			HairCellObjectData selection=cellObjects.getSelection();
+			HairMixedData selection=cellObjects.getSelection();
 			
 			
-			for(HairCellObjectData data:cellObjects.getDatas()){
+			for(HairMixedData data:cellObjects.getDatas()){
 				if(data==selection){
 					data.getMesh().setVisible(true);
 				}else{
@@ -495,9 +495,9 @@ public class HairDataPanel extends VerticalPanel{
 		hairPinPanel.setHairPins(hairPins);
 	}
 	
-	public static class HairCellObjectData{
+	public static class HairMixedData{
 		private HairData hairData;
-		public HairCellObjectData(HairData hairData, ClothData clothData, Mesh mesh) {
+		public HairMixedData(HairData hairData, ClothData clothData, Mesh mesh) {
 			super();
 			this.hairData = hairData;
 			this.clothData = clothData;
@@ -733,7 +733,7 @@ private void clearAllPoints(){
 	}
 
 	private HairDataConverter hairDataConverter=new HairDataConverter();
-	protected void removeHairData(HairCellObjectData data) {
+	protected void removeHairData(HairMixedData data) {
 		checkNotNull(data,"removeHairData:data is null");
 		GWTThreeClothHair.INSTANCE.getScene().remove(data.getMesh());
 		GWTThreeClothHair.INSTANCE.getClothControler().removeClothData(data.getClothData());
@@ -862,29 +862,7 @@ public void updateHairDataLine(){
 	
 }
 
-public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
-	checkNotNull(mesh,"hairPinToVertex:mesh is null");
-	checkNotNull(hairPin,"hairPinToVertex:hairPin is null");
-	checkArgument(mesh.getGeometry().getFaces().length()>hairPin.getFaceIndex(),"hairPinToVertex:invalid face length");
-	Face3 face=mesh.getGeometry().getFaces().get(hairPin.getFaceIndex());
-	Vector3 vertex;
-	if(hairPin.getVertexOfFaceIndex()==0){
-		vertex=mesh.getGeometry().getVertices().get(face.getA());
-	}else if(hairPin.getVertexOfFaceIndex()==1){
-		vertex=mesh.getGeometry().getVertices().get(face.getB());
-	}else{
-		vertex=mesh.getGeometry().getVertices().get(face.getC());
-	}
-	
-	//TODO support direct point
-	
-	if(applyMatrix4){
-	return vertex.clone().applyMatrix4( mesh.getMatrixWorld());
-	}else{
-	return vertex.clone();
-	}
-	
-}
+
 
 	
 
@@ -947,303 +925,14 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 	}
 	protected void addCloth(HairData hairData,boolean storeData) {
 		
-		ClothData data=new ClothData(hairData,characterMesh);
+		HairMixedData cellData=GWTThreeClothHair.INSTANCE.getClothSimulator().addCloth(hairData);
 		
-		
-		data.getCloth().setPinAll();//force pin all
-		
-		
-		//data.getCloth().ballSize=clothControls.getBallSize();
-		
-	
-		//indivisual haiar material
-		
-		Texture texture=THREE.TextureLoader().load(
-				//"models/mbl3d/bump2c.png"
-				"/hairpattern/hairpattern1.png"
-				);
-		
-		
-		texture.setFlipY(false);
-		texture.setNeedsUpdate(true);
-		
-		//displacementMap not good at plain when row-poly
-		
-		//little bit 
-		MeshPhongMaterial hairMaterial = THREE.MeshPhongMaterial(GWTParamUtils.
-				MeshPhongMaterial()
-				.side(THREE.DoubleSide)
-				.transparent(true)
-				//.wireframe(true)
-				.specular(0x111111)
-				//.specular(0xffffff)
-				.shininess(5) //switch default same as texture otherwise not good at connection
-				//.wireframe(true)
-				//.specular(0xffffff)//TODO move editor
-				//.specularMap(texture)
-				//.shininess(15)
-				
-				
-				/*
-				.displacementMap(texture)
-				.displacementScale(16)
-				.displacementBias(4)
-				*/
-				
-				.bumpMap(texture)
-				.bumpScale(0.5)
-				
-				//.di
-				);
-		/*
-		GWTParamUtils.
-				MeshPhongMaterial()
-				.color(hairData.getHairTextureData().getColor()).side(THREE.DoubleSide).specular(0xffffff).shininess(15)
-				.alphaTest(hairData.getHairTextureData().getAlphaTest())
-				.transparent(true)
-				.opacity(hairData.getHairTextureData().getOpacity())
-				);
-			*/
-		
-		Mesh object = THREE.Mesh( data.getClothGeometry(), hairMaterial );
-		//object.getPosition().set( 0, 0, 0 );
-		
-		GWTThreeClothHair.INSTANCE.getScene().add( object );
-		
-		HairCellObjectData cellData=new HairCellObjectData(hairData,data,object);
 		cellObjects.addItem(cellData);
 		cellObjects.setSelected(cellData, true);
-		
-		
-		//temporaly
-		
-		if(hairData.getHairPins().size()<3){//TODO merge 3pin
-		Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
-		Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
-		
-		//TODO move and fix
-		int cw=hairData.getSizeOfU();
-		int ch=hairData.getSizeOfV();
-		
-		data.getCloth().particles.get(0).setAllPosition(v1);
-		data.getCloth().particles.get(cw).setAllPosition(v2);
-		
-		
-		Vector3 sub=v2.clone().sub(v1).divideScalar(cw+1);
-		for(int i=1;i<cw;i++){
-			Vector3 v=sub.clone().multiplyScalar(i).add(v1);
-			data.getCloth().particles.get(i).setAllPosition(v);
-		}
-		
-		for(int i=cw+1;i<data.getCloth().particles.size();i++){
-			data.getCloth().particles.get(i).setAllPosition(v1);
-		}
-		
-		}else{
-			//only core pins
-			List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).transform(new HairPinToNormal(characterMesh)).toList();
-			List<Vector3> normals=Lists.newArrayList();
-			//PROBLEMS not support custom 
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			//3 pin
-			int cw=hairData.getSizeOfU();
-			
-			List<HairPin> normalPin=Lists.newArrayList();
-			List<HairPin> customPin=Lists.newArrayList();
-			
-			for(HairPin pin:hairData.getHairPins()){
-				if(pin.getTargetClothIndex()==-1){
-					normalPin.add(pin);
-				}else{
-					customPin.add(pin);
-				}
-			}
-			
-			Vector3 diff = THREE.Vector3();
-			List<Mesh> spheres=GWTThreeClothHair.INSTANCE.getClothControler().getSphereList(hairData.getChannel());
-			
-			
-			
-			
-			
-			int normalSize=0;
-			
-			for(int i=0;i<normalPin.size();i++){
-				Vector3 v1=hairPinToVertex(characterMesh,normalPin.get(i),true);
-				
-				//executeSphereOut(v1,spheres);//for test
-				
-				int index=hairData.getSizeOfU()*i;
-				data.getCloth().particles.get(index).setAllPosition(v1);
-				
-				//LogUtils.log("main:"+index);
-				
-				normalSize++;
-				normals.add(pinNormals.get(i));
-				
-				if(i!=normalPin.size()-1){
-					//has next;
-					Vector3 v2=hairPinToVertex(characterMesh,normalPin.get(i+1),true);
-					Vector3 sub=v2.clone().sub(v1).divideScalar(cw);
-					
-					for(int j=1;j<cw;j++){
-						int multiple=j;
-						int at=index+j;
-						Vector3 v=sub.clone().multiplyScalar(multiple).add(v1);
-						data.getCloth().particles.get(at).setAllPosition(v);
-						
-						normals.add(pinNormals.get(i).clone().add(pinNormals.get(i+1)).divideScalar(2));
-						//LogUtils.log("sub:"+at);
-						normalSize++;
-					}
-					
-					
-					//simply do it
-					//normals.add(pinNormals.get(i).clone().add(pinNormals.get(i+2).divideScalar(2)));
-				}	
-			}
-			
-			//LogUtils.log("normal-test"+normalSize+","+pinNormals.size()+","+(data.getCloth().getW()+1));
-			pinNormals=normals;
-			//LogUtils.log("normal-pos:"+normals.size()+",pin "+pinNormals.size()+"append:"+normalSize);
-			
-			
-			//init other posisions
-			for(int j=data.getCloth().getW()+1;j<data.getCloth().particles.size();j++){
-				int x=j%(data.getCloth().getW()+1);
-				int y=j/(data.getCloth().getW()+1);
-				//LogUtils.log(j+"="+x);
-				Vector3 pos=data.getCloth().particles.get(x).getOriginal();
-				//copy upper x
-				
-				//open widely
-				data.getCloth().particles.get(j).setAllPosition(pos);
-				
-				
-				//LogUtils.log("distance:"+(data.getCloth().getRestDistance()*10*y));
-				//plus-y
-				//Vector3  start=normals.get(x).clone().normalize().multiplyScalar( data.getCloth().getRestDistance()*y ).add(pos);
-				//data.getCloth().particles.get(j).setAllPosition(start);
-			
-				if(pinNormals.size()==data.getCloth().getW()+1){
-				//	LogUtils.log("can use normal");
-					Vector3  normalPosition=pinNormals.get(x).clone().normalize().multiplyScalar( data.getCloth().getRestDistance()*y ).add(pos);
-					data.getCloth().particles.get(j).setAllPosition(normalPosition);
-				}
-				
-			}
-			
-			for(HairPin pin:customPin){
-				Vector3 v=hairPinToVertex(characterMesh,pin,true);
-				data.getCloth().particles.get(pin.getTargetClothIndex()).setAllPosition(v);
-			}
-			
-			
-			/*
-			for(int i=0;i<cw*(hairData.getHairPins().size()-1);i++){
-				ThreeLog.log(""+i, data.getCloth().particles.get(i).getOriginal());
-			}
-			*/
-			
-			int w=data.getCloth().getW()+1;
-			int[] newPins=new int[w+customPin.size()];
-			for(int i=0;i<w;i++){
-				newPins[i]=i;
-			}
-			for(int i=0;i<customPin.size();i++){
-				newPins[w+i]=customPin.get(i).getTargetClothIndex();
-			}
-			data.getCloth().setPins(newPins);
-			
-			/*
-			LogUtils.log("pins");
-			for(int i=0;i<newPins.length;i++){
-				LogUtils.log(newPins[i]);
-			}
-			*/
-		
-			/*
-			if(customPin.size()>0){
-			int[] newPins=new int[customPin.size()];
-			for(int i=0;i<customPin.size();i++){
-				newPins[i]=customPin.get(i).getTargetClothIndex();
-			}
-			data.getCloth().setPins(newPins);
-			
-			LogUtils.log("pins");
-			for(int i=0;i<newPins.length;i++){
-				LogUtils.log(newPins[i]);
-			}
-			
-			
-			}
-			*/
-			
-		}
-		
-		//trying sphere-out,but not good at than expected
-		
-		
-		/*
-		Vector3 diff = THREE.Vector3();
-		List<Mesh> spheres=GWTThreeClothHair.INSTANCE.getClothControler().getSphereList(hairData.getChannel());
-		for (int i=0;i<data.getCloth().particles.size();i++) {
-			if(data.getCloth().isPinned(i)){
-				continue;
-			}
-			
-			int vIndex=data.getCloth().getVerticaPosition(i);
-			Particle particle = data.getCloth().particles.get(i);
-			Vector3 pos = particle.getPosition();
-			
-			for(Mesh mesh:spheres){
-				
-				
-				diff.subVectors(pos, mesh.getPosition());
-				if (diff.length() < mesh.getScale().getX()) {
-					LogUtils.log("sphere-out");
-					// collided
-					diff.normalize().multiplyScalar(mesh.getScale().getX()*3);
-					particle.setAllPosition(pos.copy(mesh.getPosition()).add(diff));
-					//pos.copy(mesh.getPosition()).add(diff);
-					//LogUtils.log("scale-out");
-					//break;//?
-				}
-				
-			}
-			
-			
-		}
-		*/
-		
-		//works fine?I'm not sure,howwver anyway narrow is not work fine so far
-		//data.getCloth().recalcurateHorizontalConstraintsDistance();
-		
-		//LogUtils.log("constraints-distance");
-		for(int i=0;i<data.getCloth().getConstrains().size();i++){
-			if(!data.getCloth().isHorizontalConstraints(data.getCloth().getConstrains().get(i))){
-			//	LogUtils.log(i+","+data.getCloth().getConstrains().get(i).getDistance());
-			}
-		}
-		
-		
-		//add data do everything fixed
-		GWTThreeClothHair.INSTANCE.getClothControler().addClothData(data);
 		
 		if(storeData){
 			storeDatas();
 		}
-		
-		GWTThreeClothHair.INSTANCE.updateHairTextureData(cellData,true);
 	}
 	
 	private Vector3 _diff=THREE.Vector3();
@@ -1282,9 +971,9 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 	
 	private String toStoreText(){
 		String text=
-				Joiner.on("\r\n").join(hairDataConverter.convertAll(FluentIterable.from(cellObjects.getDatas()).transform(new Function<HairCellObjectData, HairData>() {
+				Joiner.on("\r\n").join(hairDataConverter.convertAll(FluentIterable.from(cellObjects.getDatas()).transform(new Function<HairMixedData, HairData>() {
 					@Override
-					public HairData apply(HairCellObjectData input) {
+					public HairData apply(HairMixedData input) {
 						return input.getHairData();
 					}
 				})));
@@ -1302,7 +991,7 @@ public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 	private CheckBox showHair;
 	
 	private void clearAllHairData(){
-		for(HairCellObjectData data:ImmutableList.copyOf(cellObjects.getDatas())){
+		for(HairMixedData data:ImmutableList.copyOf(cellObjects.getDatas())){
 			removeHairData(data);
 		}
 	}

@@ -1,22 +1,36 @@
 package com.akjava.gwt.clothhair.client.cloth;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.List;
 import java.util.Map;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair.SphereCalculatorAndMesh;
+import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.cannon.CannonControler;
+import com.akjava.gwt.clothhair.client.hair.HairData;
+import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
+import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
+import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToNormal;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
 import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.extras.geometries.SphereGeometry;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
+import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
+import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.lib.common.utils.CSVUtils;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class ClothSimulator  {
@@ -286,6 +300,328 @@ public class ClothSimulator  {
 	}
 	
 	
+	public HairMixedData addCloth(HairData hairData) {
+		
+		ClothData data=new ClothData(hairData,characterMesh);
+		
+		
+		data.getCloth().setPinAll();//force pin all
+		
+		
+		//data.getCloth().ballSize=clothControls.getBallSize();
+		
+	
+		//indivisual haiar material
+		
+		//TODO extract
+		Texture texture=THREE.TextureLoader().load(
+				//"models/mbl3d/bump2c.png"
+				"/hairpattern/hairpattern1.png"
+				);
+		
+		
+		texture.setFlipY(false);
+		texture.setNeedsUpdate(true);
+		
+		//displacementMap not good at plain when row-poly
+		
+		//little bit 
+		MeshPhongMaterial hairMaterial = THREE.MeshPhongMaterial(GWTParamUtils.
+				MeshPhongMaterial()
+				.side(THREE.DoubleSide)
+				.transparent(true)
+				//.wireframe(true)
+				.specular(0x111111)
+				//.specular(0xffffff)
+				.shininess(5) //switch default same as texture otherwise not good at connection
+				//.wireframe(true)
+				//.specular(0xffffff)//TODO move editor
+				//.specularMap(texture)
+				//.shininess(15)
+				
+				
+				/*
+				.displacementMap(texture)
+				.displacementScale(16)
+				.displacementBias(4)
+				*/
+				
+				.bumpMap(texture)
+				.bumpScale(0.5)
+				
+				//.di
+				);
+		/*
+		GWTParamUtils.
+				MeshPhongMaterial()
+				.color(hairData.getHairTextureData().getColor()).side(THREE.DoubleSide).specular(0xffffff).shininess(15)
+				.alphaTest(hairData.getHairTextureData().getAlphaTest())
+				.transparent(true)
+				.opacity(hairData.getHairTextureData().getOpacity())
+				);
+			*/
+		
+		Mesh object = THREE.Mesh( data.getClothGeometry(), hairMaterial );
+		//object.getPosition().set( 0, 0, 0 );
+		
+		scene.add( object );
+		
+		HairMixedData cellData=new HairMixedData(hairData,data,object);
+		
+		
+		//temporaly
+		
+		if(hairData.getHairPins().size()<3){//TODO merge 3pin
+		Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
+		Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
+		
+		//TODO move and fix
+		int cw=hairData.getSizeOfU();
+		int ch=hairData.getSizeOfV();
+		
+		data.getCloth().particles.get(0).setAllPosition(v1);
+		data.getCloth().particles.get(cw).setAllPosition(v2);
+		
+		
+		Vector3 sub=v2.clone().sub(v1).divideScalar(cw+1);
+		for(int i=1;i<cw;i++){
+			Vector3 v=sub.clone().multiplyScalar(i).add(v1);
+			data.getCloth().particles.get(i).setAllPosition(v);
+		}
+		
+		for(int i=cw+1;i<data.getCloth().particles.size();i++){
+			data.getCloth().particles.get(i).setAllPosition(v1);
+		}
+		
+		}else{
+			//only core pins
+			List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).transform(new HairPinToNormal(characterMesh)).toList();
+			List<Vector3> normals=Lists.newArrayList();
+			//PROBLEMS not support custom 
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			//3 pin
+			int cw=hairData.getSizeOfU();
+			
+			List<HairPin> normalPin=Lists.newArrayList();
+			List<HairPin> customPin=Lists.newArrayList();
+			
+			for(HairPin pin:hairData.getHairPins()){
+				if(pin.getTargetClothIndex()==-1){
+					normalPin.add(pin);
+				}else{
+					customPin.add(pin);
+				}
+			}
+			
+			Vector3 diff = THREE.Vector3();
+			List<Mesh> spheres=GWTThreeClothHair.INSTANCE.getClothControler().getSphereList(hairData.getChannel());
+			
+			
+			
+			
+			
+			int normalSize=0;
+			
+			for(int i=0;i<normalPin.size();i++){
+				Vector3 v1=hairPinToVertex(characterMesh,normalPin.get(i),true);
+				
+				//executeSphereOut(v1,spheres);//for test
+				
+				int index=hairData.getSizeOfU()*i;
+				data.getCloth().particles.get(index).setAllPosition(v1);
+				
+				//LogUtils.log("main:"+index);
+				
+				normalSize++;
+				normals.add(pinNormals.get(i));
+				
+				if(i!=normalPin.size()-1){
+					//has next;
+					Vector3 v2=hairPinToVertex(characterMesh,normalPin.get(i+1),true);
+					Vector3 sub=v2.clone().sub(v1).divideScalar(cw);
+					
+					for(int j=1;j<cw;j++){
+						int multiple=j;
+						int at=index+j;
+						Vector3 v=sub.clone().multiplyScalar(multiple).add(v1);
+						data.getCloth().particles.get(at).setAllPosition(v);
+						
+						normals.add(pinNormals.get(i).clone().add(pinNormals.get(i+1)).divideScalar(2));
+						//LogUtils.log("sub:"+at);
+						normalSize++;
+					}
+					
+					
+					//simply do it
+					//normals.add(pinNormals.get(i).clone().add(pinNormals.get(i+2).divideScalar(2)));
+				}	
+			}
+			
+			//LogUtils.log("normal-test"+normalSize+","+pinNormals.size()+","+(data.getCloth().getW()+1));
+			pinNormals=normals;
+			//LogUtils.log("normal-pos:"+normals.size()+",pin "+pinNormals.size()+"append:"+normalSize);
+			
+			
+			//init other posisions
+			for(int j=data.getCloth().getW()+1;j<data.getCloth().particles.size();j++){
+				int x=j%(data.getCloth().getW()+1);
+				int y=j/(data.getCloth().getW()+1);
+				//LogUtils.log(j+"="+x);
+				Vector3 pos=data.getCloth().particles.get(x).getOriginal();
+				//copy upper x
+				
+				//open widely
+				data.getCloth().particles.get(j).setAllPosition(pos);
+				
+				
+				//LogUtils.log("distance:"+(data.getCloth().getRestDistance()*10*y));
+				//plus-y
+				//Vector3  start=normals.get(x).clone().normalize().multiplyScalar( data.getCloth().getRestDistance()*y ).add(pos);
+				//data.getCloth().particles.get(j).setAllPosition(start);
+			
+				if(pinNormals.size()==data.getCloth().getW()+1){
+				//	LogUtils.log("can use normal");
+					Vector3  normalPosition=pinNormals.get(x).clone().normalize().multiplyScalar( data.getCloth().getRestDistance()*y ).add(pos);
+					data.getCloth().particles.get(j).setAllPosition(normalPosition);
+				}
+				
+			}
+			
+			for(HairPin pin:customPin){
+				Vector3 v=hairPinToVertex(characterMesh,pin,true);
+				data.getCloth().particles.get(pin.getTargetClothIndex()).setAllPosition(v);
+			}
+			
+			
+			/*
+			for(int i=0;i<cw*(hairData.getHairPins().size()-1);i++){
+				ThreeLog.log(""+i, data.getCloth().particles.get(i).getOriginal());
+			}
+			*/
+			
+			int w=data.getCloth().getW()+1;
+			int[] newPins=new int[w+customPin.size()];
+			for(int i=0;i<w;i++){
+				newPins[i]=i;
+			}
+			for(int i=0;i<customPin.size();i++){
+				newPins[w+i]=customPin.get(i).getTargetClothIndex();
+			}
+			data.getCloth().setPins(newPins);
+			
+			/*
+			LogUtils.log("pins");
+			for(int i=0;i<newPins.length;i++){
+				LogUtils.log(newPins[i]);
+			}
+			*/
+		
+			/*
+			if(customPin.size()>0){
+			int[] newPins=new int[customPin.size()];
+			for(int i=0;i<customPin.size();i++){
+				newPins[i]=customPin.get(i).getTargetClothIndex();
+			}
+			data.getCloth().setPins(newPins);
+			
+			LogUtils.log("pins");
+			for(int i=0;i<newPins.length;i++){
+				LogUtils.log(newPins[i]);
+			}
+			
+			
+			}
+			*/
+			
+		}
+		
+		//trying sphere-out,but not good at than expected
+		
+		
+		/*
+		Vector3 diff = THREE.Vector3();
+		List<Mesh> spheres=GWTThreeClothHair.INSTANCE.getClothControler().getSphereList(hairData.getChannel());
+		for (int i=0;i<data.getCloth().particles.size();i++) {
+			if(data.getCloth().isPinned(i)){
+				continue;
+			}
+			
+			int vIndex=data.getCloth().getVerticaPosition(i);
+			Particle particle = data.getCloth().particles.get(i);
+			Vector3 pos = particle.getPosition();
+			
+			for(Mesh mesh:spheres){
+				
+				
+				diff.subVectors(pos, mesh.getPosition());
+				if (diff.length() < mesh.getScale().getX()) {
+					LogUtils.log("sphere-out");
+					// collided
+					diff.normalize().multiplyScalar(mesh.getScale().getX()*3);
+					particle.setAllPosition(pos.copy(mesh.getPosition()).add(diff));
+					//pos.copy(mesh.getPosition()).add(diff);
+					//LogUtils.log("scale-out");
+					//break;//?
+				}
+				
+			}
+			
+			
+		}
+		*/
+		
+		//works fine?I'm not sure,howwver anyway narrow is not work fine so far
+		//data.getCloth().recalcurateHorizontalConstraintsDistance();
+		
+		//LogUtils.log("constraints-distance");
+		for(int i=0;i<data.getCloth().getConstrains().size();i++){
+			if(!data.getCloth().isHorizontalConstraints(data.getCloth().getConstrains().get(i))){
+			//	LogUtils.log(i+","+data.getCloth().getConstrains().get(i).getDistance());
+			}
+		}
+		
+		
+		//add data do everything fixed
+		clothControler.addClothData(data);
+		
+		
+		GWTThreeClothHair.INSTANCE.updateHairTextureData(cellData,true);
+		
+		return cellData;
+	}
+	
+	public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
+		checkNotNull(mesh,"hairPinToVertex:mesh is null");
+		checkNotNull(hairPin,"hairPinToVertex:hairPin is null");
+		checkArgument(mesh.getGeometry().getFaces().length()>hairPin.getFaceIndex(),"hairPinToVertex:invalid face length");
+		Face3 face=mesh.getGeometry().getFaces().get(hairPin.getFaceIndex());
+		Vector3 vertex;
+		if(hairPin.getVertexOfFaceIndex()==0){
+			vertex=mesh.getGeometry().getVertices().get(face.getA());
+		}else if(hairPin.getVertexOfFaceIndex()==1){
+			vertex=mesh.getGeometry().getVertices().get(face.getB());
+		}else{
+			vertex=mesh.getGeometry().getVertices().get(face.getC());
+		}
+		
+		//TODO support direct point
+		
+		if(applyMatrix4){
+		return vertex.clone().applyMatrix4( mesh.getMatrixWorld());
+		}else{
+		return vertex.clone();
+		}
+		
+	}
 	
 
 }
