@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.HairStorageKeys;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
+import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
 import com.akjava.gwt.clothhair.client.cloth.HairCloth;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToNormal;
@@ -123,7 +124,7 @@ public class HairDataPanel extends VerticalPanel{
 						LogUtils.log("load:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						ImageData data=ImageDataUtils.create(canvas, imageElement);
 						LogUtils.log("imageData:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
-						ImageDataUtils.replaceColor(data,GWTThreeClothHair.INSTANCE.defaultHairTextureColor,colorValue);
+						ImageDataUtils.replaceColor(data,ClothSimulator.defaultHairTextureColor,colorValue);
 						LogUtils.log("replace:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						ImageDataUtils.putImageData(data, canvas);
 						LogUtils.log("putData:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
@@ -184,13 +185,13 @@ public class HairDataPanel extends VerticalPanel{
 		});
 		
 
-		editor = new HairDataEditor(this);
-		editor.setHairTextureDataEditor(hairTextureDataEditor);
-		editor.setHairPinPanel(hairPinPanel);
-		driver.initialize(editor);
+		hairDataEditor = new HairDataEditor(this);
+		hairDataEditor.setHairTextureDataEditor(hairTextureDataEditor);
+		hairDataEditor.setHairPinPanel(hairPinPanel);
+		driver.initialize(hairDataEditor);
 		
 		
-		hairPanel.add(editor);
+		hairPanel.add(hairDataEditor);
 		createClothPanel(hairPanel);
 		
 		HorizontalPanel distancePanel=new HorizontalPanel();
@@ -377,12 +378,12 @@ public class HairDataPanel extends VerticalPanel{
 				updateSelectionHairVisible(showSelectionHair.getValue());
 				
 				if(selection==null){
-					editor.getHairTextureDataEditor().setValue(null);
+					hairDataEditor.getHairTextureDataEditor().setValue(null);
 					return;
 				}
 				// TODO Auto-generated method stub
 				//editor edit
-				editor.getHairTextureDataEditor().setValue(selection.getHairData().getHairTextureData());
+				hairDataEditor.getHairTextureDataEditor().setValue(selection.getHairData().getHairTextureData());
 			}};
 			
 			
@@ -460,7 +461,7 @@ public class HairDataPanel extends VerticalPanel{
 		 new Timer(){
 			@Override
 			public void run() {
-				if(!GWTThreeClothHair.INSTANCE.isUpdatingHairTextureMap()){
+				if(!GWTThreeClothHair.INSTANCE.getClothSimulator().isUpdatingHairTextureMap()){
 					HairData hairData=loadingDatas.remove(0);
 					addCloth(hairData,false);//reading no need store
 					if(loadingDatas.isEmpty()){
@@ -710,8 +711,8 @@ private void clearAllPoints(){
 			}
 		}
 		
-		pinsLabel.setText("Pins:"+pins.size()+" p="+HairCloth.calcurateParticleSize(pins,editor.getSizeOfU(),editor.getSizeOfV())
-				+",w="+HairCloth.calcurateWSize(pins,editor.getSizeOfU())
+		pinsLabel.setText("Pins:"+pins.size()+" p="+HairCloth.calcurateParticleSize(pins,hairDataEditor.getSizeOfU(),hairDataEditor.getSizeOfV())
+				+",w="+HairCloth.calcurateWSize(pins,hairDataEditor.getSizeOfU())
 				);
 		
 		double distance=HairDataUtils.getTotalPinDistance(pins, characterMesh, false);
@@ -720,12 +721,12 @@ private void clearAllPoints(){
 						);
 		//no need * scaleof u
 		//update and make method
-		int w = (pins.size()-1)*editor.getSizeOfU();
-		int h= editor.getSizeOfV();
+		int w = (pins.size()-1)*hairDataEditor.getSizeOfU();
+		int h= hairDataEditor.getSizeOfV();
 		
 		
 		
-		double vdistanceh=HairDataUtils.getTotalVDistance(distance*editor.getScaleOfU(), w, h);
+		double vdistanceh=HairDataUtils.getTotalVDistance(distance*hairDataEditor.getScaleOfU(), w, h);
 		double ratio=vdistanceh/distance;
 		verticalDistanceLabel.setText(
 				("V:"+vdistanceh).substring(0,7)+" ratio="+String.valueOf(ratio).substring(0,4)
@@ -917,7 +918,7 @@ public void updateHairDataLine(){
 	}
 	
 	public void setHairTextureDataEditor(HairTextureDataEditor hairTextureDataEditor) {
-		this.editor.setHairTextureDataEditor(hairTextureDataEditor);
+		this.hairDataEditor.setHairTextureDataEditor(hairTextureDataEditor);
 	}
 	
 	protected void addCloth(HairData hairData) {
@@ -984,8 +985,14 @@ public void updateHairDataLine(){
 
 	private Label horizontalDistanceLabel;
 	private Label pinsLabel;
-	private HairDataEditor editor;
+	private HairDataEditor hairDataEditor;
 
+	public HairDataEditor getHairDataEditor() {
+		return hairDataEditor;
+	}
+	public void setHairDataEditor(HairDataEditor hairDataEditor) {
+		this.hairDataEditor = hairDataEditor;
+	}
 	private CheckBox showSelectionHair;
 
 	private CheckBox showHair;

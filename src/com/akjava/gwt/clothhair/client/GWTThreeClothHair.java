@@ -288,6 +288,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	@Override
 	public void onInitializedThree() {
 		clock=THREE.Clock();
+		clothSimulator=new ClothSimulator(scene,null);
+		
 		//setDebugAnimateCount(100);
 		final String modelUrl=GWTHTMLUtils.getInputValueById("model", "model11.json");
 		textureUrl=GWTHTMLUtils.getInputValueById("texture", "models/mbl3d/simpleeye-2kbluexxx-extendhead.png");
@@ -485,7 +487,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				
 				
-				clothSimulator=new ClothSimulator(scene,characterMesh);
+				clothSimulator.setCharacterMesh(characterMesh);
 				
 				clothSimulator.getClothControler().setFloorModifier(new GroundYFloor(GROUND));
 				
@@ -534,7 +536,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		});
 		
 		hairMaterial = THREE.MeshPhongMaterial(GWTParamUtils.
-				MeshPhongMaterial().color(globalHairColor).side(THREE.DoubleSide).specular(0xffffff).shininess(15)
+				MeshPhongMaterial().color(getGlobalHairColor()).side(THREE.DoubleSide).specular(0xffffff).shininess(15)
 				.alphaTest(0.9)//best for cloth
 				.transparent(true).opacity(1)
 				
@@ -613,17 +615,14 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 	//private int hairColor=0x553817;//brown
 	
-	public int defaultHairTextureColor=0xb7a9cd;//TODO move outside
-	private    int globalHairColor=defaultHairTextureColor;
-	
+
 	
 	public int getGlobalHairColor() {
-		return globalHairColor;
+		return clothSimulator.getGlobalHairColor();
 	}
 
 	public void setGlobalHairColor(int globalHairColor) {
-		//LogUtils.log("setGlobalHairColor:"+globalHairColor);
-		this.globalHairColor = globalHairColor;
+		clothSimulator.setGlobalHairColor(globalHairColor);
 	}
 
 	protected Vector3 matrixedPoint(Vector3 vec){
@@ -987,6 +986,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		hairDataPanel= new HairDataPanel(characterMesh,editor,hairPinPanel);
 		panel.add(hairDataPanel);
 		
+		hairPinPanel.setHairDataEditor(hairDataPanel.getHairDataEditor());
+		
 		return panel;
 	}
 	
@@ -1185,83 +1186,21 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	//private int animationBoneIndex=60;
 	
 	
-	private Canvas canvas=CanvasUtils.createCanvas(512, 512);
-	private boolean updatingHairTextureMap;
-	public boolean isUpdatingHairTextureMap() {
-		return updatingHairTextureMap;
-	}
 
-	public void updateHairTextureMap(final HairMixedData selection){
-		updatingHairTextureMap=true;
-		if(selection==null){
-			LogUtils.log("updateHairTextureData:null selection");
-			return;
-		}
-		//for debug
-		canvas=HairPatternDataEditor.canvas;
-		
-		//selection.getHairData().getHairTextureData().getHairPatternData().setSlices(4);//for debug
-		HairPatternDataUtils.paint(canvas, selection.getHairData().getHairTextureData().getHairPatternData());
-		
-		//String pattern="hairpattern/hairpattern1.png";
-		String pattern="img/transparent.png";//do nothing
-		/*
-		 * 
-		 * this async action make problem,only first pattern correctly update
-		 * 
-		 */
-		new ImageElementLoader().load(pattern, new ImageElementListener() {
-			
-			@Override
-			public void onLoad(ImageElement element) {
-				//TODO test alpha
-				canvas.getContext2d().setGlobalCompositeOperation(Composite.SOURCE_ATOP);
-				
-				canvas.getContext2d().drawImage(element, 0, 0,canvas.getCoordinateSpaceWidth(),canvas.getCoordinateSpaceHeight());
-				
-				
-				canvas.getContext2d().setGlobalCompositeOperation(Composite.SOURCE_OVER);
-				ImageElementUtils.createWithLoader(canvas.toDataUrl(), new ImageElementListener() {
-					
-					@Override
-					public void onLoad(ImageElement element) {
-						Texture texture=THREE.Texture(element);
-						texture.setNeedsUpdate(true);
-						texture.setFlipY(false);
-						
-						MeshPhongMaterial material=selection.getMesh().getMaterial().gwtCastMeshPhongMaterial();
-						material.setMap(texture);
-						material.setNeedsUpdate(true);//async load & need here
-						updatingHairTextureMap=false;
-					}
-					
-					@Override
-					public void onError(String url, ErrorEvent event) {
-						// TODO Auto-generated method stub
-						
-					}
-				});
-			}
-			
-			@Override
-			public void onError(String url, ErrorEvent event) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-		
-		
-		
-		
-		
-	}
+
+
+	
 	private Geometry characterGeometry;
 	
 	public void updateHairTextureData(boolean updateHairTextureMap){
 		//get hair data selection
 		HairMixedData selection=hairDataPanel.getSelection();
-		updateHairTextureData(selection,updateHairTextureMap);
+		clothSimulator.updateHairTextureData(selection,updateHairTextureMap);
 		
+		//store hair datas
+		if(hairDataPanel!=null){ //called from init hairDataPanel
+			hairDataPanel.storeDatas();
+			}
 	}
 	
 	public void updateHairTextureMap(Texture texture){
@@ -1298,42 +1237,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		material.setColor(THREE.Color(colorValue));
 	}
 		
-		public void updateHairTextureData(HairMixedData selection,boolean updateHairTextureMap){
-		if(selection==null){
-			LogUtils.log("updateHairTextureData:null selection");
-			return;
-		}
-		//store hair datas 
-		if(hairDataPanel!=null){ //called from init hairDataPanel
-			//LogUtils.log("updateHairTextureData-called");
-			hairDataPanel.storeDatas();
-		}
-		
-		//sync textures
-		MeshPhongMaterial material=selection.getMesh().getMaterial().gwtCastMeshPhongMaterial();
-		HairTextureData textureData=selection.getHairData().getHairTextureData();
-		//TODO support local or global
-		
-		int color=textureData.isUseLocalColor()?textureData.getColor():globalHairColor;
-		
-		//LogUtils.log("updateHairTextureData:"+color);
-		material.setColor(THREE.Color(color));
-		
-		
-		material.setOpacity(textureData.getOpacity());
-		material.setAlphaTest(textureData.getAlphaTest());
-		
-		//TODO copy from patterns if enabled
-		
-		if(textureData.isEnablePatternImage()){
-			if(updateHairTextureMap){
-			updateHairTextureMap(selection);
-			}
-		}else{
-			material.setMap(null);
-		}
-		material.setNeedsUpdate(true);
-	}
+
 	
 
 		public void playAnimation(AnimationClip clip,boolean facialAnimation) {

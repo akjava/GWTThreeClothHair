@@ -35,6 +35,16 @@ public int getSizeOfU() {
 	return sizeOfU;
 }
 
+public int countNormalPin(){
+	int result=0;
+	for(HairPin pin:hairPins){
+		if(pin.getTargetClothIndex()==-1){
+			result++;
+		}
+	}
+	return result;
+}
+
 public void setSizeOfU(int sizeOfU) {
 	this.sizeOfU = sizeOfU;
 }

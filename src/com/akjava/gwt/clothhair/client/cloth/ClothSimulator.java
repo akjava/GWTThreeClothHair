@@ -17,6 +17,13 @@ import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
 import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToNormal;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
+import com.akjava.gwt.clothhair.client.texture.HairPatternDataEditor;
+import com.akjava.gwt.clothhair.client.texture.HairPatternDataUtils;
+import com.akjava.gwt.clothhair.client.texture.HairTextureData;
+import com.akjava.gwt.lib.client.CanvasUtils;
+import com.akjava.gwt.lib.client.ImageElementListener;
+import com.akjava.gwt.lib.client.ImageElementLoader;
+import com.akjava.gwt.lib.client.ImageElementUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
 import com.akjava.gwt.three.client.js.THREE;
@@ -32,11 +39,23 @@ import com.akjava.lib.common.utils.CSVUtils;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.Context2d.Composite;
+import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.event.dom.client.ErrorEvent;
 
 public class ClothSimulator  {
 	private CannonControler cannonControler;
 	private Scene scene;
 	private SkinnedMesh characterMesh;
+	public SkinnedMesh getCharacterMesh() {
+		return characterMesh;
+	}
+
+	public void setCharacterMesh(SkinnedMesh characterMesh) {
+		this.characterMesh = characterMesh;
+	}
+
 	private SphereGeometry ballGeo;
 	public ClothSimulator(Scene scene,SkinnedMesh characterMesh){
 		this.scene=scene;
@@ -45,6 +64,12 @@ public class ClothSimulator  {
 		cannonControler=new CannonControler();
 		
 		ballGeo = THREE.SphereGeometry( 1, 20, 20 );
+		
+		canvas = CanvasUtils.createCanvas(256, 256);
+		canvas.setCoordinateSpaceWidth(512);
+		canvas.setCoordinateSpaceHeight(512);
+		
+		canvas.setStyleName("transparent_bg");
 	}
 	
 	public CannonControler getCannonControler() {
@@ -233,7 +258,7 @@ public class ClothSimulator  {
 			if(index!=-1){
 				data.setBoneIndex(index);
 			}
-			LogUtils.log(mirrowName+","+index);
+			//LogUtils.log(mirrowName+","+index);
 		}
 	}
 
@@ -594,11 +619,53 @@ public class ClothSimulator  {
 		clothControler.addClothData(data);
 		
 		
-		GWTThreeClothHair.INSTANCE.updateHairTextureData(cellData,true);
+		updateHairTextureData(cellData,true);
 		
 		return cellData;
 	}
+	public void updateHairTextureData(HairMixedData selection,boolean updateHairTextureMap){
+	if(selection==null){
+		LogUtils.log("updateHairTextureData:null selection");
+		return;
+	}
 	
+	
+	//sync textures
+	MeshPhongMaterial material=selection.getMesh().getMaterial().gwtCastMeshPhongMaterial();
+	HairTextureData textureData=selection.getHairData().getHairTextureData();
+	//TODO support local or global
+	
+	int color=textureData.isUseLocalColor()?textureData.getColor():globalHairColor;
+	
+	//LogUtils.log("updateHairTextureData:"+color);
+	material.setColor(THREE.Color(color));
+	
+	
+	material.setOpacity(textureData.getOpacity());
+	material.setAlphaTest(textureData.getAlphaTest());
+	
+	//TODO copy from patterns if enabled
+	
+	if(textureData.isEnablePatternImage()){
+		if(updateHairTextureMap){
+		updateHairTextureMap(selection);
+		}
+	}else{
+		material.setMap(null);
+	}
+	material.setNeedsUpdate(true);
+}
+	public static int defaultHairTextureColor=0xb7a9cd;//TODO move outside
+	private    int globalHairColor=defaultHairTextureColor;
+
+	public int getGlobalHairColor() {
+		return globalHairColor;
+	}
+
+	public void setGlobalHairColor(int globalHairColor) {
+		this.globalHairColor = globalHairColor;
+	}
+
 	public Vector3 hairPinToVertex(Mesh mesh,HairPin hairPin,boolean applyMatrix4){
 		checkNotNull(mesh,"hairPinToVertex:mesh is null");
 		checkNotNull(hairPin,"hairPinToVertex:hairPin is null");
@@ -622,6 +689,84 @@ public class ClothSimulator  {
 		}
 		
 	}
+	//used for making hair texture 
+	private Canvas canvas;
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
+	public void setCanvas(Canvas canvas) {
+		this.canvas = canvas;
+	}
+
+	private boolean updatingHairTextureMap;
+	public boolean isUpdatingHairTextureMap() {
+		return updatingHairTextureMap;
+	}
 	
+	public void updateHairTextureMap(final HairMixedData selection){
+		updatingHairTextureMap=true;
+		if(selection==null){
+			LogUtils.log("updateHairTextureData:null selection");
+			return;
+		}
+		//for debug
+		//canvas=HairPatternDataEditor.canvas;
+		
+		//selection.getHairData().getHairTextureData().getHairPatternData().setSlices(4);//for debug
+		HairPatternDataUtils.paint(canvas, selection.getHairData().getHairTextureData().getHairPatternData());
+		
+		//String pattern="hairpattern/hairpattern1.png";
+		String pattern="img/transparent.png";//do nothing
+		/*
+		 * 
+		 * this async action make problem,only first pattern correctly update
+		 * 
+		 */
+		new ImageElementLoader().load(pattern, new ImageElementListener() {
+			
+			@Override
+			public void onLoad(ImageElement element) {
+				//TODO test alpha
+				canvas.getContext2d().setGlobalCompositeOperation(Composite.SOURCE_ATOP);
+				
+				canvas.getContext2d().drawImage(element, 0, 0,canvas.getCoordinateSpaceWidth(),canvas.getCoordinateSpaceHeight());
+				
+				
+				canvas.getContext2d().setGlobalCompositeOperation(Composite.SOURCE_OVER);
+				ImageElementUtils.createWithLoader(canvas.toDataUrl(), new ImageElementListener() {
+					
+					@Override
+					public void onLoad(ImageElement element) {
+						Texture texture=THREE.Texture(element);
+						texture.setNeedsUpdate(true);
+						texture.setFlipY(false);
+						
+						MeshPhongMaterial material=selection.getMesh().getMaterial().gwtCastMeshPhongMaterial();
+						material.setMap(texture);
+						material.setNeedsUpdate(true);//async load & need here
+						updatingHairTextureMap=false;
+					}
+					
+					@Override
+					public void onError(String url, ErrorEvent event) {
+						// TODO Auto-generated method stub
+						
+					}
+				});
+			}
+			
+			@Override
+			public void onError(String url, ErrorEvent event) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		
+		
+		
+		
+	}
 
 }

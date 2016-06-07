@@ -49,17 +49,16 @@ public class HairPatternDataEditor extends VerticalPanel implements Editor<HairP
 	private ValueListBox<Integer> sliceBox;
 	 int slice=1;
 	//part of HairEditor?
+	 
+	public Canvas getCanvas(){
+		return GWTThreeClothHair.INSTANCE.getClothSimulator().getCanvas();
+	}
 	public HairPatternDataEditor(){
 		//dynamic version
 		//preset version
 		
-	
-		canvas = CanvasUtils.createCanvas(256, 256);
-		canvas.setCoordinateSpaceWidth(512);
-		canvas.setCoordinateSpaceHeight(512);
-		
-		this.add(canvas);
-		canvas.setStyleName("transparent_bg");
+		;
+		this.add(getCanvas());
 		
 		//tmp draw
 		//final CanvasTexture canvasTexture=THREE.CanvasTexture(canvas.getCanvasElement());
@@ -481,9 +480,10 @@ public class HairPatternDataEditor extends VerticalPanel implements Editor<HairP
 	private void updateCanvas(){
 		HairPatternData newData=new HairPatternData();
 		flushValues(newData);
-		HairPatternDataUtils.paint(canvas, newData);
+		HairPatternDataUtils.paint(getCanvas(), newData);
 	}
 	private void updateCanvasOld(){
+		Canvas canvas=getCanvas();
 		CanvasUtils.clear(canvas);
 		canvas.getContext2d().setStrokeStyle("#fff");//always stroke
 		
@@ -776,7 +776,7 @@ public class HairPatternDataEditor extends VerticalPanel implements Editor<HairP
 		//context.closePath();
 	}
 	
-	public static Canvas canvas;
+	
 	private CheckBox strokeCheck;
 	private LabeledInputRangeWidget2 grayRange;
 	private ListBox lrBox;

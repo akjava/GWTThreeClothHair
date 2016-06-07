@@ -344,6 +344,10 @@ public class HairCloth {
 	}
 	
 	private int sizeOfU;
+	
+	public static int calcurateHorizontalPin(int normalPinSize,int sizeOfU){
+		return (normalPinSize-1)*sizeOfU+1;
+	}
 	public HairCloth(HairData hairData,Mesh mesh){
 			
 		List<HairPin> normalPin=Lists.newArrayList();//trying cutom pin
