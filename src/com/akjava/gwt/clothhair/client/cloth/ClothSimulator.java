@@ -106,7 +106,7 @@ public class ClothSimulator  {
 		if(cannonControler.isEnabled()){//TODO move setting
 			int iteration=1; //iteration totally kill fps,but reduce shaking
 			for(int i=0;i<iteration;i++)
-			cannonControler.getWorld().step(1.0/60);//sphere first
+			cannonControler.getWorld().step(1.0/60);
 		}
 		
 		
