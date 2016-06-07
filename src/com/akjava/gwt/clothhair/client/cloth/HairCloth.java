@@ -704,12 +704,12 @@ public class HairCloth {
 	}
 	//before simulate
 	
-	public void beforeSimulate(Geometry clothGeometry,List<Mesh> spheres){
+	public void beforeSimulate(ClothSimulator simulator,Geometry clothGeometry,List<Mesh> spheres){
 		//made cannon object or sync cannon-object position
 	}
 	
 	//call after simulate
-	public void afterSimulate(double time,Geometry clothGeometry,List<Mesh> spheres) {
+	public void afterSimulate(ClothSimulator simulator,double time,Geometry clothGeometry,List<Mesh> spheres) {
 		//simulate by group means,no grouping support yet
 		//not support Wind yet
 		if(!isConnectHorizontal()){
@@ -720,25 +720,25 @@ public class HairCloth {
 			simulateCloth(time,clothGeometry,spheres);
 			return;
 		}else{//CANNON.js
-			simulateCannon(time,clothGeometry,spheres);
+			simulateCannon(simulator,time,clothGeometry,spheres);
 		}
 		
 	}
 
-	private void simulateCannon(double time, Geometry clothGeometry, List<Mesh> spheres) {
+	private void simulateCannon(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
 
 		//default simulate cannon
 		
 		Stopwatch watch=Stopwatch.createStarted();
 		
 		boolean needInitSphere=false;
-		if(!GWTThreeClothHair.INSTANCE.getCannonControler().isExistSphereData(channel)){
+		if(!simulator.getCannonControler().isExistSphereData(channel)){
 			needInitSphere=true;
 		}else{
-		SphereBodyData cannonSpheres=GWTThreeClothHair.INSTANCE.getCannonControler().getSphereData(channel);
+		SphereBodyData cannonSpheres=simulator.getCannonControler().getSphereData(channel);
 		if(spheres.size()!=cannonSpheres.getCannonSpheres().length()){
 			needInitSphere=true;
-			GWTThreeClothHair.INSTANCE.getCannonControler().removeSphereData(channel);
+			simulator.getCannonControler().removeSphereData(channel);
 			}
 			
 		}
@@ -748,14 +748,14 @@ public class HairCloth {
 			JsArray<Body> cannonSpheres=JavaScriptUtils.createJSArray();
 			for(int i=0;i<spheres.size();i++){
 				Mesh sphereMesh=spheres.get(i);
-				Body body=createSphereBody(sphereMesh.getPosition().clone().divideScalar(1000),sphereMesh.getScale().getX()/1000);
+				Body body=createSphereBody(simulator,sphereMesh.getPosition().clone().divideScalar(1000),sphereMesh.getScale().getX()/1000);
 				cannonSpheres.push(body);	
 			}
 			
-			GWTThreeClothHair.INSTANCE.getCannonControler().setSphereData(channel,new SphereBodyData(cannonSpheres));
+			simulator.getCannonControler().setSphereData(channel,new SphereBodyData(cannonSpheres));
 			
 		}else{
-			SphereBodyData data=GWTThreeClothHair.INSTANCE.getCannonControler().getSphereData(channel);
+			SphereBodyData data=simulator.getCannonControler().getSphereData(channel);
 			JsArray<Body> cannonSpheres=data.getCannonSpheres();
 			for(int i=0;i<spheres.size();i++){
 				Vector3 threePos=spheres.get(i).getPosition().clone().divideScalar(1000);
@@ -770,7 +770,7 @@ public class HairCloth {
 			}
 		}
 		
-		if(!GWTThreeClothHair.INSTANCE.getCannonControler().isExistParticleData(this)){
+		if(!simulator.getCannonControler().isExistParticleData(this)){
 			
 			
 			JsArray<Body> cannonParticles=JavaScriptUtils.createJSArray();
@@ -798,7 +798,7 @@ public class HairCloth {
 				}
 				*/
 				
-				Body p=createParticle(particle.getOriginal().clone().divideScalar(1000), mass);
+				Body p=createParticle(simulator,particle.getOriginal().clone().divideScalar(1000), mass);
 				cannonParticles.push(p);
 			}
 			
@@ -814,9 +814,9 @@ public class HairCloth {
 			
 			
 			
-			GWTThreeClothHair.INSTANCE.getCannonControler().setParticleData(this, new ParticleBodyData(cannonParticles,cannonConstraints));
+			simulator.getCannonControler().setParticleData(this, new ParticleBodyData(cannonParticles,cannonConstraints));
 		}else{
-			ParticleBodyData data=GWTThreeClothHair.INSTANCE.getCannonControler().getCannonData(this);
+			ParticleBodyData data=simulator.getCannonControler().getCannonData(this);
 			JsArray<Body> cannonParticles=data.getCannonParticles();
 			
 			//basically never changed length
@@ -873,7 +873,7 @@ public class HairCloth {
 		//LogUtils.log("simulate-time:"+watch.elapsed(TimeUnit.MILLISECONDS)+" ms");
 		
 	}
-	protected Body createSphereBody(Vector3 position, double size) {
+	protected Body createSphereBody(ClothSimulator simulator,Vector3 position, double size) {
 		
 		com.github.gwtcannonjs.client.shapes.Sphere sphereShape = CANNON.newSphere(size);
 		
@@ -881,7 +881,7 @@ public class HairCloth {
 		//com.github.gwtcannonjs.client.shapes.Box sphereShape = CANNON.newBox(CANNON.newVec3(size, size, size));
 		
 		Body sphereBody  = CANNON.newBody(CANNON.newBodyOptions().withMass(0)
-				.withMaterial(GWTThreeClothHair.INSTANCE.getCannonControler().getSphereMaterial())
+				.withMaterial(simulator.getCannonControler().getSphereMaterial())
 				);
 		
 		sphereBody.addShape(sphereShape);
@@ -892,9 +892,9 @@ public class HairCloth {
 		
 	}
 
-	private Body createParticle(Vector3 p,double mass){
+	private Body createParticle(ClothSimulator simulator,Vector3 p,double mass){
 		Body particle = CANNON.newBody(CANNON.newBodyOptions().withMass(mass)
-				.withMaterial(GWTThreeClothHair.INSTANCE.getCannonControler().getClothMaterial())
+				.withMaterial(simulator.getCannonControler().getClothMaterial())
 		
 				);
 		//seems impossible

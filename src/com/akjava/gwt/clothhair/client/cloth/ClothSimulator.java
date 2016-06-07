@@ -100,7 +100,7 @@ public class ClothSimulator  {
 
 	public void update(double timestamp){
 		updateSphereMeshs();//sphere first
-		getClothControler().beforeSimulate();
+		getClothControler().beforeSimulate(this);
 		
 		
 		if(cannonControler.isEnabled()){//TODO move setting
@@ -111,7 +111,7 @@ public class ClothSimulator  {
 		
 		
 		//do simulate
-		getClothControler().afterSimulate(timestamp);//back to physics
+		getClothControler().afterSimulate(this,timestamp);//back to physics
 	}
 	
 	Map<SphereData,SphereCalculatorAndMesh> sphereMeshMap=Maps.newHashMap();
@@ -326,6 +326,9 @@ public class ClothSimulator  {
 	
 	
 	public HairMixedData addCloth(HairData hairData) {
+		if(isUpdatingHairTextureMap()){
+			LogUtils.log("addCloth:Warning - maybe broken texture added.still texture making");
+		}
 		
 		ClothData data=new ClothData(hairData,characterMesh);
 		
@@ -447,8 +450,9 @@ public class ClothSimulator  {
 				}
 			}
 			
+			
 			Vector3 diff = THREE.Vector3();
-			List<Mesh> spheres=GWTThreeClothHair.INSTANCE.getClothControler().getSphereList(hairData.getChannel());
+			//List<Mesh> spheres=clothControler.getSphereList(hairData.getChannel());
 			
 			
 			
@@ -750,16 +754,17 @@ public class ClothSimulator  {
 					
 					@Override
 					public void onError(String url, ErrorEvent event) {
-						// TODO Auto-generated method stub
-						
+						LogUtils.log("image not found.update texture skipped:"+url);
+						updatingHairTextureMap=false;
 					}
 				});
 			}
 			
 			@Override
 			public void onError(String url, ErrorEvent event) {
-				// TODO Auto-generated method stub
-				
+				LogUtils.log("Error-on loading:"+url);
+				LogUtils.log(event);
+				updatingHairTextureMap=false;
 			}
 		});
 		

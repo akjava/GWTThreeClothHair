@@ -462,11 +462,13 @@ public class HairDataPanel extends VerticalPanel{
 			@Override
 			public void run() {
 				if(!GWTThreeClothHair.INSTANCE.getClothSimulator().isUpdatingHairTextureMap()){
-					HairData hairData=loadingDatas.remove(0);
-					addCloth(hairData,false);//reading no need store
 					if(loadingDatas.isEmpty()){
 						cancel();
+						return;
 					}
+					
+					HairData hairData=loadingDatas.remove(0);
+					addCloth(hairData,false);//reading no need store
 				}
 			}
 			 

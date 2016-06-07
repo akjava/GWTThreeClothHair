@@ -21,6 +21,7 @@
   	<inherits name="com.akjava.gwt.three.Three"/>
 	<inherits name="com.google.gwt.json.JSON" /> 
 	<inherits name="com.akjava.gwt.lib.Commons"/>
+	   <inherits name='com.github.gwtcannonjs.Core'/>
 	
 
   <!-- Specify the paths for translatable code                    -->

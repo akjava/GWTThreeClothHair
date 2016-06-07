@@ -61,18 +61,18 @@ public class ClothControler {
 	}
 	
 	//made before update
-	public void beforeSimulate(){
+	public void beforeSimulate(ClothSimulator simulator){
 		syncPins();
 		
 		for(ClothData data:cloths){
 			HairCloth cloth=data.getCloth();
 			Geometry clothGeometry=data.getClothGeometry();
 			
-			cloth.beforeSimulate(clothGeometry,getSphereList(cloth.channel));//set otherwhere?
+			cloth.beforeSimulate(simulator,clothGeometry,getSphereList(cloth.channel));//set otherwhere?
 			}
 	}
 	
-	public void afterSimulate(double time){
+	public void afterSimulate(ClothSimulator simulator,double time){
 		
 		double windStrength= Math.cos( time / 7000 ) * 20 + 40;;
 		
@@ -96,7 +96,7 @@ public class ClothControler {
 			//support-matrix4
 			
 			//should switch to sphere
-			cloth.afterSimulate(time,clothGeometry,getSphereList(cloth.channel));//set otherwhere?
+			cloth.afterSimulate(simulator,time,clothGeometry,getSphereList(cloth.channel));//set otherwhere?
 		}
 		
 		renderCloth();//cloth-vertex to three.js object
