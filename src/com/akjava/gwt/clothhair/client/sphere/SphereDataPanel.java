@@ -216,7 +216,7 @@ public class SphereDataPanel extends VerticalPanel{
 			});
 			buttons.add(removeBt);
 			
-			Button removeAll=new Button("remove ll",new ClickHandler() {
+			Button removeAll=new Button("remove All",new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					boolean confirm=Window.confirm("remove all?");

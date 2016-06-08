@@ -1,5 +1,6 @@
 package com.akjava.gwt.clothhair.client;
 
+import com.akjava.gwt.clothhair.client.lights.LightDataPanel;
 import com.akjava.gwt.lib.client.CanvasUtils;
 import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.lib.client.experimental.ImageDataUtils;
@@ -189,6 +190,7 @@ public class BasicPanel extends VerticalPanel{
 			}
 			
 		});
-		
+		this.add(new HTML("<h4>Lights</h4>"));
+		this.add(new LightDataPanel(GWTThreeClothHairStorageKeys.KEY_LIGHTS,GWTThreeClothHair.INSTANCE.getStorageControler()));
 	}
 }

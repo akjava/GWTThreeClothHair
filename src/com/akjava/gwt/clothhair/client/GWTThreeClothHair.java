@@ -50,6 +50,7 @@ import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.extras.helpers.VertexNormalsHelper;
 import com.akjava.gwt.three.client.js.lights.AmbientLight;
 import com.akjava.gwt.three.client.js.lights.DirectionalLight;
+import com.akjava.gwt.three.client.js.lights.HemisphereLight;
 import com.akjava.gwt.three.client.js.loaders.JSONLoader.JSONLoadHandler;
 import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
@@ -317,14 +318,24 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		controls.update();
 
 		
-		AmbientLight ambient = THREE.AmbientLight( 0xb7b7b7 );//var ambient = new THREE.AmbientLight( 0xffffff );
-		scene.add( ambient );
-
-		DirectionalLight directionalLight = THREE.DirectionalLight( 0xffffff );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
+		AmbientLight ambient = THREE.AmbientLight( 0x111111);//0xb7b7b7 );//var ambient = new THREE.AmbientLight( 0xffffff );
+		//scene.add( ambient );
 		
-		directionalLight.getPosition().set( -1, 1, 1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
+		HemisphereLight hemiLight=THREE.HemisphereLight(0xffffff, 0xffffff,0.6);
+		
+		hemiLight.getColor().setHSL(  0.6, 0.75, 0.5  );
+		hemiLight.getGroundColor().setHSL(0.095, 0.5, 0.5 );
+		hemiLight.getPosition().set( 0, 500, 0 );
+		scene.add( hemiLight );
+
+		DirectionalLight directionalLight = THREE.DirectionalLight( 0xffffff,0.9 );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
+		
+		directionalLight.getPosition().set( -1, 0.75, 1 );
+		directionalLight.getPosition().multiplyScalar( 50);
+		
+		//directionalLight.getPosition().set( -1, 1, 1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
 		scene.add( directionalLight );
-		directionalLight.setIntensity(0.4);
+		
 		
 		DirectionalLight directionalLight2 = THREE.DirectionalLight( 0x444444 );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
 		directionalLight2.getPosition().set( 1, 1, -1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
