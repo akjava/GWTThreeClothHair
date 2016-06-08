@@ -203,7 +203,7 @@ public class ClothControler {
 				
 				if(i!=pinSize-1){
 					//has next;
-					Vector3 v2=data.getCalculator().getResult().get(i+1);
+					Vector3 v2=generalPinVectors.get(i+1);
 					Vector3 sub=v2.clone().sub(v1).divideScalar(cw);
 					
 					for(int j=1;j<cw;j++){

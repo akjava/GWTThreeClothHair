@@ -318,12 +318,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 		
 		AmbientLight ambient = THREE.AmbientLight( 0xb7b7b7 );//var ambient = new THREE.AmbientLight( 0xffffff );
-		//scene.add( ambient );
+		scene.add( ambient );
 
 		DirectionalLight directionalLight = THREE.DirectionalLight( 0xffffff );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
 		
-		directionalLight.getPosition().set( 0, 1000, 1000 );//.normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
+		directionalLight.getPosition().set( -1, 1, 1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
 		scene.add( directionalLight );
+		directionalLight.setIntensity(0.1);
 		
 		DirectionalLight directionalLight2 = THREE.DirectionalLight( 0x444444 );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
 		directionalLight2.getPosition().set( 1, 1, -1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();

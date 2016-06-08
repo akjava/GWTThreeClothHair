@@ -12,6 +12,7 @@ import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.cannon.CannonControler;
 import com.akjava.gwt.clothhair.client.hair.HairData;
+import com.akjava.gwt.clothhair.client.hair.HairPinPredicates;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
 import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToNormal;
@@ -423,8 +424,10 @@ public class ClothSimulator  {
 		}
 		
 		}else{
-			//only core pins
-			List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).transform(new HairPinToNormal(characterMesh)).toList();
+			//only core pins,only use no-custom pin
+			List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).filter(HairPinPredicates.NoTargetOnly()).transform(new HairPinToNormal(characterMesh)).toList();
+			//List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).transform(new HairPinToNormal(characterMesh)).toList();
+			
 			List<Vector3> normals=Lists.newArrayList();
 			//PROBLEMS not support custom 
 			
@@ -440,12 +443,12 @@ public class ClothSimulator  {
 			//3 pin
 			int cw=hairData.getSizeOfU();
 			
-			List<HairPin> normalPin=Lists.newArrayList();
+			List<HairPin> noTargetPins=Lists.newArrayList();
 			List<HairPin> customPin=Lists.newArrayList();
 			
 			for(HairPin pin:hairData.getHairPins()){
 				if(pin.getTargetClothIndex()==-1){
-					normalPin.add(pin);
+					noTargetPins.add(pin);
 				}else{
 					customPin.add(pin);
 				}
@@ -461,8 +464,8 @@ public class ClothSimulator  {
 			
 			int normalSize=0;
 			
-			for(int i=0;i<normalPin.size();i++){
-				Vector3 v1=hairPinToVertex(characterMesh,normalPin.get(i),true);
+			for(int i=0;i<noTargetPins.size();i++){
+				Vector3 v1=hairPinToVertex(characterMesh,noTargetPins.get(i),true);
 				
 				//executeSphereOut(v1,spheres);//for test
 				
@@ -474,9 +477,9 @@ public class ClothSimulator  {
 				normalSize++;
 				normals.add(pinNormals.get(i));
 				
-				if(i!=normalPin.size()-1){
+				if(i!=noTargetPins.size()-1){
 					//has next;
-					Vector3 v2=hairPinToVertex(characterMesh,normalPin.get(i+1),true);
+					Vector3 v2=hairPinToVertex(characterMesh,noTargetPins.get(i+1),true);
 					Vector3 sub=v2.clone().sub(v1).divideScalar(cw);
 					
 					for(int j=1;j<cw;j++){

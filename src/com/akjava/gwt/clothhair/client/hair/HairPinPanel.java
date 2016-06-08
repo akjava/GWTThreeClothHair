@@ -128,7 +128,7 @@ public class HairPinPanel extends VerticalPanel{
 		int index=0;
 		int w=HairCloth.calcurateHorizontalPin(data.countNormalPin(), data.getSizeOfU());
 		//LogUtils.log(w+","+data.getSizeOfV());
-		for(int y=0;y<data.getSizeOfV();y++){
+		for(int y=0;y<=data.getSizeOfV();y++){
 			List<Integer> ints=Lists.newArrayList();
 			for(int x=0;x<w;x++){
 				ints.add(index);
