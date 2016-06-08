@@ -328,6 +328,7 @@ public class ClothControler {
 			*/
 			
 
+			
 			clothGeometry.computeFaceNormals();
 			clothGeometry.computeVertexNormals();
 

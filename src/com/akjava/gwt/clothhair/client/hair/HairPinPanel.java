@@ -68,6 +68,25 @@ public class HairPinPanel extends VerticalPanel{
 		});
 		buttons.add(remove);
 		
+		Button reverse=new Button("reverse all",new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				List<HairPin> pins=Lists.newArrayList();
+				for(HairPin pin:cellObjects.getDatas()){
+					pins.add(0,pin);
+				}
+				//because use List-reference
+				cellObjects.getDatas().clear();
+				for(HairPin pin:pins){
+					cellObjects.getDatas().add(pin);
+				}
+				cellObjects.update();
+				//would called
+			}
+		});
+		buttons.add(reverse);
+		
 		final HairPinEditor editor=new HairPinEditor();
 		
 		cellObjects = new EasyCellTableObjects<HairPin>(table){
