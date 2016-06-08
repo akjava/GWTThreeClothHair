@@ -28,6 +28,17 @@ public abstract class SimpleThreeAppEntryPoint extends AbstractThreeApp implemen
 	protected Scene scene;
 	protected PerspectiveCamera camera;
 	
+	public WebGLRenderer getRenderer() {
+		return renderer;
+	}
+
+	public Scene getScene() {
+		return scene;
+	}
+
+	public PerspectiveCamera getCamera() {
+		return camera;
+	}
 	protected double SCREEN_WIDTH;
 	protected double SCREEN_HEIGHT;
 	//protected FocusPanel 
