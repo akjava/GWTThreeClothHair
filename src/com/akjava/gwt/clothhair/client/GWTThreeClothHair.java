@@ -126,7 +126,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	public static GWTThreeClothHair INSTANCE;
 	@Override
 	public WebGLRendererParameter createRendererParameter() {
-		return GWTParamUtils.WebGLRenderer().preserveDrawingBuffer(false).logarithmicDepthBuffer(false);
+		boolean antialias=getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_RENDERER_ANTIALIAS, false);
+		return GWTParamUtils.WebGLRenderer().preserveDrawingBuffer(false).antialias(antialias);
 	}
 	
 	Clock clock;
@@ -945,7 +946,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 		sphereDataPanel = new SphereDataPanel(this, firstOne);
 	
-		String lines=storageControler.getValue(HairStorageKeys.KEY_SPHERES, null);
+		String lines=storageControler.getValue(GWTThreeClothHairStorageKeys.KEY_SPHERES, null);
 		if(lines!=null){
 			Iterable<SphereData> datas=new SphereDataConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(lines));
 			for(SphereData data:datas){
@@ -991,6 +992,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 
 	
+	public StorageControler getStorageControler() {
+		return storageControler;
+	}
+
 	int mouseX,mouseY;
 	
 	/**

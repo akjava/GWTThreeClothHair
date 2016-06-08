@@ -1,6 +1,6 @@
 package com.akjava.gwt.clothhair.client.sphere;
 
-import com.akjava.gwt.clothhair.client.HairStorageKeys;
+import com.akjava.gwt.clothhair.client.GWTThreeClothHairStorageKeys;
 import com.akjava.gwt.clothhair.client.TmpSphereInfoConverter;
 import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.lib.client.LogUtils;
@@ -111,7 +111,7 @@ public class SphereInfoPanel extends VerticalPanel{
 				
 				//LogUtils.log("v:"+storageControler.getValue(HairStorageKeys.temp_sphere, null));
 				
-				String storedVaues=storageControler.getValue(HairStorageKeys.temp_sphere,null);
+				String storedVaues=storageControler.getValue(GWTThreeClothHairStorageKeys.temp_sphere,null);
 				
 				
 				double[] values;
@@ -140,7 +140,7 @@ public class SphereInfoPanel extends VerticalPanel{
 		
 		
 		try {
-			storageControler.setValue(HairStorageKeys.temp_sphere, line);
+			storageControler.setValue(GWTThreeClothHairStorageKeys.temp_sphere, line);
 		} catch (StorageException e) {
 			LogUtils.log(e.getMessage());
 		}

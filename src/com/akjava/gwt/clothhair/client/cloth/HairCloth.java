@@ -10,6 +10,7 @@ import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataUtils;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
@@ -345,8 +346,16 @@ public class HairCloth {
 	
 	private int sizeOfU;
 	
+	private boolean cutHorizontalConnection;
+	private int startCutHorizontalConnection;
+	
 	public static int calcurateHorizontalPin(int normalPinSize,int sizeOfU){
 		return (normalPinSize-1)*sizeOfU+1;
+	}
+	
+	//ignore 0 index
+	public boolean needConnectHorizontal(int v){
+		return (!cutHorizontalConnection || v<startCutHorizontalConnection);
 	}
 	public HairCloth(HairData hairData,Mesh mesh){
 			
@@ -368,6 +377,8 @@ public class HairCloth {
 		
 		this.connectHorizontal=hairData.isConnectHorizontal();
 		//LogUtils.log("connect-horizontal:"+connectHorizontal);
+		this.cutHorizontalConnection=hairData.isCutU();
+		this.startCutHorizontalConnection=hairData.getStartCutUIndexV();
 		
 		
 			//TODO support 0 sizeOfU
@@ -783,10 +794,12 @@ public class HairCloth {
 				
 				/*
 				 * trid last one is heavy,but not so good
-				if(v==h){
-					baseMass=1.2;
-				}
+				
 				*/
+				if(!needConnectHorizontal(v)){
+					//LogUtils.log(v);
+					//baseMass=0.05;//try less effect,i'm not sure still this is useful
+				}
 				
 				double mass=isPinned(i)?0:baseMass;
 				
@@ -873,6 +886,9 @@ public class HairCloth {
 		//LogUtils.log("simulate-time:"+watch.elapsed(TimeUnit.MILLISECONDS)+" ms");
 		
 	}
+	
+
+	
 	protected Body createSphereBody(ClothSimulator simulator,Vector3 position, double size) {
 		
 		com.github.gwtcannonjs.client.shapes.Sphere sphereShape = CANNON.newSphere(size);

@@ -1,6 +1,7 @@
 package com.akjava.gwt.clothhair.client;
 
 import com.akjava.gwt.lib.client.CanvasUtils;
+import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.lib.client.experimental.ImageDataUtils;
 import com.akjava.gwt.lib.client.experimental.ImageDataUtils.RGBColorFilter;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
@@ -15,6 +16,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
@@ -164,7 +166,29 @@ public class BasicPanel extends VerticalPanel{
 		this.add(h2);
 		
 		
+		this.add(new HTML("<h4>Three.js</h4>"));
+		HorizontalPanel h3=new HorizontalPanel();
+		h3.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+		this.add(h3);
+		CheckBox antialiasCheck=new CheckBox();
+		h3.add(antialiasCheck);
+		h3.add(new Label("antialias(need reload page)"));
+		boolean antialias=GWTThreeClothHair.INSTANCE.getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_RENDERER_ANTIALIAS, false);
+		antialiasCheck.setValue(antialias);
 		
+		antialiasCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				try {
+					GWTThreeClothHair.INSTANCE.getStorageControler().setValue(GWTThreeClothHairStorageKeys.THREEJS_RENDERER_ANTIALIAS, event.getValue());
+				} catch (StorageException e) {
+					Window.alert("faild maybe quota problem");
+					e.printStackTrace();
+				}
+			}
+			
+		});
 		
 	}
 }

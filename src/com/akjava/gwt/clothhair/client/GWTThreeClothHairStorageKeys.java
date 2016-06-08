@@ -1,6 +1,6 @@
 package com.akjava.gwt.clothhair.client;
 
-public class HairStorageKeys {
+public class GWTThreeClothHairStorageKeys {
 public static final String temp_sphere="tmp_sphere";
 
 public static final String KEY_SPHERES="spheres";

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
-import com.akjava.gwt.clothhair.client.HairStorageKeys;
+import com.akjava.gwt.clothhair.client.GWTThreeClothHairStorageKeys;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
 import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
 import com.akjava.gwt.clothhair.client.cloth.HairCloth;
@@ -388,7 +388,7 @@ public class HairDataPanel extends VerticalPanel{
 			
 			
 		//
-		 String text=storageControler.getValue(HairStorageKeys.temp_hairset, null);
+		 String text=storageControler.getValue(GWTThreeClothHairStorageKeys.temp_hairset, null);
 		 if(text!=null && !text.isEmpty()){
 			 loadHairDataSync(text);
 		 }
@@ -464,6 +464,7 @@ public class HairDataPanel extends VerticalPanel{
 				if(!GWTThreeClothHair.INSTANCE.getClothSimulator().isUpdatingHairTextureMap()){
 					if(loadingDatas.isEmpty()){
 						cancel();
+						storeDatas();
 						return;
 					}
 					
@@ -957,7 +958,7 @@ public void updateHairDataLine(){
 	
 	public void storeDatas() {
 		if(cellObjects.getDatas().size()==0){
-			storageControler.removeValue(HairStorageKeys.temp_hairset);
+			storageControler.removeValue(GWTThreeClothHairStorageKeys.temp_hairset);
 			return;
 		}
 		
@@ -965,7 +966,7 @@ public void updateHairDataLine(){
 				toStoreText();
 		
 		try {
-			storageControler.setValue(HairStorageKeys.temp_hairset, text);
+			storageControler.setValue(GWTThreeClothHairStorageKeys.temp_hairset, text);
 		} catch (StorageException e) {
 			Window.alert(e.getMessage());
 		}

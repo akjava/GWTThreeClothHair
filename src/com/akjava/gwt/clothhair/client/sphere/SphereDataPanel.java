@@ -1,7 +1,7 @@
 package com.akjava.gwt.clothhair.client.sphere;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
-import com.akjava.gwt.clothhair.client.HairStorageKeys;
+import com.akjava.gwt.clothhair.client.GWTThreeClothHairStorageKeys;
 import com.akjava.gwt.clothhair.client.cloth.SphereDataControler;
 import com.akjava.gwt.html5.client.download.HTML5Download;
 import com.akjava.gwt.html5.client.file.File;
@@ -325,7 +325,7 @@ public class SphereDataPanel extends VerticalPanel{
 		 //store data
 		 String lines=toStoreText();
 		 try {
-			storageControler.setValue(HairStorageKeys.KEY_SPHERES, lines);
+			storageControler.setValue(GWTThreeClothHairStorageKeys.KEY_SPHERES, lines);
 		} catch (StorageException e) {
 			//possible quote error
 			LogUtils.log(e.getMessage());
