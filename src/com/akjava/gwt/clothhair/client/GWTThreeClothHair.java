@@ -324,7 +324,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		directionalLight.getPosition().set( -1, 1, 1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
 		scene.add( directionalLight );
-		directionalLight.setIntensity(0.1);
+		directionalLight.setIntensity(0.4);
 		
 		DirectionalLight directionalLight2 = THREE.DirectionalLight( 0x444444 );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
 		directionalLight2.getPosition().set( 1, 1, -1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();

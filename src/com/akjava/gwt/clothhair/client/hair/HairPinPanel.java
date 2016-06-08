@@ -105,7 +105,7 @@ public class HairPinPanel extends VerticalPanel{
 		this.add(editor);
 		
 		pinText = new TextArea();
-		pinText.setReadOnly(true);
+		//pinText.setReadOnly(true);
 		pinText.setSize("200px", "300px");
 		this.add(pinText);
 		
