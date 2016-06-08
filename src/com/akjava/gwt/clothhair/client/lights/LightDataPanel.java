@@ -2,8 +2,6 @@ package com.akjava.gwt.clothhair.client.lights;
 
 import javax.annotation.Nullable;
 
-import com.akjava.gwt.clothhair.client.sphere.SphereData;
-import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
 import com.akjava.gwt.html5.client.download.HTML5Download;
 import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileUploadForm;
