@@ -172,7 +172,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			//LogUtils.log("sim="+sim+",skinning="+skinning);
 		}
 		//logarithmicDepthBuffer
-		renderer.render(scene, camera);//render last,very important
+		//render last,very important
 		
 		//mixer first,this make animation
 				if(mixer!=null){
@@ -185,6 +185,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 					 //fixed dt //TODO make option
 					//mixer.update(clock.getDelta());
 				}
+				renderer.render(scene, camera);
 		
 		if(stats!=null){
 			stats.update();
@@ -339,7 +340,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		controls.update();
 
 		
-		AmbientLight ambient = THREE.AmbientLight( 0x111111);//0xb7b7b7 );//var ambient = new THREE.AmbientLight( 0xffffff );
+		AmbientLight ambient = THREE.AmbientLight( 0x333333);//0xb7b7b7 );//var ambient = new THREE.AmbientLight( 0xffffff );
 		scene.add( ambient );
 		
 		HemisphereLight hemiLight=THREE.HemisphereLight(0xffffff, 0xffffff,0.6);
