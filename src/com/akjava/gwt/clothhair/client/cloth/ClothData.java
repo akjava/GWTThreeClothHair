@@ -50,7 +50,7 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 	//LogUtils.log("g-size:"+clothGeometry.getVertices().length());
 	
 	
-	HairPinToNormal hairPinToNormal=new HairPinToNormal(mesh);
+	HairPinToNormal hairPinToNormal=new HairPinToNormal(mesh,true);
 	
 	calculator=new SkinningVertexCalculator(mesh);
 	for(HairPin pin:hairData.getHairPins()){

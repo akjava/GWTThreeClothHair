@@ -425,7 +425,7 @@ public class ClothSimulator  {
 		
 		}else{
 			//only core pins,only use no-custom pin
-			List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).filter(HairPinPredicates.NoTargetOnly()).transform(new HairPinToNormal(characterMesh)).toList();
+			List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).filter(HairPinPredicates.NoTargetOnly()).transform(new HairPinToNormal(characterMesh,true)).toList();
 			//List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).transform(new HairPinToNormal(characterMesh)).toList();
 			
 			List<Vector3> normals=Lists.newArrayList();
