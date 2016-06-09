@@ -29,6 +29,7 @@ import com.akjava.gwt.three.client.gwt.core.BoundingBox;
 import com.akjava.gwt.three.client.gwt.core.Intersect;
 import com.akjava.gwt.three.client.gwt.math.HSL;
 import com.akjava.gwt.three.client.gwt.renderers.WebGLRendererParameter;
+import com.akjava.gwt.three.client.java.utils.Mbl3dLoader;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.animation.AnimationClip;
 import com.akjava.gwt.three.client.js.animation.AnimationMixer;
@@ -49,7 +50,6 @@ import com.akjava.gwt.three.client.js.extras.helpers.VertexNormalsHelper;
 import com.akjava.gwt.three.client.js.lights.AmbientLight;
 import com.akjava.gwt.three.client.js.lights.DirectionalLight;
 import com.akjava.gwt.three.client.js.lights.HemisphereLight;
-import com.akjava.gwt.three.client.js.loaders.JSONLoader;
 import com.akjava.gwt.three.client.js.loaders.JSONLoader.JSONLoadHandler;
 import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
@@ -377,9 +377,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//String url= "models/mbl3d/model11-eyelid-extendhead.json"; //tmp9xxx3-front4
 		
 		//String url="models/mbl3d/model8-hair-color-expand-bone.json"; //no-morph over 40fps
-		//Mbl3dLoader loader=new Mbl3dLoader();
+		Mbl3dLoader loader=new Mbl3dLoader();
 		//loader.needFix=false;//for test,TODO autodetect
-		JSONLoader loader=	THREE.JSONLoader();
+		//JSONLoader loader=	THREE.JSONLoader();
 		
 		loader.load(modelUrl,new JSONLoadHandler() {
 			
