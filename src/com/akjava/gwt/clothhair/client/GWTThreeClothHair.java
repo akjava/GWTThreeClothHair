@@ -21,7 +21,6 @@ import com.akjava.gwt.clothhair.client.texture.TexturePanel;
 import com.akjava.gwt.lib.client.GWTHTMLUtils;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
-import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.stats.client.Stats;
 import com.akjava.gwt.three.client.examples.js.THREEExp;
 import com.akjava.gwt.three.client.examples.js.controls.OrbitControls;
@@ -30,7 +29,6 @@ import com.akjava.gwt.three.client.gwt.core.BoundingBox;
 import com.akjava.gwt.three.client.gwt.core.Intersect;
 import com.akjava.gwt.three.client.gwt.math.HSL;
 import com.akjava.gwt.three.client.gwt.renderers.WebGLRendererParameter;
-import com.akjava.gwt.three.client.java.utils.Mbl3dLoader;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.animation.AnimationClip;
 import com.akjava.gwt.three.client.js.animation.AnimationMixer;
@@ -51,6 +49,7 @@ import com.akjava.gwt.three.client.js.extras.helpers.VertexNormalsHelper;
 import com.akjava.gwt.three.client.js.lights.AmbientLight;
 import com.akjava.gwt.three.client.js.lights.DirectionalLight;
 import com.akjava.gwt.three.client.js.lights.HemisphereLight;
+import com.akjava.gwt.three.client.js.loaders.JSONLoader;
 import com.akjava.gwt.three.client.js.loaders.JSONLoader.JSONLoadHandler;
 import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
@@ -119,7 +118,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	@Override
 	public void animate(double timestamp) {
 		
-		double delta=clock.getDelta();
+		
 		
 		
 		/* for test
@@ -143,6 +142,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//not support skinning
 		if(vertexHelper!=null){
 			vertexHelper.update();//for moving
+			//i guess vertexHelper update almost hand as hand animation
 		}
 		
 		
@@ -165,6 +165,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 					if(useFixedFrame){
 						mixer.update(1.0/mixerFrixedFrameNumber);
 					}else{
+						double delta=clock.getDelta();
 						mixer.update(delta);
 					}
 					 //fixed dt //TODO make option
@@ -376,8 +377,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//String url= "models/mbl3d/model11-eyelid-extendhead.json"; //tmp9xxx3-front4
 		
 		//String url="models/mbl3d/model8-hair-color-expand-bone.json"; //no-morph over 40fps
-		Mbl3dLoader loader=new Mbl3dLoader();
-		loader.needFix=false;//for test
+		//Mbl3dLoader loader=new Mbl3dLoader();
+		//loader.needFix=false;//for test,TODO autodetect
+		JSONLoader loader=	THREE.JSONLoader();
+		
 		loader.load(modelUrl,new JSONLoadHandler() {
 			
 			private MultiMaterial multiMaterials;
@@ -459,7 +462,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						);
 				
 				characterMesh = THREE.SkinnedMesh( geometry, bodyMaterial );
-				LogUtils.log(characterMesh);
+				//LogUtils.log(characterMesh);
 				//characterMesh = THREE.SkinnedMesh( geometry, multiMaterials );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = new THREE.SkinnedMesh( geometry, mat );
 				
 				
@@ -498,7 +501,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				
 				
-				characterMesh.getSkeleton().getBones().get(0).getPosition();
+				//characterMesh.getSkeleton().getBones().get(0).getPosition();
 				
 				
 				createControler();
