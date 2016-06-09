@@ -790,7 +790,7 @@ public class HairCloth {
 				Particle particle=particles.get(i);
 				int v=i/(w+1);
 				//this effect small,TODO more check
-				double baseMass=0.1;
+				double baseMass=1;//this is very important
 				
 				/*
 				 * trid last one is heavy,but not so good

@@ -269,8 +269,14 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 	@Override
 	public void onInitializedThree() {
+		INSTANCE=this;//must be first
 		clock=THREE.Clock();
 		clothSimulator=new ClothSimulator(scene,null);
+		
+		LogUtils.log("clear-color:"+getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR, 0));
+		
+		renderer.setClearColor(getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR, 0));
+		
 		
 		//setDebugAnimateCount(100);
 		final String modelUrl=GWTHTMLUtils.getInputValueById("model", "model11.json");
@@ -279,9 +285,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		super.onInitializedThree();
 		setRightTopPopupWidth("360px");
-		INSTANCE=this;
 		
-		renderer.setClearColor(0x888888);
+		
+		
 		
 		rendererContainer.addMouseMoveHandler(new MouseMoveHandler() {
 			@Override
@@ -348,8 +354,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		DirectionalLightHelper helper=THREE.DirectionalLightHelper(directionalLight, 1000);
 		//scene.add(helper);
 		
-		
-		MeshPhongMaterial groundMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0xaaaaaa).specular(0x111111)
+		int groundHex=getStorageControler().getValue(GWTThreeClothHairStorageKeys.KEY_GROUND_COLOR, 0x888888);
+		MeshPhongMaterial groundMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(groundHex).specular(0x111111)
 				.transparent(true).opacity(1)
 				.side(THREE.DoubleSide)
 				);
@@ -981,15 +987,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 	
 
-	private StorageControler storageControler=new StorageControler();
-
-	
 	
 
 	
-	public StorageControler getStorageControler() {
-		return storageControler;
-	}
+	
+
+	
+	
 
 	int mouseX,mouseY;
 	

@@ -1,6 +1,7 @@
 package com.akjava.gwt.clothhair.client;
 
 import com.akjava.gwt.clothhair.client.lights.LightDataPanel;
+import com.akjava.gwt.html5.client.input.ColorBox;
 import com.akjava.gwt.lib.client.CanvasUtils;
 import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.lib.client.experimental.ImageDataUtils;
@@ -8,7 +9,9 @@ import com.akjava.gwt.lib.client.experimental.ImageDataUtils.RGBColorFilter;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.loaders.ImageLoader.ImageLoadHandler;
+import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.textures.Texture;
+import com.akjava.lib.common.utils.ColorUtils;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.ImageData;
 import com.google.gwt.dom.client.ImageElement;
@@ -190,6 +193,51 @@ public class BasicPanel extends VerticalPanel{
 			}
 			
 		});
+		
+		HorizontalPanel h4=new HorizontalPanel();
+		this.add(h4);
+		h4.add(new Label("Sky:"));
+		ColorBox bgColor=new ColorBox();
+		bgColor.setValue(ColorUtils.toCssColor(GWTThreeClothHair.INSTANCE.getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR, 0)));
+		bgColor.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event) {
+				int hex=ColorUtils.toColor(event.getValue());
+				GWTThreeClothHair.INSTANCE.getRenderer().setClearColor(hex);
+				try {
+					GWTThreeClothHair.INSTANCE.getStorageControler().setValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR,hex);
+				} catch (StorageException e) {
+					Window.alert("can't update color,because of quote:"+e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		
+		});
+		h4.add(bgColor);
+		
+		h4.add(new Label("Ground:"));
+		ColorBox groundColor=new ColorBox();
+		groundColor.setValue(ColorUtils.toCssColor(GWTThreeClothHair.INSTANCE.getStorageControler().getValue(GWTThreeClothHairStorageKeys.KEY_GROUND_COLOR, 0x888888)));
+		groundColor.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<String> event) {
+				int hex=ColorUtils.toColor(event.getValue());
+				MeshPhongMaterial material=GWTThreeClothHair.INSTANCE.getGroundMesh().getMaterial().cast();
+				material.getColor().setHex(hex);
+				try {
+					GWTThreeClothHair.INSTANCE.getStorageControler().setValue(GWTThreeClothHairStorageKeys.KEY_GROUND_COLOR,hex);
+				} catch (StorageException e) {
+					Window.alert("can't update color,because of quote:"+e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		
+		});
+		h4.add(groundColor);
+		
+		
 		this.add(new HTML("<h4>Lights</h4>"));
 		this.add(new LightDataPanel(GWTThreeClothHairStorageKeys.KEY_LIGHTS,GWTThreeClothHair.INSTANCE.getStorageControler()));
 	}
