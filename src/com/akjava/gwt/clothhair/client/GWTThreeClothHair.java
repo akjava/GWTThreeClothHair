@@ -1,5 +1,7 @@
 package com.akjava.gwt.clothhair.client;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nullable;
 
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
@@ -64,6 +66,7 @@ import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.lib.common.utils.CSVUtils;
+import com.google.common.base.Stopwatch;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayNumber;
@@ -141,7 +144,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//not support skinning
 		if(vertexHelper!=null){
+			if(vertexHelper.isVisible()){
 			vertexHelper.update();//for moving
+			}
 			//i guess vertexHelper update almost hand as hand animation
 		}
 		
@@ -149,14 +154,23 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		
 		if(skeltonHelper!=null){
+			if(skeltonHelper.isVisible()){
 			skeltonHelper.update();
+			}
 		}
 		
+		Stopwatch watch=Stopwatch.createStarted();
 		if(clothSimulator!=null){
 			clothSimulator.update(timestamp);
 		}
+		double sim=watch.elapsed(TimeUnit.MILLISECONDS);//10ms
+		watch.reset();watch.start();
+		if(characterMesh!=null){
+			skinningbyHand(characterMesh);//maybe complete control
 		
-		
+			double skinning=watch.elapsed(TimeUnit.MILLISECONDS);//30ms
+			//LogUtils.log("sim="+sim+",skinning="+skinning);
+		}
 		//logarithmicDepthBuffer
 		renderer.render(scene, camera);//render last,very important
 		
@@ -392,7 +406,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			public void loaded(Geometry geometry,JsArray<Material> m) {
 				
 				//materials=fixMaterial(materials);
-				characterGeometry=geometry;
+				characterGeometry=geometry.clone();
 				geometry.computeBoundingBox();
 				BoundingBox bb = geometry.getBoundingBox();
 				//double x=-20, y=-1270,z= -300,s= 800;
@@ -440,7 +454,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				bodyMaterial = THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial()
 						.morphTargets(true)
-						.skinning(true)
+						//.skinning(true) //TEST skip skinning by manual skinning
 						.transparent(true)
 						.alphaTest(0.5)
 						//.emissiveMap(THREE.TextureLoader().load("models/mbl3d/emissive.png"))
@@ -464,6 +478,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				characterMesh = THREE.SkinnedMesh( geometry, bodyMaterial );
 				//LogUtils.log(characterMesh);
 				//characterMesh = THREE.SkinnedMesh( geometry, multiMaterials );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = new THREE.SkinnedMesh( geometry, mat );
+				
 				
 				
 				//for updebug
@@ -1156,6 +1171,22 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			initMorph();
 		}
 			
+		
+	public void skinningbyHand(SkinnedMesh mesh){
+		mesh.getGeometry().setDynamic(true);
+		for(int i=0;i<mesh.getGeometry().getVertices().length();i++){
+			Vector3 transformed=SkinningVertexCalculator.transformSkinningVertex(mesh,i,characterGeometry.getVertices().get(i));
+			mesh.getGeometry().getVertices().get(i).copy(transformed);
+		}
+		
+		//for lighting
+		mesh.getGeometry().computeFaceNormals ();
+		mesh.getGeometry().computeVertexNormals ();
+		
+		mesh.getGeometry().setVerticesNeedUpdate(true);
+		mesh.getGeometry().setNormalsNeedUpdate(true);
+	}
+		
 	public void startAnimation(int boneIndex,double x,double y,double z,boolean both,boolean facialAnimation){
 		if(mixer==null){
 			return;

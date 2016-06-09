@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.math.Vector4;
@@ -58,7 +59,7 @@ public class SkinningVertexCalculator {
 	
 	public void update(){
 		for(int i=0;i<skinningVertexs.size();i++){
-			result.get(i).copy(transformSkinningVertex(skinningVertexs.get(i)).applyMatrix4(skinnedMesh.getMatrixWorld()));
+			result.get(i).copy(transformSkinningVertex(skinnedMesh,skinningVertexs.get(i)).applyMatrix4(skinnedMesh.getMatrixWorld()));
 		}
 	}
 	
@@ -66,8 +67,9 @@ public class SkinningVertexCalculator {
 	 * only workd geometry ,not buffer geometry
 	 * @param vertex
 	 * @return
+	 //from http://stackoverflow.com/questions/31620194/how-to-calculate-transformed-skin-vertices
 	 */
-	public  Vector3 transformSkinningVertex(SkinningVertex vertex){
+	public static Vector3 transformSkinningVertex(SkinnedMesh skinnedMesh,SkinningVertex vertex){
 		//for thread safe
 		Vector3 vec3=THREE.Vector3();
 		vec3.copy(vertex.getVertex()).applyMatrix4(skinnedMesh.getBindMatrix());
@@ -91,6 +93,42 @@ public class SkinningVertexCalculator {
 	        }else{
 	        	boneIndex=(int)vertex.getSkinIndices().getW();
 	        	boneWeight=vertex.getSkinWeights().getW();
+	        }
+	        if(boneIndex<0 || boneIndex>=skinnedMesh.getSkeleton().getBones().length()){
+	        	LogUtils.log("boneIndex="+boneIndex+",but bones below");
+	        	LogUtils.log(skinnedMesh.getSkeleton().getBones());
+	        	throw new RuntimeException("out of index");
+	        }
+	        
+	        tempMatrix.multiplyMatrices (skinnedMesh.getSkeleton().getBones().get(boneIndex).getMatrixWorld(), skinnedMesh.getSkeleton().getBoneInverses().get(boneIndex));
+	        result.add (temp.copy (vec3).applyMatrix4 (tempMatrix).multiplyScalar (boneWeight));
+	    }
+	    return result.applyMatrix4 (skinnedMesh.getBindMatrixInverse());
+	}
+	public static Vector3 transformSkinningVertex(SkinnedMesh skinnedMesh,int index,Vector3 vertex){
+		//for thread safe
+		Vector3 vec3=THREE.Vector3();
+		vec3.copy(vertex).applyMatrix4(skinnedMesh.getBindMatrix());
+		Vector3 result = THREE.Vector3 ();
+		Vector3 temp = THREE.Vector3 ();
+		Matrix4 tempMatrix = THREE.Matrix4 (); 
+		//properties = ['x', 'y', 'z', 'w'];
+	    
+		for (int i = 0; i < 4; i++) {
+	        int boneIndex;
+	        double boneWeight;
+	        if(i==0){
+	        	boneIndex=(int)skinnedMesh.getGeometry().getSkinIndices().get(index).getX();
+	        	boneWeight=skinnedMesh.getGeometry().getSkinWeights().get(index).getX();
+	        }else if(i==1){
+	        	boneIndex=(int)skinnedMesh.getGeometry().getSkinIndices().get(index).getY();
+	        	boneWeight=skinnedMesh.getGeometry().getSkinWeights().get(index).getY();
+	        }else if(i==2){
+	        	boneIndex=(int)skinnedMesh.getGeometry().getSkinIndices().get(index).getZ();
+	        	boneWeight=skinnedMesh.getGeometry().getSkinWeights().get(index).getZ();
+	        }else{
+	        	boneIndex=(int)skinnedMesh.getGeometry().getSkinIndices().get(index).getW();
+	        	boneWeight=skinnedMesh.getGeometry().getSkinWeights().get(index).getW();
 	        }
 	        if(boneIndex<0 || boneIndex>=skinnedMesh.getSkeleton().getBones().length()){
 	        	LogUtils.log("boneIndex="+boneIndex+",but bones below");
