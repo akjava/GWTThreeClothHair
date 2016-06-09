@@ -319,14 +319,14 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 		
 		AmbientLight ambient = THREE.AmbientLight( 0x111111);//0xb7b7b7 );//var ambient = new THREE.AmbientLight( 0xffffff );
-		//scene.add( ambient );
+		scene.add( ambient );
 		
 		HemisphereLight hemiLight=THREE.HemisphereLight(0xffffff, 0xffffff,0.6);
 		
 		hemiLight.getColor().setHSL(  0.6, 0.75, 0.5  );
 		hemiLight.getGroundColor().setHSL(0.095, 0.5, 0.5 );
 		hemiLight.getPosition().set( 0, 500, 0 );
-		scene.add( hemiLight );
+		//scene.add( hemiLight );
 
 		DirectionalLight directionalLight = THREE.DirectionalLight( 0xffffff,0.9 );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
 		
@@ -334,7 +334,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		directionalLight.getPosition().multiplyScalar( 50);
 		
 		//directionalLight.getPosition().set( -1, 1, 1 ).normalize();//directionalLight.position.set( -1, 1, 1 ).normalize();
-		scene.add( directionalLight );
+		//scene.add( directionalLight );
 		
 		
 		DirectionalLight directionalLight2 = THREE.DirectionalLight( 0x444444 );//var directionalLight = new THREE.DirectionalLight( 0x444444 );
@@ -346,7 +346,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//scene.add( directionalLight3 );
 		
 		DirectionalLightHelper helper=THREE.DirectionalLightHelper(directionalLight, 1000);
-		scene.add(helper);
+		//scene.add(helper);
 		
 		
 		MeshPhongMaterial groundMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0xaaaaaa).specular(0x111111)

@@ -1,13 +1,25 @@
 package com.akjava.gwt.clothhair.client.lights;
 
 import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.lights.Light;
 import com.akjava.gwt.three.client.js.math.Vector3;
 
 public class LightData {
-public static final int DIRECTION=0;
+public static final int DIRECTIONAL=0;
 public static final int AMBIENT=1;
 public static final int HEMISPHERE=2;
 private String name="";
+private Light light;
+
+public boolean hasLight(){
+	return light!=null;
+}
+public Light getLight() {
+	return light;
+}
+public void setLight(Light light) {
+	this.light = light;
+}
 public String getName() {
 	return name;
 }

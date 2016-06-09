@@ -2,30 +2,49 @@ package com.akjava.gwt.clothhair.client.lights;
 
 import javax.annotation.Nullable;
 
+import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
+import com.akjava.gwt.clothhair.client.lights.SimpleVector3Editor.SimpleVector3EditorListener;
 import com.akjava.gwt.html5.client.download.HTML5Download;
 import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileUploadForm;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.html5.client.file.FileUtils.DataURLListener;
+import com.akjava.gwt.html5.client.input.ColorBox;
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
+import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
+import com.akjava.gwt.three.client.java.ThreeLog;
+import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.lights.AmbientLight;
+import com.akjava.gwt.three.client.js.lights.DirectionalLight;
+import com.akjava.gwt.three.client.js.lights.HemisphereLight;
+import com.akjava.gwt.three.client.js.lights.Light;
+import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.lib.common.utils.CSVUtils;
+import com.akjava.lib.common.utils.ColorUtils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorDelegate;
 import com.google.gwt.editor.client.ValueAwareEditor;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class LightDataPanel extends VerticalPanel{
@@ -41,6 +60,7 @@ public class LightDataPanel extends VerticalPanel{
 		editor = new LightDataEditor();    
 				
 		this.add(editor);
+		editor.setValue(null);
 
 
 	
@@ -48,6 +68,42 @@ public class LightDataPanel extends VerticalPanel{
 	SimpleCellTable<LightData> table=new SimpleCellTable<LightData>() {
 		@Override
 		public void addColumns(CellTable<LightData> table) {
+			
+			
+			TextColumn<LightData> typeColumn=new TextColumn<LightData>() {
+				@Override
+				public String getValue(LightData object) {
+					String type="";
+					if(object.getType()==LightData.AMBIENT){
+						type="Ambient";
+					}else if(object.getType()==LightData.DIRECTIONAL){
+						type="Directional";
+					}else if(object.getType()==LightData.HEMISPHERE){
+						type="Hemisphere";
+					}
+					return type;
+				}
+			};
+			table.addColumn(typeColumn);
+			
+			TextColumn<LightData> xyzColumn=new TextColumn<LightData>() {
+				@Override
+				public String getValue(LightData object) {
+					String xyz="";
+					xyz=ThreeLog.get(object.getPosition());
+					return xyz;
+				}
+			};
+			table.addColumn(xyzColumn);
+			
+			TextColumn<LightData> intensityColumn=new TextColumn<LightData>() {
+				@Override
+				public String getValue(LightData object) {
+					return String.valueOf(object.getIntensity());
+				}
+			};
+			table.addColumn(intensityColumn);
+			
 			TextColumn<LightData> nameColumn=new TextColumn<LightData>() {
 				@Override
 				public String getValue(LightData object) {
@@ -55,14 +111,6 @@ public class LightDataPanel extends VerticalPanel{
 				}
 			};
 			table.addColumn(nameColumn);
-			
-			TextColumn<LightData> typeColumn=new TextColumn<LightData>() {
-				@Override
-				public String getValue(LightData object) {
-					return ""+object.getType();
-				}
-			};
-			table.addColumn(typeColumn);
 		}
 	};
 	this.add(table);
@@ -255,27 +303,185 @@ public class LightDataPanel extends VerticalPanel{
 	}
 
 	public void onDataRemoved(LightData data){
-		
+		if(data.hasLight()){
+			GWTThreeClothHair.INSTANCE.getScene().remove(data.getLight());
+		}
+		storeData();
 	}
 	public void onDataAdded(LightData data){
+		Light light=null;
+		if(data.getType()==LightData.AMBIENT){
+			light=THREE.AmbientLight(data.getColor(),data.getIntensity());
+			LogUtils.log(light);
+		}else if(data.getType()==LightData.DIRECTIONAL){
+			light=THREE.DirectionalLight(data.getColor(),data.getIntensity());
+		}else if(data.getType()==LightData.HEMISPHERE){
+			light=THREE.HemisphereLight(data.getColor(), data.getColor2(), data.getIntensity());;
+		}
+		light.setName(data.getName());
+		light.getPosition().copy(data.getPosition());
+		//TODO set position
+		GWTThreeClothHair.INSTANCE.getScene().add(light);
 		
-	}
-	public void onDataUpdated(LightData data){
-		//TODO link something
-		cellObjects.getSimpleCellTable().getCellTable().redraw();
+		data.setLight(light);
 	}
 	
+	public boolean sameType(int type,String typeString){
+		if(type==LightData.AMBIENT){
+			return "AmbientLight".equals(typeString);
+		}else if(type==LightData.DIRECTIONAL){
+			return "DirectionalLight".equals(typeString);
+		}else if(type==LightData.HEMISPHERE){
+			return "HemisphereLight".equals(typeString);
+		}
+		
+		return false;
+	}
+	public void onDataUpdated(LightData data){
+		
+		
+		if(!data.hasLight()){
+			LogUtils.log("onDataUpdated:no light");
+			return;
+		}
+		
+		if(!sameType(data.getType(), data.getLight().getType())){
+			LogUtils.log("onDataUpdated:type changed");
+			onDataRemoved(data);
+			onDataAdded(data);
+			return;
+		}
+		
+		
+		
+		
+		if(data.getType()==LightData.AMBIENT){
+			AmbientLight light=data.getLight().cast();
+			light.setName(data.getName());
+			light.setIntensity(data.getIntensity());
+			light.getColor().setHex(data.getColor());
+			light.getPosition().copy(data.getPosition());//no effect
+			
+			LogUtils.log(light);
+			
+		}else if(data.getType()==LightData.DIRECTIONAL){
+			DirectionalLight light=data.getLight().cast();
+			light.setName(data.getName());
+			light.setIntensity(data.getIntensity());
+			light.getColor().setHex(data.getColor());
+			light.getPosition().copy(data.getPosition());
+			
+			
+		}else if(data.getType()==LightData.HEMISPHERE){
+			HemisphereLight light=data.getLight().cast();
+			light.setName(data.getName());
+			light.setIntensity(data.getIntensity());
+			light.getColor().setHex(data.getColor());
+			light.getGroundColor().setHex(data.getColor2());
+			light.getPosition().copy(data.getPosition());
+		}
+	}
+	
+	public void updateData(LightData data){
+		storeData();
+		//TODO link something
+		cellObjects.getSimpleCellTable().getCellTable().redraw();
+		
+		onDataUpdated(data);
+	}
 
 	
 	public class LightDataEditor extends VerticalPanel implements Editor<LightData>,ValueAwareEditor<LightData>{
 		private LightData value;
+		private ListBox typeEditor;
+		private TextBox nameEditor;
+		private ColorBox colorEditor;
+		private ColorBox color2Editor;
+		private LabeledInputRangeWidget2 intensityEditor;
+		private SimpleVector3Editor positionEditor;
 		
 		public LightData getValue() {
 			return value;
 		}
 		
 		public LightDataEditor(){
+				HorizontalPanel h1=new HorizontalPanel();
+				this.add(h1);
+				typeEditor = new ListBox();
+				h1.add(typeEditor);
+				typeEditor.addItem("Direction");
+				typeEditor.addItem("Ambient");
+				typeEditor.addItem("Hemisphere");
+				typeEditor.addChangeHandler(new ChangeHandler() {
+					
+					@Override
+					public void onChange(ChangeEvent event) {
+						flush();
+					}
+				});
+				
+				h1.add(new Label("Name:"));
+				nameEditor = new TextBox();
+				nameEditor.setWidth("120px");
+				nameEditor.addChangeHandler(new ChangeHandler() {
+					
+					@Override
+					public void onChange(ChangeEvent event) {
+						flush();
+					}
+				});
+				h1.add(nameEditor);
+				
+				
+				
+				
+				HorizontalPanel h2=new HorizontalPanel();
+				this.add(h2);
+				h2.add(new Label("Color1"));
+				colorEditor = new ColorBox();
+				colorEditor.addValueChangeHandler(new ValueChangeHandler<String>() {
+					
+					@Override
+					public void onValueChange(ValueChangeEvent<String> event) {
+						flush();
+					}
+				});
+				colorEditor.setValue("#ffffff");
+				h2.add(colorEditor);
+				
+				h2.add(new Label("Color2"));
+				color2Editor = new ColorBox();
+				color2Editor.addValueChangeHandler(new ValueChangeHandler<String>() {
 
+					@Override
+					public void onValueChange(ValueChangeEvent<String> event) {
+						flush();
+					}
+				});
+				color2Editor.setValue("#ffffff");
+				h2.add(color2Editor);
+				
+				intensityEditor = new LabeledInputRangeWidget2("intensity", 0, 5, 0.01);
+				intensityEditor.addtRangeListener(new ValueChangeHandler<Number>() {
+
+					@Override
+					public void onValueChange(ValueChangeEvent<Number> event) {
+						flush();
+					}
+				});
+				add(intensityEditor);
+				
+				//TODO make vector3editor
+				
+				positionEditor = new SimpleVector3Editor(new SimpleVector3EditorListener() {
+					
+					@Override
+					public void onValueChanged(Vector3 value) {
+						flush();
+					}
+				});
+				add(positionEditor);
+				
 		}
 @Override
 			public void setDelegate(EditorDelegate<LightData> delegate) {
@@ -285,7 +491,19 @@ public class LightDataPanel extends VerticalPanel{
 
 			@Override
 			public void flush() {
-				onDataUpdated(value);
+				if(value==null){
+					return;
+				}
+				
+				value.setType(typeEditor.getSelectedIndex());
+				value.setName(nameEditor.getValue());
+				value.setColor(ColorUtils.toColor(colorEditor.getValue()));
+				value.setColor2(ColorUtils.toColor(color2Editor.getValue()));
+				value.setIntensity(intensityEditor.getValue());
+
+				//position value's value already linked no need
+				
+				updateData(value);
 			}
 
 			@Override
@@ -299,9 +517,32 @@ public class LightDataPanel extends VerticalPanel{
 				this.value=value;
 				if(value==null){
 					//set disable
+					typeEditor.setEnabled(false);
+					nameEditor.setEnabled(false);
+					//colorEditor.setEnabled(false);
+					//color2Editor.setEnabled(false);
+					intensityEditor.setEnabled(false);
+
+					
+					return;
 				}else{
 					//set enable
+					typeEditor.setEnabled(true);
+					nameEditor.setEnabled(true);
+					//colorEditor.setEnabled(true);
+					//color2Editor.setEnabled(true);
+					intensityEditor.setEnabled(true);
+
 				}
+				
+				typeEditor.setSelectedIndex(value.getType());
+				nameEditor.setValue(value.getName());
+				colorEditor.setValue(ColorUtils.toCssColor(value.getColor()));
+				color2Editor.setValue(ColorUtils.toCssColor(value.getColor2()));
+				intensityEditor.setValue(value.getIntensity());
+				
+				positionEditor.setValue(value.getPosition());
+
 			}
 	}
 }
