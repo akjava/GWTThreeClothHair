@@ -414,6 +414,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				//materials=fixMaterial(materials);
 				characterGeometry=geometry.clone();
+				
 				geometry.computeBoundingBox();
 				BoundingBox bb = geometry.getBoundingBox();
 				//double x=-20, y=-1270,z= -300,s= 800;
@@ -1077,6 +1078,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		return groundMesh;
 	}
 
+	/*
+	 * thisi is original loaded geometry cloned.for hand skinning
+	 */
 	private Geometry characterGeometry;
 	
 	public void updateHairTextureData(boolean updateHairTextureMap){
@@ -1146,12 +1150,14 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			if(mixer==null){
 				return;
 			}
+			
 			JsArray<KeyframeTrack> tracks=JavaScriptObject.createArray().cast();
 			Quaternion q=THREE.Quaternion();
 			for(int i=0;i<characterMesh.getSkeleton().getBones().length();i++){
 				JsArrayNumber times=JavaScriptObject.createArray().cast();
 				times.push(0);
 				
+				//I'm not sure is there reset-pose has value
 				JsArrayNumber values=JsArray.createArray().cast();
 				concat(values,q.toArray());
 				QuaternionKeyframeTrack track=THREE.QuaternionKeyframeTrack(".bones["+i+"].quaternion", times, values);
@@ -1164,7 +1170,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				times2.push(0);
 				
 				JsArrayNumber values2=JsArray.createArray().cast();
-				concat(values2,characterGeometry.getBones().get(i).getPos());
+				concat(values2,characterMesh.getGeometry().getBones().get(i).getPos());
 				VectorKeyframeTrack track2=THREE.VectorKeyframeTrack(".bones["+i+"].position", times2, values2);
 				tracks.push(track2);
 			}
