@@ -52,7 +52,10 @@ import com.akjava.gwt.three.client.js.extras.helpers.VertexNormalsHelper;
 import com.akjava.gwt.three.client.js.lights.AmbientLight;
 import com.akjava.gwt.three.client.js.lights.DirectionalLight;
 import com.akjava.gwt.three.client.js.lights.HemisphereLight;
+import com.akjava.gwt.three.client.js.loaders.Cache;
 import com.akjava.gwt.three.client.js.loaders.JSONLoader.JSONLoadHandler;
+import com.akjava.gwt.three.client.js.loaders.TextureLoader.TextureLoadHandler;
+import com.akjava.gwt.three.client.js.loaders.XHRLoader.XHRProgressHandler;
 import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.materials.MultiMaterial;
@@ -70,6 +73,7 @@ import com.google.common.base.Stopwatch;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayNumber;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -80,6 +84,7 @@ import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Panel;
@@ -1323,5 +1328,40 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	@Override
 	public void addSphereData(SphereData data) {
 		clothSimulator.addSphereData(data);
+	}
+	public  void reloadBodyTexture() {
+		Cache.clear();	
+		THREE.TextureLoader().load(textureUrl+"?time="+System.currentTimeMillis(),new TextureLoadHandler() {
+			
+			@Override
+			public void onLoad(Texture texture) {
+				LogUtils.log("load");
+				/** NearestFilter Tips **/
+				//default LinearMipMapLinearFilter use small mipmapping this approach contain some transparent area,
+				//change nearest or paint all transparent area
+				
+				texture.setMinFilter(THREE.NearestFilter);
+				
+				bodyMaterial.setMap(texture);
+				bodyMaterial.setNeedsUpdate(true);
+				
+				LogUtils.log("texture");
+				
+				Window.open(texture.getImage().getSrc(), "text", null);
+			}
+		}
+		,new XHRProgressHandler() {
+			
+			@Override
+			public void onProgress(NativeEvent progress) {
+				//not calling?
+				LogUtils.log(progress);
+			}
+		}
+				);
+		
+		
+		
+		
 	}
 }

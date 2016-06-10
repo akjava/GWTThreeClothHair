@@ -31,12 +31,12 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class BasicPanel extends VerticalPanel{
 
 	public BasicPanel(){
-
+		this.add(new HTML("<h4>Visible</h4>"));
 		HorizontalPanel h1=new HorizontalPanel();
 		this.add(h1);
 		
 		h1.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
-		this.add(new Label("Visible"));
+		
 		CheckBox windCheck=new CheckBox("Wind");
 		windCheck.setValue(true);
 		windCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -64,7 +64,7 @@ public class BasicPanel extends VerticalPanel{
 		h1.add(groundCheck);
 		groundCheck.setValue(false,true);
 		
-		this.add(new Label("Camera"));
+		this.add(new HTML("<h4>Camera</h4>"));
 		LabeledInputRangeWidget2 near=new LabeledInputRangeWidget2("near", 0.1, 100, 0.1);
 		
 		
@@ -90,6 +90,18 @@ public class BasicPanel extends VerticalPanel{
 			}
 		});
 		h1.add(visibleVertexCheck);
+		
+		
+		this.add(new HTML("<h4>Texture</h4>"));
+		HorizontalPanel textureButtons=new HorizontalPanel();
+		this.add(textureButtons);
+		Button reload=new Button("reload texture",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				GWTThreeClothHair.INSTANCE.reloadBodyTexture();
+			}
+		});
+		textureButtons.add(reload);
 		
 		
 		Button test=new Button("test",new ClickHandler() {
