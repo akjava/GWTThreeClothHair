@@ -485,13 +485,19 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						//not good for low polygon,change geometry position
 						//.displacementMap(THREE.TextureLoader().load("models/mbl3d/tempdisplacement.png"))
 						//.displacementScale(0.05)
-						.bumpMap(THREE.TextureLoader().load("models/mbl3d/tempbump.png"))
-						.bumpScale(6)
+						//.bumpMap(THREE.TextureLoader().load("models/mbl3d/tempbump.png"))
+						
 						//.specular(0xffffff)
 						//.specularMap(THREE.TextureLoader().load("models/mbl3d/simpleeye-2kbluexxx-extendhead-bump.png"))
 						
 						//.map(THREE.TextureLoader().load("models/mbl3d/simpleeye2.png"))
 						);
+				
+				String bumpUrl=GWTHTMLUtils.getInputValueById("bump", null);
+				if(bumpUrl!=null){
+					bodyMaterial.setBumpMap(THREE.TextureLoader().load(bumpUrl));
+					bodyMaterial.setBumpScale(6);
+				}
 				
 				characterMesh = THREE.SkinnedMesh( geometry, bodyMaterial );
 				//LogUtils.log(characterMesh);

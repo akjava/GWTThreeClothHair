@@ -438,9 +438,26 @@ public class HairDataPanel extends VerticalPanel{
 			}
 		});
 		 downloadPanels.add(downloadBt);
-		 downloadPanels.add(download);
+		
 		 
+		 Button downloadSelectionBt=new Button("selection",new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					download.clear();
+					if(cellObjects.getSelection()==null){
+						return;
+					}
+					String text=hairDataConverter.convert(cellObjects.getSelection().getHairData());
+					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair-selection.csv", "selection to download",true);
+					download.add(a);
+				}
+			});
+			 downloadPanels.add(downloadSelectionBt);
+			
+			 downloadSelectionBt.setTitle("download selection only");
 		 
+			 downloadPanels.add(download);
 		 
 		 
 		 //add
