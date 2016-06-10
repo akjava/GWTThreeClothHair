@@ -164,6 +164,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			clothSimulator.update(timestamp);
 		}
 		double sim=watch.elapsed(TimeUnit.MILLISECONDS);//10ms
+		
+		
+		/*
+		 stop manual skinning.
 		watch.reset();watch.start();
 		if(characterMesh!=null){
 			skinningbyHand(characterMesh);//maybe complete control
@@ -171,6 +175,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			double skinning=watch.elapsed(TimeUnit.MILLISECONDS);//30ms
 			//LogUtils.log("sim="+sim+",skinning="+skinning);
 		}
+		 */
+		
 		//logarithmicDepthBuffer
 		//render last,very important
 		
@@ -455,7 +461,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				bodyMaterial = THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial()
 						.morphTargets(true)
-						//.skinning(true) //TEST skip skinning by manual skinning
+						.skinning(true) //TEST skip skinning by manual skinning
 						.transparent(true)
 						.alphaTest(0.5)
 						//.emissiveMap(THREE.TextureLoader().load("models/mbl3d/emissive.png"))
@@ -798,7 +804,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 
 	
-	private int mixerFrixedFrameNumber=60;
+	private int mixerFrixedFrameNumber=120;//so so quolity
 	public int getMixerFrixedFrameNumber() {
 		return mixerFrixedFrameNumber;
 	}
