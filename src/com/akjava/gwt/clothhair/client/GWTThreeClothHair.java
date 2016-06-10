@@ -418,6 +418,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			public void loaded(Geometry geometry,JsArray<Material> m) {
 				
 				//materials=fixMaterial(materials);
+				//becareful only has vertex,face,uvs
 				characterGeometry=geometry.clone();
 				
 				geometry.computeBoundingBox();
@@ -470,6 +471,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						.skinning(true) //TEST skip skinning by manual skinning
 						.transparent(true)
 						.alphaTest(0.5)
+						//.normalMap(THREE.TextureLoader().load("models/mbl3d/tempnormal.png"))
+						.normalScale(THREE.Vector2(5, 5))
 						//.emissiveMap(THREE.TextureLoader().load("models/mbl3d/emissive.png"))
 						//.specularMap(THREE.TextureLoader().load("models/mbl3d/specular.png"))
 						//.specular(0xffffff)//specular(0xffffff)// ff is for map ,11 is skin
@@ -479,9 +482,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						.side(THREE.DoubleSide)//for inside mouse
 						//.specular(1).shininess(1)
 						.map(mapTexture)
-						
-						//.bumpMap(THREE.TextureLoader().load("models/mbl3d/simpleeye-2kbluexxx-extendhead-bump.png"))
-						.bumpScale(0.5)
+						//not good for low polygon,change geometry position
+						//.displacementMap(THREE.TextureLoader().load("models/mbl3d/tempdisplacement.png"))
+						//.displacementScale(0.05)
+						.bumpMap(THREE.TextureLoader().load("models/mbl3d/tempbump.png"))
+						.bumpScale(6)
 						//.specular(0xffffff)
 						//.specularMap(THREE.TextureLoader().load("models/mbl3d/simpleeye-2kbluexxx-extendhead-bump.png"))
 						
@@ -1345,9 +1350,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				bodyMaterial.setMap(texture);
 				bodyMaterial.setNeedsUpdate(true);
 				
-				LogUtils.log("texture");
 				
-				Window.open(texture.getImage().getSrc(), "text", null);
 			}
 		}
 		,new XHRProgressHandler() {
