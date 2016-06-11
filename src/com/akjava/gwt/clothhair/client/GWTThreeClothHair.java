@@ -472,7 +472,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						.transparent(true)
 						.alphaTest(0.5)
 						//.normalMap(THREE.TextureLoader().load("models/mbl3d/tempnormal.png"))
-						.normalScale(THREE.Vector2(5, 5))
+						//.normalScale(THREE.Vector2(5, 5))
 						//.emissiveMap(THREE.TextureLoader().load("models/mbl3d/emissive.png"))
 						//.specularMap(THREE.TextureLoader().load("models/mbl3d/specular.png"))
 						//.specular(0xffffff)//specular(0xffffff)// ff is for map ,11 is skin
@@ -482,6 +482,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						.side(THREE.DoubleSide)//for inside mouse
 						//.specular(1).shininess(1)
 						.map(mapTexture)
+						.aoMap(THREE.TextureLoader().load("/models/mbl3d/aomap.png"))
+						.aoMapIntensity(1)
 						//not good for low polygon,change geometry position
 						//.displacementMap(THREE.TextureLoader().load("models/mbl3d/tempdisplacement.png"))
 						//.displacementScale(0.05)
@@ -493,6 +495,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						//.map(THREE.TextureLoader().load("models/mbl3d/simpleeye2.png"))
 						);
 				
+				
 				String bumpUrl=GWTHTMLUtils.getInputValueById("bump", null);
 				if(bumpUrl!=null){
 					bodyMaterial.setBumpMap(THREE.TextureLoader().load(bumpUrl));
@@ -500,6 +503,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				}
 				
 				characterMesh = THREE.SkinnedMesh( geometry, bodyMaterial );
+				//aomap need second uvs,but what kind difference need?
+				characterMesh.getGeometry().getFaceVertexUvs().set(1, characterMesh.getGeometry().getFaceVertexUvs().get(0));
 				//LogUtils.log(characterMesh);
 				//characterMesh = THREE.SkinnedMesh( geometry, multiMaterials );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = THREE.SkinnedMesh( geometry, mat );//mesh = new THREE.SkinnedMesh( geometry, mat );
 				
