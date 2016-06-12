@@ -69,6 +69,7 @@ import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.lib.common.utils.CSVUtils;
+import com.akjava.lib.common.utils.ValuesUtils;
 import com.google.common.base.Stopwatch;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -482,8 +483,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						.side(THREE.DoubleSide)//for inside mouse
 						//.specular(1).shininess(1)
 						.map(mapTexture)
-						.aoMap(THREE.TextureLoader().load("/models/mbl3d/aomap.png"))
-						.aoMapIntensity(1)
+						
 						//not good for low polygon,change geometry position
 						//.displacementMap(THREE.TextureLoader().load("models/mbl3d/tempdisplacement.png"))
 						//.displacementScale(0.05)
@@ -494,12 +494,22 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						
 						//.map(THREE.TextureLoader().load("models/mbl3d/simpleeye2.png"))
 						);
+				String aoUrl=parameterFile("ao");
+				if(aoUrl!=null){
+					bodyMaterial.setAoMap(THREE.TextureLoader().load(aoUrl));
+					bodyMaterial.setAoMapIntensity(paramDouble("aoMapIntensity",1));
+				}
 				
-				
-				String bumpUrl=GWTHTMLUtils.getInputValueById("bump", null);
+				String bumpUrl=parameterFile("bump");
 				if(bumpUrl!=null){
 					bodyMaterial.setBumpMap(THREE.TextureLoader().load(bumpUrl));
-					bodyMaterial.setBumpScale(6);
+					bodyMaterial.setBumpScale(paramDouble("bumpScale",1));
+				}
+				
+				String displacementUrl=parameterFile("displacement");
+				if(displacementUrl!=null){
+					bodyMaterial.setDisplacementMap(THREE.TextureLoader().load(displacementUrl));
+					bodyMaterial.setDisplacementScale(paramDouble("displacementScale", 0.1));
 				}
 				
 				characterMesh = THREE.SkinnedMesh( geometry, bodyMaterial );
@@ -608,6 +618,14 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	return clothSimulator.getCannonControler();
 }
 
+	
+	public String parameterFile(String id){
+		double t=System.currentTimeMillis();
+		return GWTHTMLUtils.getInputValueById(id, null)+"?t="+t;
+	}
+	public double paramDouble(String id,double defaultValue){
+		return ValuesUtils.toDouble(GWTHTMLUtils.getInputValueById(id,null),defaultValue);
+	}
 	
 	
 	
