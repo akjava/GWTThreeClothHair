@@ -307,9 +307,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		
 		//setDebugAnimateCount(100);
-		final String modelUrl=GWTHTMLUtils.getInputValueById("model", "model11.json");
-		textureUrl=GWTHTMLUtils.getInputValueById("texture", "models/mbl3d/simpleeye-2kbluexxx-extendhead.png");
-		LogUtils.log("model-texture:"+modelUrl+","+textureUrl);
+		final String modelUrl=parameterFile("model");
+		textureUrl=parameterFile("texture");
+		LogUtils.log("model & texture:"+modelUrl+","+textureUrl);
 		
 		super.onInitializedThree();
 		setRightTopPopupWidth("360px");
@@ -417,10 +417,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 			@Override
 			public void loaded(Geometry geometry,JsArray<Material> m) {
-				/*
+				
 				int result=geometry.mergeVertices();//or seam line showing on texture
-				LogUtils.log(result);
-				 */
+				LogUtils.log("merge-vertex:"+result);
+				
 				
 				//materials=fixMaterial(materials);
 				
