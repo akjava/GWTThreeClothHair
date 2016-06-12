@@ -417,9 +417,14 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 			@Override
 			public void loaded(Geometry geometry,JsArray<Material> m) {
+				/*
+				int result=geometry.mergeVertices();//or seam line showing on texture
+				LogUtils.log(result);
+				 */
 				
 				//materials=fixMaterial(materials);
-				//becareful only has vertex,face,uvs
+				
+				//Be careful only has vertex,face,uvs
 				characterGeometry=geometry.clone();
 				
 				geometry.computeBoundingBox();
