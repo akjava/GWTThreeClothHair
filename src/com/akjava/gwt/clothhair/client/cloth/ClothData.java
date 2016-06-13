@@ -5,6 +5,7 @@ import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToNormal;
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
@@ -50,7 +51,9 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 	//LogUtils.log("g-size:"+clothGeometry.getVertices().length());
 	
 	
-	HairPinToNormal hairPinToNormal=new HairPinToNormal(mesh,true);
+	//SkinningVertex no need apply matrix,
+	HairPinToNormal hairPinToNormalFunction=new HairPinToNormal(mesh,false);
+	
 	
 	calculator=new SkinningVertexCalculator(mesh);
 	for(HairPin pin:hairData.getHairPins()){
@@ -64,7 +67,7 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 		//TODO add option
 		//if extend outside,extend-ratio
 		double extendRatio=hairData.isConnectHorizontal()?0.5:0;//right now connected use Cannon
-		Vector3 normal=hairPinToNormal.apply(pin);
+		Vector3 normal=hairPinToNormalFunction.apply(pin);
 		double distance=cloth.getRestDistance()/mesh.getScale().getX()*extendRatio;
 		Vector3 appendPos=normal.normalize().multiplyScalar(distance);
 		svertex.getVertex().add(appendPos);
