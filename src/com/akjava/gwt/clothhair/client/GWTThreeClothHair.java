@@ -306,6 +306,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		renderer.setClearColor(getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR, 0));
 		
 		
+		
 		//setDebugAnimateCount(100);
 		final String modelUrl=parameterFile("model");
 		textureUrl=parameterFile("texture");
@@ -353,7 +354,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 		
 		AmbientLight ambient = THREE.AmbientLight( 0x333333);//0xb7b7b7 );//var ambient = new THREE.AmbientLight( 0xffffff );
-		scene.add( ambient );
+		//scene.add( ambient );
 		
 		HemisphereLight hemiLight=THREE.HemisphereLight(0xffffff, 0xffffff,0.6);
 		
@@ -385,13 +386,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		int groundHex=getStorageControler().getValue(GWTThreeClothHairStorageKeys.KEY_GROUND_COLOR, 0x888888);
 		MeshPhongMaterial groundMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(groundHex).specular(0x111111)
 				.transparent(true).opacity(1)
-				.side(THREE.DoubleSide)
+				//.side(THREE.DoubleSide)
 				);
 		
 		groundMesh = THREE.Mesh( THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
 		groundMesh.getPosition().setY(GROUND);//mesh.position.y = -250;
 		groundMesh.getRotation().setX(- Math.PI / 2);//mesh.rotation.x = - Math.PI / 2;
-		groundMesh.setReceiveShadow(true);//mesh.receiveShadow = true;
+		groundMesh.setReceiveShadow(true);
 		scene.add( groundMesh );
 		
 		
@@ -539,6 +540,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				//mesh.getPosition().set( x, y - bb.getMin().getY() * s, z );//mesh.getPosition().set( x, y - bb.getMin().y * s, z );//mesh.getPosition().set( x, y - bb.getMin().y * s, z );//mesh.position.set( x, y - bb.min.y * s, z );
 				characterMesh.getPosition().set(x, y, z);
 				characterMesh.getScale().set( characterScale, characterScale, characterScale );//mesh.getScale().set( s, s, s );//mesh.getScale().set( s, s, s );//mesh.scale.set( s, s, s );
+				characterMesh.updateMatrixWorld();//ref later
+
+				characterMesh.setCastShadow(true);
+				//characterMesh.setReceiveShadow(true);
+				
 				scene.add( characterMesh );
 				
 				
@@ -588,6 +594,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				mixer=THREE.AnimationMixer(characterMesh);
 				
 				stats = Stats.insertStatsToRootPanel();
+				
+				//enable shadow
+				//enable shadow
+				renderer.getShadowMap().setEnabled(true);
+				
+				
+				
 			}
 			
 			

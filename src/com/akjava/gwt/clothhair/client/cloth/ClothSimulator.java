@@ -391,7 +391,7 @@ public class ClothSimulator  {
 			*/
 		
 		Mesh object = THREE.Mesh( data.getClothGeometry(), hairMaterial );
-		
+		object.setCastShadow(true);
 		//object.getPosition().set( 0, 0, 0 );
 		
 		scene.add( object );

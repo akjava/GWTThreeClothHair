@@ -315,6 +315,27 @@ public class LightDataPanel extends VerticalPanel{
 			LogUtils.log(light);
 		}else if(data.getType()==LightData.DIRECTIONAL){
 			light=THREE.DirectionalLight(data.getColor(),data.getIntensity());
+			light.setCastShadow(true);
+			
+			DirectionalLight dlight=light.cast();
+			
+			/*
+			 * if your shadow is dirty increse this.
+			 */
+			dlight.getShadow().getMapSize().set(2048, 2048);
+			
+			//if your shadow is dot ,default value is 5
+			int d = 2000;
+			dlight.gwtGetShadowCamera().setLeft(-d);
+			dlight.gwtGetShadowCamera().setRight(d);
+			dlight.gwtGetShadowCamera().setTop(d);
+			dlight.gwtGetShadowCamera().setBottom(-d);
+			
+			//default far is 500
+			//if nothing shadow,
+			dlight.gwtGetShadowCamera().setNear(10);
+			dlight.gwtGetShadowCamera().setFar(50000);
+			
 		}else if(data.getType()==LightData.HEMISPHERE){
 			light=THREE.HemisphereLight(data.getColor(), data.getColor2(), data.getIntensity());;
 		}
