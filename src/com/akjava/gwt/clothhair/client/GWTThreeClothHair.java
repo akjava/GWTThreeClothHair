@@ -31,6 +31,7 @@ import com.akjava.gwt.three.client.gwt.core.BoundingBox;
 import com.akjava.gwt.three.client.gwt.core.Intersect;
 import com.akjava.gwt.three.client.gwt.math.HSL;
 import com.akjava.gwt.three.client.gwt.renderers.WebGLRendererParameter;
+import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.java.utils.Mbl3dLoader;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.animation.AnimationClip;
@@ -489,7 +490,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 						.side(THREE.DoubleSide)//for inside mouse
 						//.specular(1).shininess(1)
 						.map(mapTexture)
-						
+						//.wireframe(true)//TODO move basic
 						//not good for low polygon,change geometry position
 						//.displacementMap(THREE.TextureLoader().load("models/mbl3d/tempdisplacement.png"))
 						//.displacementScale(0.05)
@@ -785,7 +786,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			Face3 face=characterMesh.getGeometry().getFaces().get(faceIndex);
 			int vertexIndex=face.gwtGet(vertexOfFaceIndex);
 			
+			
+			
 			Vector3 selection=characterMesh.getGeometry().getVertices().get(vertexIndex);
+			
+			LogUtils.log(vertexIndex+","+ThreeLog.get(selection));
 			
 			//make lines
 			double size=48;
