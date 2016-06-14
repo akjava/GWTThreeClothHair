@@ -790,7 +790,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			
 			Vector3 selection=characterMesh.getGeometry().getVertices().get(vertexIndex);
 			
-			LogUtils.log(vertexIndex+","+ThreeLog.get(selection));
+			//TODO log switch
+			//LogUtils.log(vertexIndex+","+ThreeLog.get(selection));
 			
 			//make lines
 			double size=48;
