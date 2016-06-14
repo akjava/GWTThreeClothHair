@@ -509,7 +509,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				
 				String bumpUrl=parameterFile("bump");
 				if(bumpUrl!=null){
-					bodyMaterial.setBumpMap(THREE.TextureLoader().load(bumpUrl));
+					Texture texture=THREE.TextureLoader().load(bumpUrl);
+					texture.setMinFilter(THREE.NearestFilter);//make problem
+					bodyMaterial.setBumpMap(texture);
 					bodyMaterial.setBumpScale(paramDouble("bumpScale",1));
 				}
 				
