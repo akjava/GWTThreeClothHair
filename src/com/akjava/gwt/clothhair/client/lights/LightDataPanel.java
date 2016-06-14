@@ -310,24 +310,9 @@ public class LightDataPanel extends VerticalPanel{
 		storeData();
 	}
 	public void onDataAdded(LightData data){
-		Light light=null;
-		if(data.getType()==LightData.AMBIENT){
-			light=THREE.AmbientLight(data.getColor(),data.getIntensity());
-			LogUtils.log(light);
-		}else if(data.getType()==LightData.DIRECTIONAL){
-			light=THREE.DirectionalLight(data.getColor(),data.getIntensity());
-			//TODO fix scale based shadow
-			updateCastShadow(data,(DirectionalLight)light.cast());
-			
-		}else if(data.getType()==LightData.HEMISPHERE){
-			light=THREE.HemisphereLight(data.getColor(), data.getColor2(), data.getIntensity());;
-		}
-		light.setName(data.getName());
-		light.getPosition().copy(data.getPosition());
-		//TODO set position
-		GWTThreeClothHair.INSTANCE.getScene().add(light);
 		
-		data.setLight(light);
+		LightUtils.addLight(GWTThreeClothHair.INSTANCE.getScene(), data);
+		
 	}
 	
 	public boolean sameType(int type,String typeString){
@@ -366,7 +351,7 @@ public class LightDataPanel extends VerticalPanel{
 			light.getColor().setHex(data.getColor());
 			light.getPosition().copy(data.getPosition());//no effect
 			
-			LogUtils.log(light);
+			
 			
 		}else if(data.getType()==LightData.DIRECTIONAL){
 			DirectionalLight light=data.getLight().cast();
@@ -375,7 +360,7 @@ public class LightDataPanel extends VerticalPanel{
 			light.getColor().setHex(data.getColor());
 			light.getPosition().copy(data.getPosition());
 			
-			updateCastShadow(data,light);
+			LightUtils.updateCastShadow(data,light);
 			
 		}else if(data.getType()==LightData.HEMISPHERE){
 			HemisphereLight light=data.getLight().cast();
@@ -387,33 +372,6 @@ public class LightDataPanel extends VerticalPanel{
 		}
 	}
 	
-	private void updateCastShadow(LightData data,DirectionalLight light){
-		if(data.isCastShadow()){
-			light.setCastShadow(true);
-			
-			DirectionalLight dlight=light.cast();
-			
-			/*
-			 * if your shadow is dirty increse this.
-			 */
-			dlight.getShadow().getMapSize().set(2048, 2048);
-			
-			//if your shadow is dot ,default value is 5
-			int d = 2000;
-			dlight.gwtGetShadowCamera().setLeft(-d);
-			dlight.gwtGetShadowCamera().setRight(d);
-			dlight.gwtGetShadowCamera().setTop(d);
-			dlight.gwtGetShadowCamera().setBottom(-d);
-			
-			//default far is 500
-			//if nothing shadow,
-			dlight.gwtGetShadowCamera().setNear(10);
-			dlight.gwtGetShadowCamera().setFar(50000);
-			}
-		else{
-			light.setCastShadow(false);
-		}
-	}
 	
 	public void updateData(LightData data){
 		storeData();
