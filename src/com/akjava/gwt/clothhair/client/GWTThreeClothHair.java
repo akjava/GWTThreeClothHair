@@ -1204,12 +1204,22 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			mixer.uncacheClip(clip);//reset can cache
 			mixer.clipAction(clip).play();
 			initMorph();
-			if(facialAnimation && facialAnimationClip!=null){
-				mixer.uncacheClip(facialAnimationClip);//same name cache that.
-				mixer.clipAction(facialAnimationClip).play();
-			}
+			playFacialAnimation(facialAnimation);
 		}
 	
+		private double facialAnimationTime=-1;//default -1 auto
+		public double getFacialAnimationTime() {
+			return facialAnimationTime;
+		}
+		public void setFacialAnimationTime(double facialAnimationTime) {
+			this.facialAnimationTime = facialAnimationTime;
+		}
+		private void playFacialAnimation(boolean facialAnimation) {
+			if(facialAnimation && facialAnimationClip!=null){
+				mixer.uncacheClip(facialAnimationClip);//same name cache that.
+				mixer.clipAction(facialAnimationClip).setDuration(facialAnimationTime).play();
+			}
+		}
 		public void startAnimation(int boneIndex,double x,double y,double z){
 			startAnimation(boneIndex,x,y,z,true,true);
 		}
@@ -1339,12 +1349,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		mixer.clipAction(clip).play();
 		
 		initMorph();
-		if(facialAnimation && facialAnimationClip!=null){
-			
-			
-			mixer.uncacheClip(facialAnimationClip);//same name cache that.
-			mixer.clipAction(facialAnimationClip).play();
-		}
+		playFacialAnimation(facialAnimation);
 	}
 	
 	//TODO make method
