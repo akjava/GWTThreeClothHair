@@ -129,6 +129,9 @@ public class HairDataPanel extends VerticalPanel{
 						ImageDataUtils.putImageData(data, canvas);
 						LogUtils.log("putData:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						Texture texture=THREE.TextureLoader().load(canvas.toDataUrl());
+						texture.setMinFilter(THREE.NearestFilter);
+						//Window.open(canvas.toDataUrl(), "test", null);
+						
 						LogUtils.log("make texture:"+watch.elapsed(TimeUnit.MILLISECONDS));watch.reset();watch.start();
 						//texture.setFlipY(false);
 						GWTThreeClothHair.INSTANCE.getBodyMaterial().setMap(texture);
