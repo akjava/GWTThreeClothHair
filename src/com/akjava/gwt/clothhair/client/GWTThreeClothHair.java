@@ -392,7 +392,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		groundMesh = THREE.Mesh( THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
 		groundMesh.getPosition().setY(GROUND);//mesh.position.y = -250;
 		groundMesh.getRotation().setX(- Math.PI / 2);//mesh.rotation.x = - Math.PI / 2;
-		groundMesh.setReceiveShadow(true);
+		groundMesh.setReceiveShadow(true);//set here,TODO solve after enable shadow
 		scene.add( groundMesh );
 		
 		
@@ -1130,6 +1130,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 
 
+	public Mesh getCharacterMesh() {
+		return characterMesh;
+	}
 	
 	public Mesh getGroundMesh() {
 		return groundMesh;

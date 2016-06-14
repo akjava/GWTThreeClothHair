@@ -5,15 +5,23 @@ import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToNormal;
-import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.math.Vector3;
+import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 
 public class ClothData {
 private HairCloth cloth;
+private Mesh clothMesh;
+
+public Mesh getClothMesh() {
+	return clothMesh;
+}
+public void setClothMesh(Mesh clothMesh) {
+	this.clothMesh = clothMesh;
+}
 public HairCloth getCloth() {
 	return cloth;
 }

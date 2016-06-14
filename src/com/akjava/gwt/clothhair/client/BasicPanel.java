@@ -8,6 +8,8 @@ import com.akjava.gwt.lib.client.experimental.ImageDataUtils;
 import com.akjava.gwt.lib.client.experimental.ImageDataUtils.RGBColorFilter;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.core.Object3D;
+import com.akjava.gwt.three.client.js.lights.DirectionalLight;
 import com.akjava.gwt.three.client.js.loaders.ImageLoader.ImageLoadHandler;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.textures.Texture;
@@ -63,6 +65,46 @@ public class BasicPanel extends VerticalPanel{
 		groundCheck.setValue(true);
 		h1.add(groundCheck);
 		groundCheck.setValue(false,true);
+		
+		CheckBox shadowCheck=new CheckBox("Shadow");
+		shadowCheck.setValue(true);
+		shadowCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				GWTThreeClothHair.INSTANCE.getRenderer().getShadowMap().setEnabled(event.getValue());
+				
+				for(int i=0;i<GWTThreeClothHair.INSTANCE.getScene().getChildren().length();i++){
+				Object3D children=GWTThreeClothHair.INSTANCE.getScene().getChildren().get(i);
+				if(children.getType().equals("DirectionalLight")){
+					DirectionalLight light=children.cast();
+					GWTThreeClothHair.INSTANCE.getRenderer().clearTarget(light.getShadow().getMap());
+					}
+				
+				}
+				
+			}
+		});
+		h1.add(shadowCheck);
+		
+		/*
+		 * faild how to control
+		 */
+		CheckBox receiveShadowCheck=new CheckBox("S-Receive");
+		receiveShadowCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				GWTThreeClothHair.INSTANCE.getGroundMesh().setReceiveShadow(event.getValue());
+				GWTThreeClothHair.INSTANCE.getScene().remove(GWTThreeClothHair.INSTANCE.getGroundMesh());
+				GWTThreeClothHair.INSTANCE.getScene().add(GWTThreeClothHair.INSTANCE.getGroundMesh());
+				
+				GWTThreeClothHair.INSTANCE.getCharacterMesh().setReceiveShadow(event.getValue());
+				GWTThreeClothHair.INSTANCE.getClothSimulator().setReceiveShadow(event.getValue());
+			}
+		});
+		//h1.add(receiveShadowCheck);
+		receiveShadowCheck.setTitle("receive shadow self");
 		
 		this.add(new HTML("<h4>Camera</h4>"));
 		LabeledInputRangeWidget2 near=new LabeledInputRangeWidget2("near", 0.1, 100, 0.1);

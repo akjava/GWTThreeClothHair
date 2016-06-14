@@ -390,13 +390,16 @@ public class ClothSimulator  {
 				);
 			*/
 		
-		Mesh object = THREE.Mesh( data.getClothGeometry(), hairMaterial );
-		object.setCastShadow(true);
+		Mesh clothMesh = THREE.Mesh( data.getClothGeometry(), hairMaterial );
+		clothMesh.setCastShadow(true);
+		clothMesh.setReceiveShadow(receiveShadow);
 		//object.getPosition().set( 0, 0, 0 );
 		
-		scene.add( object );
+		data.setClothMesh(clothMesh);
 		
-		HairMixedData cellData=new HairMixedData(hairData,data,object);
+		scene.add( clothMesh );
+		
+		HairMixedData cellData=new HairMixedData(hairData,data,clothMesh);
 		
 		
 		//temporaly
@@ -776,6 +779,21 @@ public class ClothSimulator  {
 		
 		
 		
+	}
+	private boolean receiveShadow;//for new addition
+	public boolean isReceiveShadow() {
+		return receiveShadow;
+	}
+
+	/*
+	 * right now not working,i'don't know how to change this later.
+	 */
+	public void setReceiveShadow(boolean value) {
+		receiveShadow=value;
+		//replace exists
+		for(ClothData data:clothControler.getCloths()){
+			data.getClothMesh().setReceiveShadow(value);
+		}
 	}
 
 }
