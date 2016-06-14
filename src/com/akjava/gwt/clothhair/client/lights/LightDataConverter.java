@@ -26,6 +26,7 @@ public class LightDataConverter extends Converter<LightData,String>{
 			if(data.getPosition()!=null){
 				list.add(data.getPosition().getX()+":"+data.getPosition().getY()+":"+data.getPosition().getZ());
 			}
+			list.add(String.valueOf(data.isCastShadow()));
 		}
 		return Joiner.on(",").join(list);
 	}
@@ -56,6 +57,9 @@ public class LightDataConverter extends Converter<LightData,String>{
 			if(pos.length>2){
 				data.getPosition().set(ValuesUtils.toDouble(pos[0], 0), ValuesUtils.toDouble(pos[1], 0), ValuesUtils.toDouble(pos[2], 0));
 			}
+		}
+		if(list.size()>6){
+			data.setCastShadow(ValuesUtils.toBoolean(list.get(6),false));
 		}
 		
 		return data;

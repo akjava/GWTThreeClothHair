@@ -41,6 +41,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -315,26 +316,8 @@ public class LightDataPanel extends VerticalPanel{
 			LogUtils.log(light);
 		}else if(data.getType()==LightData.DIRECTIONAL){
 			light=THREE.DirectionalLight(data.getColor(),data.getIntensity());
-			light.setCastShadow(true);
-			
-			DirectionalLight dlight=light.cast();
-			
-			/*
-			 * if your shadow is dirty increse this.
-			 */
-			dlight.getShadow().getMapSize().set(2048, 2048);
-			
-			//if your shadow is dot ,default value is 5
-			int d = 2000;
-			dlight.gwtGetShadowCamera().setLeft(-d);
-			dlight.gwtGetShadowCamera().setRight(d);
-			dlight.gwtGetShadowCamera().setTop(d);
-			dlight.gwtGetShadowCamera().setBottom(-d);
-			
-			//default far is 500
-			//if nothing shadow,
-			dlight.gwtGetShadowCamera().setNear(10);
-			dlight.gwtGetShadowCamera().setFar(50000);
+			//TODO fix scale based shadow
+			updateCastShadow(data,(DirectionalLight)light.cast());
 			
 		}else if(data.getType()==LightData.HEMISPHERE){
 			light=THREE.HemisphereLight(data.getColor(), data.getColor2(), data.getIntensity());;
@@ -392,6 +375,7 @@ public class LightDataPanel extends VerticalPanel{
 			light.getColor().setHex(data.getColor());
 			light.getPosition().copy(data.getPosition());
 			
+			updateCastShadow(data,light);
 			
 		}else if(data.getType()==LightData.HEMISPHERE){
 			HemisphereLight light=data.getLight().cast();
@@ -400,6 +384,34 @@ public class LightDataPanel extends VerticalPanel{
 			light.getColor().setHex(data.getColor());
 			light.getGroundColor().setHex(data.getColor2());
 			light.getPosition().copy(data.getPosition());
+		}
+	}
+	
+	private void updateCastShadow(LightData data,DirectionalLight light){
+		if(data.isCastShadow()){
+			light.setCastShadow(true);
+			
+			DirectionalLight dlight=light.cast();
+			
+			/*
+			 * if your shadow is dirty increse this.
+			 */
+			dlight.getShadow().getMapSize().set(2048, 2048);
+			
+			//if your shadow is dot ,default value is 5
+			int d = 2000;
+			dlight.gwtGetShadowCamera().setLeft(-d);
+			dlight.gwtGetShadowCamera().setRight(d);
+			dlight.gwtGetShadowCamera().setTop(d);
+			dlight.gwtGetShadowCamera().setBottom(-d);
+			
+			//default far is 500
+			//if nothing shadow,
+			dlight.gwtGetShadowCamera().setNear(10);
+			dlight.gwtGetShadowCamera().setFar(50000);
+			}
+		else{
+			light.setCastShadow(false);
 		}
 	}
 	
@@ -420,7 +432,7 @@ public class LightDataPanel extends VerticalPanel{
 		private ColorBox color2Editor;
 		private LabeledInputRangeWidget2 intensityEditor;
 		private SimpleVector3Editor positionEditor;
-		
+		private CheckBox castShadowEditor;
 		public LightData getValue() {
 			return value;
 		}
@@ -492,6 +504,16 @@ public class LightDataPanel extends VerticalPanel{
 				});
 				add(intensityEditor);
 				
+				
+				castShadowEditor=new CheckBox("cast shadow");
+				castShadowEditor.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+					@Override
+					public void onValueChange(ValueChangeEvent<Boolean> event) {
+						flush();
+					}
+				});
+				add(castShadowEditor);
+				
 				//TODO make vector3editor
 				
 				positionEditor = new SimpleVector3Editor(new SimpleVector3EditorListener() {
@@ -522,6 +544,7 @@ public class LightDataPanel extends VerticalPanel{
 				value.setColor2(ColorUtils.toColor(color2Editor.getValue()));
 				value.setIntensity(intensityEditor.getValue());
 
+				value.setCastShadow(castShadowEditor.getValue());
 				//position value's value already linked no need
 				
 				updateData(value);
@@ -544,6 +567,7 @@ public class LightDataPanel extends VerticalPanel{
 					//color2Editor.setEnabled(false);
 					intensityEditor.setEnabled(false);
 
+					castShadowEditor.setEnabled(false);
 					
 					return;
 				}else{
@@ -553,7 +577,7 @@ public class LightDataPanel extends VerticalPanel{
 					//colorEditor.setEnabled(true);
 					//color2Editor.setEnabled(true);
 					intensityEditor.setEnabled(true);
-
+					castShadowEditor.setEnabled(true);
 				}
 				
 				typeEditor.setSelectedIndex(value.getType());
@@ -561,6 +585,7 @@ public class LightDataPanel extends VerticalPanel{
 				colorEditor.setValue(ColorUtils.toCssColor(value.getColor()));
 				color2Editor.setValue(ColorUtils.toCssColor(value.getColor2()));
 				intensityEditor.setValue(value.getIntensity());
+				castShadowEditor.setValue(value.isCastShadow());
 				
 				positionEditor.setValue(value.getPosition());
 

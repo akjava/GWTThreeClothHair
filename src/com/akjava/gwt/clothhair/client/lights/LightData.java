@@ -61,4 +61,12 @@ private int color;
 private int color2;
 private double intensity;
 private Vector3 position=THREE.Vector3();
+private boolean castShadow;
+
+public boolean isCastShadow() {
+	return castShadow;
+}
+public void setCastShadow(boolean castShadow) {
+	this.castShadow = castShadow;
+}
 }
