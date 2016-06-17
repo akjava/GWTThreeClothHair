@@ -1,5 +1,6 @@
 package com.akjava.gwt.clothhair.client.lights;
 
+import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -7,14 +8,22 @@ import com.google.gwt.user.client.ui.DoubleBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 
+/**
+ * @deprecated moved to three core
+ * @author aki
+ *
+ */
 public class SimpleVector3Editor extends HorizontalPanel {
-	private Vector3 value;
+	private Vector3 value=THREE.Vector3();
 	private DoubleBox xEditor;
 	private DoubleBox yEditor;
 	private DoubleBox zEditor;
 	public Vector3 getValue() {
 		return value;
 	}
+	
+
+	
 	public void setValue(Vector3 value) {
 		this.value = value;
 		if(value==null){
