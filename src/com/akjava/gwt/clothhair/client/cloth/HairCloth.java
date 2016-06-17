@@ -913,9 +913,13 @@ public class HairCloth {
 				.withMaterial(simulator.getCannonControler().getClothMaterial())
 		
 				);
+		double s=restDistance/1000/2;
+		
+		//so so work,maybe slow
+		particle.addShape(CANNON.newSphere(s));
 		//seems impossible
-		//particle.addShape(CANNON.newSphere(restDistance/100));
-		particle.addShape(CANNON.newParticle());
+		//particle.addShape(CANNON.newBox(CANNON.newVec3(s, s, s)));
+		//particle.addShape(CANNON.newParticle());
 		
 		
 		//this seems works when extremly dynamic movement
