@@ -10,6 +10,7 @@ import com.akjava.gwt.clothhair.client.GWTThreeClothHair.SphereCalculatorAndMesh
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
+import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler;
 import com.akjava.gwt.clothhair.client.cannon.CannonControler;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairPinPredicates;
@@ -47,6 +48,11 @@ import com.google.gwt.event.dom.client.ErrorEvent;
 
 public class ClothSimulator  {
 	private CannonControler cannonControler;
+	private AmmoHairControler ammoHairControler;
+	public AmmoHairControler getAmmoHairControler() {
+		return ammoHairControler;
+	}
+
 	private Scene scene;
 	private SkinnedMesh characterMesh;
 	public SkinnedMesh getCharacterMesh() {
@@ -63,6 +69,7 @@ public class ClothSimulator  {
 		this.characterMesh=characterMesh;
 		clothControler=new ClothControler();
 		cannonControler=new CannonControler();
+		ammoHairControler=new AmmoHairControler(scene);
 		
 		ballGeo = THREE.SphereGeometry( 1, 20, 20 );
 		
@@ -108,6 +115,10 @@ public class ClothSimulator  {
 			int iteration=1; //iteration totally kill fps,but reduce shaking
 			for(int i=0;i<iteration;i++)
 			cannonControler.getWorld().step(1.0/60);
+		}
+		
+		if(ammoHairControler.isEnabled()){
+			ammoHairControler.getAmmoControler().update();
 		}
 		
 		
