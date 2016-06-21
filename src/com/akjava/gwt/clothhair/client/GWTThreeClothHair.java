@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
+import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler;
 import com.akjava.gwt.clothhair.client.cannon.CannonControler;
 import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
@@ -31,7 +32,6 @@ import com.akjava.gwt.three.client.gwt.core.BoundingBox;
 import com.akjava.gwt.three.client.gwt.core.Intersect;
 import com.akjava.gwt.three.client.gwt.math.HSL;
 import com.akjava.gwt.three.client.gwt.renderers.WebGLRendererParameter;
-import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.java.utils.Mbl3dLoader;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.animation.AnimationClip;
@@ -86,7 +86,6 @@ import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Panel;
@@ -301,6 +300,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		INSTANCE=this;//must be first
 		clock=THREE.Clock();
 		clothSimulator=new ClothSimulator(scene,null);
+		clothSimulator.getCannonControler().setStopped(true);//temporaly stop
 		
 		LogUtils.log("clear-color:"+getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR, 0));
 		
@@ -635,6 +635,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 
 
+	public AmmoHairControler getAmmoControler() {
+	return clothSimulator.getAmmoHairControler();
+}
+	
 	public CannonControler getCannonControler() {
 	return clothSimulator.getCannonControler();
 }

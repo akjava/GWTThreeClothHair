@@ -25,6 +25,7 @@
 	<inherits name="com.akjava.gwt.html5.Html5widget" />
 	 <inherits name='com.akjava.gwt.jszip.GWTJSZip'/>
 	   <inherits name='com.github.gwtcannonjs.Core'/>
+	   <inherits name="com.akjava.gwt.threeammo.ThreeAmmo"/>
   <!-- Specify the app entry point class.                         -->
   <entry-point class='com.akjava.gwt.clothhair.client.GWTThreeClothHair'/>
 

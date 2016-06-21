@@ -763,7 +763,10 @@ private void clearAllPoints(){
 		GWTThreeClothHair.INSTANCE.getClothControler().removeClothData(data.getClothData());
 		cellObjects.removeItem(data);
 		//remove physics data
-		GWTThreeClothHair.INSTANCE.getCannonControler().removeParticleData(data.getClothData().getCloth());
+		
+		GWTThreeClothHair.INSTANCE.getAmmoControler()
+		//GWTThreeClothHair.INSTANCE.getCannonControler()
+		.removeParticleData(data.getClothData().getCloth());
 		
 		
 		//no need to sphere data

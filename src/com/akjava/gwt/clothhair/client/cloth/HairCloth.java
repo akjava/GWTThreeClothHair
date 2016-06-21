@@ -10,7 +10,9 @@ import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataUtils;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
+import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
@@ -19,8 +21,13 @@ import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.threeammo.client.AmmoUtils;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
+import com.akjava.gwt.threeammo.client.ConstraintAndMesh;
+import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
+import com.akjava.gwt.threeammo.client.SphereBodyAndMesh;
+import com.akjava.gwt.threeammo.client.ThreeAmmoControler;
 import com.akjava.gwt.threeammo.client.core.Ammo;
-import com.akjava.gwt.threeammo.client.core.btRigidBody;
+import com.akjava.gwt.threeammo.client.core.btGeneric6DofSpringConstraint;
+import com.akjava.gwt.threeammo.client.core.btTransform;
 import com.github.gwtcannonjs.client.CANNON;
 import com.github.gwtcannonjs.client.constraints.DistanceConstraint;
 import com.github.gwtcannonjs.client.math.Vec3;
@@ -725,12 +732,18 @@ public class HairCloth {
 		//made cannon object or sync cannon-object position
 	}
 	
+	//TODO allow editor?
+	int connectedEngine=PHYSICS_AMMO;
+	int noconnectedEngine=PHYSICS_CLOTH;
+	
 	//call after simulate
 	public void afterSimulate(ClothSimulator simulator,double time,Geometry clothGeometry,List<Mesh> spheres) {
 		//simulate by group means,no grouping support yet
 		//not support Wind yet
 		if(isConnectHorizontal()){
-			physicsMode=PHYSICS_AMMO;
+			physicsMode=connectedEngine;
+		}else{
+			physicsMode=noconnectedEngine;
 		}
 		
 		if(physicsMode==PHYSICS_CLOTH){
@@ -745,11 +758,16 @@ public class HairCloth {
 		}
 		
 	}
-	
-
+	 double ammoMultipleScalar=0.2;//1;//0.1;//should be small,0.1 seems good,but need modify-function
+	 //double ammoMultipleScalar=1;
+	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
+	 private boolean visibleDummy=false;
+	 
 	private void simulateAmmo(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
 
 		//default simulate cannon
+		
+		
 		
 		Stopwatch watch=Stopwatch.createStarted();
 		
@@ -757,8 +775,8 @@ public class HairCloth {
 		if(!simulator.getAmmoHairControler().isExistSphereData(channel)){
 			needInitSphere=true;
 		}else{
-		AmmoHairControler.SphereBodyData cannonSpheres=simulator.getAmmoHairControler().getSphereData(channel);
-		if(spheres.size()!=cannonSpheres.getAmmoSpheres().size()){
+		AmmoHairControler.SphereBodyData ammoSpheres=simulator.getAmmoHairControler().getSphereData(channel);
+		if(spheres.size()!=ammoSpheres.getAmmoSpheres().size()){
 			needInitSphere=true;
 			simulator.getAmmoHairControler().removeSphereData(channel);
 			}
@@ -767,11 +785,11 @@ public class HairCloth {
 		
 		
 		if(needInitSphere){
-			List<BodyAndMesh> cannonSpheres=Lists.newArrayList();
+			List<SphereBodyAndMesh> cannonSpheres=Lists.newArrayList();
 			for(int i=0;i<spheres.size();i++){
 				//seems no need sphere
 				Mesh sphereMesh=spheres.get(i);
-				BodyAndMesh body=createAmmoSphereBody(simulator,sphereMesh.getPosition().clone().divideScalar(1000),sphereMesh.getScale().getX()/1000);
+				SphereBodyAndMesh body=createAmmoSphereBody(simulator,sphereMesh.getPosition().clone().multiplyScalar(ammoMultipleScalar),sphereMesh.getScale().getX()*ammoMultipleScalar);
 				cannonSpheres.add(body);	
 			}
 			
@@ -779,32 +797,42 @@ public class HairCloth {
 			
 		}else{
 			AmmoHairControler.SphereBodyData data=simulator.getAmmoHairControler().getSphereData(channel);
-			List<BodyAndMesh> cannonSpheres=data.getAmmoSpheres();
+			List<SphereBodyAndMesh> cannonSpheres=data.getAmmoSpheres();
 			for(int i=0;i<spheres.size();i++){
 				//TODO modify divided size
-				Vector3 threePos=spheres.get(i).getPosition().clone().divideScalar(1000);
+				Vector3 threePos=spheres.get(i).getPosition().clone().multiplyScalar(ammoMultipleScalar);
 				cannonSpheres.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
-				double radius=spheres.get(i).getScale().getX()/1000;
-				cannonSpheres.get(i).getBody().
-				for(int j=0;j<cannonSpheres.get(i).getShapes().length();j++){
-					Sphere sphere=cannonSpheres.get(i).getShapes().get(j).cast();
-					sphere.setRadius(radius);
+				cannonSpheres.get(i).getMesh().getPosition().copy(threePos);//for when resize
+				//ThreeLog.log("sphere-position-updated:"+i,threePos);
+				double radius=spheres.get(i).getScale().getX()*ammoMultipleScalar;
+				
+				if(!isSame(4,radius,cannonSpheres.get(i).getRadius())){
+					//resize it costly
+					LogUtils.log("sphere different-size-recreate:"+radius+","+cannonSpheres.get(i).getRadius());
+					simulator.getAmmoHairControler().getAmmoControler().setRadiusWithRecreate(radius, cannonSpheres.get(i));
 				}
+				
+				
 				//cannonSpheres.get(i).set
 				//sadly not support size yet
 			}
 		}
 		
-		if(!simulator.getAmmoHairControler.isExistParticleData(this)){
+		if(!simulator.getAmmoHairControler().isExistParticleData(this)){
 			
+			List<BodyAndMesh> cannonParticles=Lists.newArrayList();
 			
-			JsArray<Body> cannonParticles=JavaScriptUtils.createJSArray();
-			JsArray<DistanceConstraint> cannonConstraints=JavaScriptUtils.createJSArray();
 			for(int i=0;i<particles.size();i++){
 				Particle particle=particles.get(i);
 				int v=i/(w+1);
 				//this effect small,TODO more check
-				double baseMass=1;//this is very important
+				double baseMass=1;//not so effect
+				
+				
+				if(v==h){
+					baseMass*=100;// no effect
+				}
+				
 				
 				/*
 				 * trid last one is heavy,but not so good
@@ -825,35 +853,54 @@ public class HairCloth {
 				}
 				*/
 				
-				Body p=createParticle(simulator,particle.getOriginal().clone().divideScalar(1000), mass);
-				cannonParticles.push(p);
+				BodyAndMesh p=createAmmoParticle(simulator,particle.getOriginal().clone().multiplyScalar(ammoMultipleScalar), mass);
+				cannonParticles.add(p);
 			}
 			
+			//make constraint
+
+			JsArray<btGeneric6DofSpringConstraint> cannonConstraints=JavaScriptUtils.createJSArray();
 			
+			ThreeAmmoControler controler=simulator.getAmmoHairControler().getAmmoControler();
+			btTransform transform1=controler.makeTransform();
+			btTransform transform2=controler.makeTransform();
 			for(int i=0;i<constrains.size();i++){
 				Constrain con=constrains.get(i);
 				int p1=particles.indexOf(con.p1);
 				int p2=particles.indexOf(con.p2);
-				//max force is no effect?.at least set 1 or Too gravity.
-				cannonConstraints.push(CANNON.newDistanceConstraint(cannonParticles.get(p1),cannonParticles.get(p2),con.distance/1000));
+				
+				BodyAndMesh bm1=cannonParticles.get(p1);
+				BodyAndMesh bm2=cannonParticles.get(p2);
+				
+				//already multiple when created
+				Vector3 pos1=bm1.getMesh().getPosition();//.multiplyScalar(ammoMultipleScalar);
+				Vector3 pos2=bm2.getMesh().getPosition();//.multiplyScalar(ammoMultipleScalar);
+				
+				DistanceConstraintProperties distanceConstraintProperties=simulator.getAmmoHairControler().getConstraintProperties();
+				
+				//not using distance here.
+				
+				distanceConstraintProperties.updateFrameInA(transform1, pos1, pos2);
+				distanceConstraintProperties.updateFrameInB(transform2, pos1, pos2);
+				
+				ConstraintAndMesh constraintAndMesh=simulator.getAmmoHairControler().getAmmoControler().createGeneric6DofSpringConstraintConstraint(bm1.getBody(), bm2.getBody(), transform1, transform2, distanceConstraintProperties.isDisableCollisionsBetweenLinkedBodies());
+				
+				cannonConstraints.push(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint());
 			}
 			
-			
-			
-			
-			simulator.getAmmoHairControler.setParticleData(this, new ParticleBodyData(cannonParticles,cannonConstraints));
+			simulator.getAmmoHairControler().setParticleData(this, new AmmoHairControler.ParticleBodyDatas(cannonParticles,cannonConstraints));
 		}else{
-			ParticleBodyData data=simulator.getAmmoHairControler.getCannonData(this);
-			JsArray<Body> cannonParticles=data.getCannonParticles();
+			AmmoHairControler.ParticleBodyDatas data=simulator.getAmmoHairControler().getAmmoData(this);
+			List<BodyAndMesh> cannonParticles=data.getAmmoParticles();
 			
 			//basically never changed length
-			for(int i=0;i<cannonParticles.length();i++){
+			for(int i=0;i<cannonParticles.size();i++){
 				if(isPinned(i)){
-					Vector3 threePos=particles.get(i).getOriginal().clone().divideScalar(1000);
-					cannonParticles.get(i).getPosition().set(threePos.getX(),threePos.getY(),threePos.getZ());
+					Vector3 threePos=particles.get(i).getOriginal().clone().multiplyScalar(ammoMultipleScalar);
+					cannonParticles.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
 				}else{
-					Vec3 cannonPos=cannonParticles.get(i).getPosition();
-					particles.get(i).position.set(cannonPos.getX(),cannonPos.getY(),cannonPos.getZ()).multiplyScalar(1000);
+					Vector3 ammoPos=cannonParticles.get(i).getBody().getPosition();
+					particles.get(i).position.copy(ammoPos).divideScalar(ammoMultipleScalar);
 				}
 			}
 			
@@ -864,6 +911,10 @@ public class HairCloth {
 		
 		
 	}
+	
+	public native final boolean isSame(int c,double value1,double value2)/*-{
+	return value1.toFixed(c)==value2.toFixed(c);
+	}-*/;
 
 	private void simulateCannon(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
 
@@ -879,6 +930,7 @@ public class HairCloth {
 		if(spheres.size()!=cannonSpheres.getCannonSpheres().length()){
 			needInitSphere=true;
 			simulator.getCannonControler().removeSphereData(channel);
+			
 			}
 			
 		}
@@ -920,6 +972,8 @@ public class HairCloth {
 				int v=i/(w+1);
 				//this effect small,TODO more check
 				double baseMass=1;//this is very important
+				
+				
 				
 				/*
 				 * trid last one is heavy,but not so good
@@ -1037,18 +1091,35 @@ public class HairCloth {
 		
 	}
 	
-	protected BodyAndMesh createAmmoSphereBody(ClothSimulator simulator,Vector3 position, double size) {
+	
+	protected SphereBodyAndMesh createAmmoSphereBody(ClothSimulator simulator,Vector3 position, double size) {
 		
-		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0xff0000));//dummy
 		
-		BodyAndMesh body=BodyAndMesh.createSphere(size, 0, position.getX(),position.getY(),position.getZ(),material);
-		AmmoUtils.setBodyMaterial(body.getBody(),simulator.getAmmoHairControler().getSpherehMaterial());
+		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0xff0000).visible(visibleDummy));//dummy
+		
+		SphereBodyAndMesh body=BodyAndMesh.createSphere(size, 0, position.getX(),position.getY(),position.getZ(),material);
+		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getSpherehProperties());
 		body.getBody().setActivationState(Ammo.DISABLE_DEACTIVATION);
 		
 		return body;
 		
 	}
 
+	private BodyAndMesh createAmmoParticle(ClothSimulator simulator,Vector3 p,double mass){
+		double s=restDistance*ammoMultipleScalar/2;
+		
+		
+		
+		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x008800).visible(visibleDummy));//dummy
+		
+		SphereBodyAndMesh body=BodyAndMesh.createSphere(s, mass, p,material);
+		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getClothProperties());
+		body.getBody().setActivationState(Ammo.DISABLE_DEACTIVATION);
+		
+		
+		return body;
+	}
+	
 	private Body createParticle(ClothSimulator simulator,Vector3 p,double mass){
 		Body particle = CANNON.newBody(CANNON.newBodyOptions().withMass(mass)
 				.withMaterial(simulator.getCannonControler().getClothMaterial())

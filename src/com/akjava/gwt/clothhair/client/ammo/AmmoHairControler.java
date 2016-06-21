@@ -1,0 +1,210 @@
+package com.akjava.gwt.clothhair.client.ammo;
+
+import java.util.List;
+import java.util.Map;
+
+import com.akjava.gwt.clothhair.client.cloth.HairCloth;
+import com.akjava.gwt.lib.client.LogUtils;
+import com.akjava.gwt.three.client.java.ThreeLog;
+import com.akjava.gwt.three.client.js.scenes.Scene;
+import com.akjava.gwt.threeammo.client.BodyAndMesh;
+import com.akjava.gwt.threeammo.client.BodyProperties;
+import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
+import com.akjava.gwt.threeammo.client.SphereBodyAndMesh;
+import com.akjava.gwt.threeammo.client.ThreeAmmoControler;
+import com.akjava.gwt.threeammo.client.core.Ammo;
+import com.akjava.gwt.threeammo.client.core.btGeneric6DofSpringConstraint;
+import com.google.common.collect.Maps;
+import com.google.gwt.core.client.JsArray;
+
+public class AmmoHairControler {
+
+	private boolean creating;//tested
+	
+	private boolean stopped;
+
+	private ThreeAmmoControler ammoControler;
+
+	public ThreeAmmoControler getAmmoControler() {
+		return ammoControler;
+	}
+
+
+	public boolean isStopped() {
+		return stopped;
+	}
+
+
+	public void setStopped(boolean stopped) {
+		this.stopped = stopped;
+	}
+
+
+	public boolean isCreating() {
+		return creating;
+	}
+
+
+	public boolean isEnabled(){
+	return !creating && !stopped;
+	}
+
+
+	public void setCreating(boolean creating) {
+		this.creating = creating;
+	}
+
+	
+	public AmmoHairControler(Scene scene){
+		ammoControler = new ThreeAmmoControler(scene,Ammo.initWorld(0,-100,0));
+	}
+	
+	Map<HairCloth,ParticleBodyDatas> particleMap=Maps.newHashMap();
+	public boolean isExistParticleData(HairCloth hairCloth) {
+		return particleMap.get(hairCloth)!=null;
+	}
+	public boolean isExistSphereData(int channel) {
+		return sphereMap.get(channel)!=null;
+	}
+	
+	private boolean disableCollisionsBetweenLinkedBodies=true;
+	public void setParticleData(HairCloth hairCloth,ParticleBodyDatas data){
+		particleMap.put(hairCloth,data);
+		LogUtils.log("particles:particle="+data.getAmmoParticles().size()+",const="+data.getConstraints().length());
+		
+		
+		for(int i=0;i<data.getAmmoParticles().size();i++){
+			
+			//i'm not sure any reason, add here
+			ammoControler.addBodyMesh(data.getAmmoParticles().get(i));
+			
+		}
+		
+		/*
+		for(int i=0;i<data.getConstraints().length();i++){
+			ammoControler.getWorld().addConstraint(data.getConstraints().get(i),disableCollisionsBetweenLinkedBodies);
+		}
+		*/
+		//LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
+	}
+	
+	public void setSphereData(int channel,SphereBodyData data){
+		sphereMap.put(channel,data);
+		
+		
+		
+		for(int i=0;i<data.getAmmoSpheres().size();i++){
+			//spehre seems ok!
+
+			//i'm not sure any reason, add here
+			ammoControler.addBodyMesh(data.getAmmoSpheres().get(i));
+		}
+		
+		
+		LogUtils.log("set-sphere:"+channel+","+data.getAmmoSpheres().size());
+		
+		//LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
+	}
+	
+	public void removeSphereData(int channel){
+		SphereBodyData data=sphereMap.get(channel);
+		LogUtils.log("sphere-removed:ch="+channel+" size="+data.getAmmoSpheres().size());
+		for(int i=0;i<data.getAmmoSpheres().size();i++){
+			ammoControler.destroyBodyAndMesh(data.getAmmoSpheres().get(i));
+			//ammoControler.destroyBodyAndMesh(data.getAmmoSpheres().get(i));
+		}
+	}
+	public void removeParticleData(HairCloth hairCloth){
+		ParticleBodyDatas data=getAmmoData(hairCloth);
+		
+		if(data==null){
+			LogUtils.log("removeParticleData-called but data not exist");
+			return;
+		}
+		for(int i=0;i<data.getAmmoParticles().size();i++){
+			ammoControler.destroyBodyAndMesh(data.getAmmoParticles().get(i));
+		}
+		
+		for(int i=0;i<data.getConstraints().length();i++){
+			ammoControler.destroyConstraintOnly(data.getConstraints().get(i));
+		}
+		LogUtils.log("removeParticleData:bm="+data.getAmmoParticles().size()+",const="+data.getConstraints().length());
+		//LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
+	}
+	public ParticleBodyDatas getAmmoData(HairCloth hairCloth){
+		return particleMap.get(hairCloth);
+	}
+	public SphereBodyData getSphereData(int channel){
+		return sphereMap.get(channel);
+	}
+	
+	Map<Integer,SphereBodyData> sphereMap=Maps.newHashMap();
+	
+
+	public static class SphereBodyData{
+		List<SphereBodyAndMesh> cannonSpheres;
+		public SphereBodyData(List<SphereBodyAndMesh> cannonSpheres) {
+			super();
+			this.cannonSpheres = cannonSpheres;
+		}
+		public List<SphereBodyAndMesh> getAmmoSpheres() {
+			return cannonSpheres;
+		}
+	}
+	
+	
+	private DistanceConstraintProperties constraintProperties=new DistanceConstraintProperties(0);
+	
+	public DistanceConstraintProperties getConstraintProperties() {
+		return constraintProperties;
+	}
+
+
+	public void setConstraintProperties(DistanceConstraintProperties constraintProperties) {
+		this.constraintProperties = constraintProperties;
+	}
+
+	private BodyProperties clothProperties=new BodyProperties();
+	public BodyProperties getClothProperties() {
+		return clothProperties;
+	}
+
+
+	public void setClothProperties(BodyProperties clothMaterial) {
+		this.clothProperties = clothMaterial;
+	}
+
+	private BodyProperties spherehProperties=new BodyProperties();
+	
+	public BodyProperties getSpherehProperties() {
+		return spherehProperties;
+	}
+
+
+	public void setSpherehProperties(BodyProperties spherehMaterial) {
+		this.spherehProperties = spherehMaterial;
+	}
+
+
+	public static class ParticleBodyDatas{
+		
+		public ParticleBodyDatas(List<BodyAndMesh> cannonParticles,JsArray<btGeneric6DofSpringConstraint> constraints) {
+			super();
+			this.cannonParticles = cannonParticles;
+			this.constraints=constraints;
+		}
+		public List<BodyAndMesh> getAmmoParticles() {
+			return cannonParticles;
+		}
+		List<BodyAndMesh> cannonParticles;
+		JsArray<btGeneric6DofSpringConstraint> constraints;
+		public JsArray<btGeneric6DofSpringConstraint> getConstraints() {
+			return constraints;
+		}
+	}
+	
+
+	public String getInfo() {
+		return "TODO:getInfo()";
+	}
+}

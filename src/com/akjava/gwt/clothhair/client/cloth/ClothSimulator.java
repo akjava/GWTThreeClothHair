@@ -71,6 +71,9 @@ public class ClothSimulator  {
 		cannonControler=new CannonControler();
 		ammoHairControler=new AmmoHairControler(scene);
 		
+		updateAmmoProperties();
+		
+		
 		ballGeo = THREE.SphereGeometry( 1, 20, 20 );
 		
 		canvas = CanvasUtils.createCanvas(256, 256);
@@ -80,6 +83,27 @@ public class ClothSimulator  {
 		canvas.setStyleName("transparent_bg");
 	}
 	
+	private void updateAmmoProperties() {
+		ammoHairControler.getSpherehProperties().setFriction(10);
+		ammoHairControler.getSpherehProperties().setRestitution(0);
+		
+		ammoHairControler.getClothProperties().setFriction(10);
+		ammoHairControler.getClothProperties().setRestitution(1);
+		ammoHairControler.getClothProperties().setDamping(.5,.5); //for lighter
+		ammoHairControler.getClothProperties().setDamping(0,0);
+		ammoHairControler.getConstraintProperties().setEnableSpringsAll(true);
+		ammoHairControler.getConstraintProperties().setStiffnessAll(1);
+		ammoHairControler.getConstraintProperties().setDampingAll(0);
+		double mpi=Math.PI/4;
+		ammoHairControler.getConstraintProperties().setAngularLowerLimit(THREE.Vector3(-mpi, -mpi, -mpi));
+		ammoHairControler.getConstraintProperties().setAngularUpperLimit(THREE.Vector3(mpi, mpi, mpi));
+		
+		
+		double v=0.5;
+		ammoHairControler.getConstraintProperties().setLinearLowerLimit(THREE.Vector3(-v, -v, -v));
+		ammoHairControler.getConstraintProperties().setLinearUpperLimit(THREE.Vector3(v, v,v));
+	}
+
 	public CannonControler getCannonControler() {
 		return cannonControler;
 	}
@@ -118,6 +142,7 @@ public class ClothSimulator  {
 		}
 		
 		if(ammoHairControler.isEnabled()){
+			//LogUtils.log("ammo-update");
 			ammoHairControler.getAmmoControler().update();
 		}
 		
