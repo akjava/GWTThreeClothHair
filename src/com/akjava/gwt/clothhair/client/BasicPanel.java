@@ -199,6 +199,29 @@ public class BasicPanel extends VerticalPanel{
 		});
 		//basicPanel.add(test);
 		
+		this.add(new HTML("<h4>Ammo</h4>"));
+		HorizontalPanel ha=new HorizontalPanel();
+		ha.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+		CheckBox ammoStopCheck=new CheckBox("stop");
+		
+		ammoStopCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				GWTThreeClothHair.INSTANCE.getAmmoControler().setStopped(event.getValue());
+			}
+			
+		});
+		ha.add(ammoStopCheck);
+		Button ammostep=new Button("step",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				GWTThreeClothHair.INSTANCE.getAmmoControler().getAmmoControler().update();
+			}
+		});
+		ha.add(ammostep);
+		this.add(ha);
+		
 		//cannon controling
 		this.add(new HTML("<h4>Cannon</h4>"));
 		HorizontalPanel h2=new HorizontalPanel();

@@ -5,7 +5,8 @@ import java.util.Map;
 
 import com.akjava.gwt.clothhair.client.cloth.HairCloth;
 import com.akjava.gwt.lib.client.LogUtils;
-import com.akjava.gwt.three.client.java.ThreeLog;
+import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
+import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.akjava.gwt.threeammo.client.BodyProperties;
@@ -128,6 +129,15 @@ public class AmmoHairControler {
 		for(int i=0;i<data.getConstraints().length();i++){
 			ammoControler.destroyConstraintOnly(data.getConstraints().get(i));
 		}
+		
+		if(data.getSkinnedMesh()!=null){
+			ammoControler.getScene().remove(data.getSkinnedMesh());
+		}
+		
+		if(data.getSkeltonHelper()!=null){
+			ammoControler.getScene().remove(data.getSkeltonHelper());
+		}
+		
 		LogUtils.log("removeParticleData:bm="+data.getAmmoParticles().size()+",const="+data.getConstraints().length());
 		//LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
 	}
@@ -187,7 +197,20 @@ public class AmmoHairControler {
 
 
 	public static class ParticleBodyDatas{
-		
+		private SkeletonHelper skeltonHelper;
+		public SkeletonHelper getSkeltonHelper() {
+			return skeltonHelper;
+		}
+		public void setSkeltonHelper(SkeletonHelper skeltonHelper) {
+			this.skeltonHelper = skeltonHelper;
+		}
+		private SkinnedMesh skinnedMesh;//GPU version;
+		public SkinnedMesh getSkinnedMesh() {
+			return skinnedMesh;
+		}
+		public void setSkinnedMesh(SkinnedMesh skinnedMesh) {
+			this.skinnedMesh = skinnedMesh;
+		}
 		public ParticleBodyDatas(List<BodyAndMesh> cannonParticles,JsArray<btGeneric6DofSpringConstraint> constraints) {
 			super();
 			this.cannonParticles = cannonParticles;

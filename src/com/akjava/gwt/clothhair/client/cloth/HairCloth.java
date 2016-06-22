@@ -9,31 +9,39 @@ import com.akjava.gwt.clothhair.client.cannon.CannonControler.SphereBodyData;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataUtils;
+import com.akjava.gwt.html5.client.file.FileUtils.DataArrayListener;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
-import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
+import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
+import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.threeammo.client.AmmoUtils;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.akjava.gwt.threeammo.client.ConstraintAndMesh;
 import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
 import com.akjava.gwt.threeammo.client.SphereBodyAndMesh;
 import com.akjava.gwt.threeammo.client.ThreeAmmoControler;
+import com.akjava.gwt.threeammo.client.bones.PlainBoneCreator;
+import com.akjava.gwt.threeammo.client.bones.PointsToGeometry;
+import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight;
+import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight.WeightResult;
 import com.akjava.gwt.threeammo.client.core.Ammo;
 import com.akjava.gwt.threeammo.client.core.btGeneric6DofSpringConstraint;
 import com.akjava.gwt.threeammo.client.core.btTransform;
+import com.akjava.gwt.threeammo.client.functions.BodyAndMeshFunctions;
 import com.github.gwtcannonjs.client.CANNON;
 import com.github.gwtcannonjs.client.constraints.DistanceConstraint;
 import com.github.gwtcannonjs.client.math.Vec3;
 import com.github.gwtcannonjs.client.objects.Body;
 import com.github.gwtcannonjs.client.shapes.Sphere;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
@@ -758,10 +766,11 @@ public class HairCloth {
 		}
 		
 	}
-	 double ammoMultipleScalar=0.2;//1;//0.1;//should be small,0.1 seems good,but need modify-function
-	 //double ammoMultipleScalar=1;
+     //double ammoMultipleScalar=0.2;//1;//0.1;//should be small,0.1 seems good,but need modify-function
+	 double ammoMultipleScalar=1;
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
 	 private boolean visibleDummy=false;
+	
 	 
 	private void simulateAmmo(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
 
@@ -820,7 +829,7 @@ public class HairCloth {
 		
 		if(!simulator.getAmmoHairControler().isExistParticleData(this)){
 			
-			List<BodyAndMesh> cannonParticles=Lists.newArrayList();
+			List<BodyAndMesh> ammoParticles=Lists.newArrayList();
 			
 			for(int i=0;i<particles.size();i++){
 				Particle particle=particles.get(i);
@@ -854,12 +863,12 @@ public class HairCloth {
 				*/
 				
 				BodyAndMesh p=createAmmoParticle(simulator,particle.getOriginal().clone().multiplyScalar(ammoMultipleScalar), mass);
-				cannonParticles.add(p);
+				ammoParticles.add(p);
 			}
 			
 			//make constraint
 
-			JsArray<btGeneric6DofSpringConstraint> cannonConstraints=JavaScriptUtils.createJSArray();
+			JsArray<btGeneric6DofSpringConstraint> ammoConstraints=JavaScriptUtils.createJSArray();
 			
 			ThreeAmmoControler controler=simulator.getAmmoHairControler().getAmmoControler();
 			btTransform transform1=controler.makeTransform();
@@ -869,8 +878,8 @@ public class HairCloth {
 				int p1=particles.indexOf(con.p1);
 				int p2=particles.indexOf(con.p2);
 				
-				BodyAndMesh bm1=cannonParticles.get(p1);
-				BodyAndMesh bm2=cannonParticles.get(p2);
+				BodyAndMesh bm1=ammoParticles.get(p1);
+				BodyAndMesh bm2=ammoParticles.get(p2);
 				
 				//already multiple when created
 				Vector3 pos1=bm1.getMesh().getPosition();//.multiplyScalar(ammoMultipleScalar);
@@ -885,27 +894,60 @@ public class HairCloth {
 				
 				ConstraintAndMesh constraintAndMesh=simulator.getAmmoHairControler().getAmmoControler().createGeneric6DofSpringConstraintConstraint(bm1.getBody(), bm2.getBody(), transform1, transform2, distanceConstraintProperties.isDisableCollisionsBetweenLinkedBodies());
 				
-				cannonConstraints.push(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint());
+				ammoConstraints.push(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint());
 			}
+			AmmoHairControler.ParticleBodyDatas data=new AmmoHairControler.ParticleBodyDatas(ammoParticles,ammoConstraints);
 			
-			simulator.getAmmoHairControler().setParticleData(this, new AmmoHairControler.ParticleBodyDatas(cannonParticles,cannonConstraints));
+			
+			
+			
+			List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).toList();
+			
+			Geometry clothBox=new PointsToGeometry().createGeometry(positions, w, restDistance/20, true);
+			
+			clothBox.setBones(new PlainBoneCreator().createBone(positions, w));
+			
+			int influence=1;
+			WeightResult result=new SimpleAutoWeight(influence).autoWeight(clothBox, clothBox.getBones(),Lists.newArrayList(0));//ignore root
+			result.insertToGeometry(clothBox);
+			
+			
+			
+			MeshPhongMaterial boxhMaterial = THREE.MeshPhongMaterial(
+					GWTParamUtils.MeshPhongMaterial().alphaTest(0.5).color(0x880000).specular(0x030303).emissive(0x111111).shininess(10)
+					//.map(clothTexture)
+					.skinning(true)
+					.visible(true).wireframe(false)
+					.side(THREE.DoubleSide)
+					);
+			
+			SkinnedMesh clothBoxMesh = THREE.SkinnedMesh(clothBox,boxhMaterial);
+			data.setSkinnedMesh(clothBoxMesh);
+			simulator.getAmmoHairControler().getAmmoControler().getScene().add(clothBoxMesh);
+			
+			SkeletonHelper helper=THREE.SkeletonHelper(clothBoxMesh);
+			simulator.getAmmoHairControler().getAmmoControler().getScene().add(helper);
+			data.setSkeltonHelper(helper);
+			helper.setVisible(false);
+			
+			simulator.getAmmoHairControler().setParticleData(this,data );
 		}else{
 			AmmoHairControler.ParticleBodyDatas data=simulator.getAmmoHairControler().getAmmoData(this);
-			List<BodyAndMesh> cannonParticles=data.getAmmoParticles();
+			List<BodyAndMesh> ammoParticles=data.getAmmoParticles();
 			
 			//basically never changed length
-			for(int i=0;i<cannonParticles.size();i++){
+			for(int i=0;i<ammoParticles.size();i++){
 				if(isPinned(i)){
 					Vector3 threePos=particles.get(i).getOriginal().clone().multiplyScalar(ammoMultipleScalar);
-					cannonParticles.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
+					ammoParticles.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
 				}else{
-					Vector3 ammoPos=cannonParticles.get(i).getBody().getPosition();
+					Vector3 ammoPos=ammoParticles.get(i).getBody().getPosition();
 					particles.get(i).position.copy(ammoPos).divideScalar(ammoMultipleScalar);
 				}
 			}
 			
-			
-			
+			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles);
+			data.getSkeltonHelper().update();
 			
 		}
 		
