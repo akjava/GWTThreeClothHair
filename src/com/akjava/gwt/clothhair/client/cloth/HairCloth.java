@@ -9,7 +9,6 @@ import com.akjava.gwt.clothhair.client.cannon.CannonControler.SphereBodyData;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataUtils;
-import com.akjava.gwt.html5.client.file.FileUtils.DataArrayListener;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
@@ -35,6 +34,7 @@ import com.akjava.gwt.threeammo.client.core.Ammo;
 import com.akjava.gwt.threeammo.client.core.btGeneric6DofSpringConstraint;
 import com.akjava.gwt.threeammo.client.core.btTransform;
 import com.akjava.gwt.threeammo.client.functions.BodyAndMeshFunctions;
+import com.akjava.gwt.threeammo.client.functions.BodyAndMeshFunctions.CloneDivided;
 import com.github.gwtcannonjs.client.CANNON;
 import com.github.gwtcannonjs.client.constraints.DistanceConstraint;
 import com.github.gwtcannonjs.client.math.Vec3;
@@ -766,8 +766,8 @@ public class HairCloth {
 		}
 		
 	}
-     //double ammoMultipleScalar=0.2;//1;//0.1;//should be small,0.1 seems good,but need modify-function
-	 double ammoMultipleScalar=1;
+     double ammoMultipleScalar=0.2;//1;//0.1;//should be small,0.1 seems good,but need modify-function
+	 //double ammoMultipleScalar=1;
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
 	 private boolean visibleDummy=false;
 	
@@ -900,24 +900,26 @@ public class HairCloth {
 			
 			
 			
+			//position keep same
+			List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).transform(new CloneDivided(ammoMultipleScalar)).toList();
 			
-			List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).toList();
-			
-			Geometry clothBox=new PointsToGeometry().createGeometry(positions, w, restDistance/20, true);
+			//force up normal //THREE.Vector3(0,1,0)
+			Geometry clothBox=new PointsToGeometry().vertexNormal(null).createGeometry(positions, w, restDistance, true);
 			
 			clothBox.setBones(new PlainBoneCreator().createBone(positions, w));
 			
 			int influence=1;
 			WeightResult result=new SimpleAutoWeight(influence).autoWeight(clothBox, clothBox.getBones(),Lists.newArrayList(0));//ignore root
 			result.insertToGeometry(clothBox);
-			
+			//LogUtils.log(result.toString());
 			
 			
 			MeshPhongMaterial boxhMaterial = THREE.MeshPhongMaterial(
 					GWTParamUtils.MeshPhongMaterial().alphaTest(0.5).color(0x880000).specular(0x030303).emissive(0x111111).shininess(10)
 					//.map(clothTexture)
 					.skinning(true)
-					.visible(true).wireframe(false)
+					.visible(true)
+					//.wireframe(true)//wire frame
 					.side(THREE.DoubleSide)
 					);
 			
@@ -928,7 +930,8 @@ public class HairCloth {
 			SkeletonHelper helper=THREE.SkeletonHelper(clothBoxMesh);
 			simulator.getAmmoHairControler().getAmmoControler().getScene().add(helper);
 			data.setSkeltonHelper(helper);
-			helper.setVisible(false);
+			
+			helper.setVisible(false);//TODO move setting
 			
 			simulator.getAmmoHairControler().setParticleData(this,data );
 		}else{
@@ -946,7 +949,7 @@ public class HairCloth {
 				}
 			}
 			
-			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles);
+			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles,ammoMultipleScalar);
 			data.getSkeltonHelper().update();
 			
 		}
