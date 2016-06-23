@@ -10,6 +10,27 @@ public class HairData {
 	
 private boolean visible;
 private boolean connectHorizontal;
+
+
+/*
+ * cloth made by normals.
+ * if use execAverageNormal more natural curved mesh made.
+ * 
+ * it's effect on connected horizontal 
+ * 
+ * actual averagint normal is created in ClothSimulator.addCloth
+ * 
+ * 
+ */
+private boolean execAverageNormal=true;
+public boolean isExecAverageNormal() {
+	return execAverageNormal;
+}
+
+public void setExecAverageNormal(boolean execAverageNormal) {
+	this.execAverageNormal = execAverageNormal;
+}
+
 public boolean isConnectHorizontal() {
 	return connectHorizontal;
 }
@@ -283,32 +304,70 @@ public void setHairPins(List<HairPin> hairPins) {
 	}
 	
 	
+	/**
+	 * 
+	 * for Ammo CLOTH and BONE
+	 * 
+	 * small value move smooth but,slip out easily
+	 * 
+	 * 0.5 is best.
+	 * 
+	 * actually value is restdistance * particleRadiusRatio
+	 * 
+	 */
 	/*
 	 * 0.5 measn almost max,if more big conflict others
 	 */
-	private double particleRadius=0.5;//for ammo cloth
+	private double particleRadiusRatio=0.5;//for ammo cloth
 	
-	public double getParticleRadius() {
-		return particleRadius;
+	public double getParticleRadiusRatio() {
+		return particleRadiusRatio;
 	}
 
-	public void setParticleRadius(double particleRadius) {
-		this.particleRadius = particleRadius;
+	public void setParticleRadiusRatio(double particleRadius) {
+		this.particleRadiusRatio = particleRadius;
 	}
 
 
-	public static final int CLOTH=0;
-	public static final int AMMO_CLOTH=1;
-	private int hairType;
+	public static final int TYPE_SIMPLE_CLOTH=0;
+	public static final int TYPE_AMMO_CLOTH=1;
+	public static final int TYPE_AMMO_BONE=2;
+	
+	/**
+	 * what kind physics using
+	 * 
+	 * TYPE_SIMPLE_CLOTH is three.js cloth(ultra first smooth,but not suite cloth)
+	 * 
+	 * 
+	 * maybe Cannon drop soon because Ammo do everything It's possibility.
+	 * 
+	 */
+	private int hairType;//TODO support hair type
 	
 	
-	private double thick=0.1;//for ammo cloth thick
-	public double getThick() {
-		return thick;
+	public int getHairPhysicsType() {
+		return hairType;
 	}
 
-	public void setThick(double thick) {
-		this.thick = thick;
+	public void setHairPhysicsType(int hairType) {
+		this.hairType = hairType;
+	}
+
+
+	/**
+	 * for ammo Bone Cloth
+	 * 
+	 * bone cloth has a thick
+	 * 
+	 * actually value is restdistance * thickRatio
+	 */
+	private double thickRatio=0.1;//for ammo cloth thick
+	public double getThickRatio() {
+		return thickRatio;
+	}
+
+	public void setThickRatio(double thick) {
+		this.thickRatio = thick;
 	}
 
 	public double getExtendOutsideRatio() {
@@ -320,5 +379,13 @@ public void setHairPins(List<HairPin> hairPins) {
 	}
 
 
+	/**
+	 * how position extend outside.
+	 * 
+	 * it's better to set 0.01 or 0.1 if data is cloth.
+	 * 
+	 * 0 mean no extend.exactly same vertex point.
+	 * use  restdistance * extendOutsideRatio
+	 */
 	private double extendOutsideRatio;
 }

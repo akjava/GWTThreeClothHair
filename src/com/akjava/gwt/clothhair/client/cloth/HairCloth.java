@@ -67,11 +67,6 @@ public class HairCloth {
 
 	
 	
-	public static final int PHYSICS_CANNON=0;
-	public static final int PHYSICS_CLOTH=1;
-	public static final int PHYSICS_AMMO=2;
-	
-	private int physicsMode;
 	
 	
 	/**
@@ -381,6 +376,7 @@ public class HairCloth {
 	
 	private double ammoThick;
 	
+	private int hairPhysicsType;
 	public HairCloth(HairData hairData,Mesh mesh){
 			
 		List<HairPin> normalPin=Lists.newArrayList();//trying cutom pin
@@ -398,8 +394,9 @@ public class HairCloth {
 		 * when small cut u setted, sometime connection seems faild.
 		 * 
 		 */
-		this.ammoThick=hairData.getThick();
-		this.ammoParticleSphereRadius=hairData.getParticleRadius();
+		this.ammoThick=hairData.getThickRatio();
+		this.ammoParticleSphereRadius=hairData.getParticleRadiusRatio();
+		this.hairPhysicsType=hairData.getHairPhysicsType();
 		
 		this.connectHorizontal=hairData.isConnectHorizontal();
 		//LogUtils.log("connect-horizontal:"+connectHorizontal);
@@ -745,29 +742,22 @@ public class HairCloth {
 		//made cannon object or sync cannon-object position
 	}
 	
-	//TODO allow editor?//no need after hair cloth option
-	int connectedEngine=PHYSICS_AMMO;
-	int noconnectedEngine=PHYSICS_CLOTH;
 	
 	//call after simulate
 	public void afterSimulate(ClothSimulator simulator,double time,Geometry clothGeometry,List<Mesh> spheres) {
 		//simulate by group means,no grouping support yet
 		//not support Wind yet
-		if(isConnectHorizontal()){
-			physicsMode=connectedEngine;
-		}else{
-			physicsMode=noconnectedEngine;
-		}
 		
-		if(physicsMode==PHYSICS_CLOTH){
+		
+		if(hairPhysicsType==HairData.TYPE_SIMPLE_CLOTH){
 			simulateCloth(time,clothGeometry,spheres);
 			return;
-		}else if(physicsMode==PHYSICS_AMMO){
+		}else if(hairPhysicsType==HairData.TYPE_AMMO_CLOTH || hairPhysicsType==HairData.TYPE_AMMO_BONE){
 			simulateAmmo(simulator,time,clothGeometry,spheres);
 		}
 			else{//CANNON.js
 		
-			simulateCannon(simulator,time,clothGeometry,spheres);
+			//simulateCannon(simulator,time,clothGeometry,spheres);
 		}
 		
 	}
@@ -904,17 +894,20 @@ public class HairCloth {
 				
 				ConstraintAndMesh constraintAndMesh=simulator.getAmmoHairControler().getAmmoControler().createGeneric6DofSpringConstraintConstraint(bm1.getBody(), bm2.getBody(), transform1, transform2, distanceConstraintProperties.isDisableCollisionsBetweenLinkedBodies());
 				
+				simulator.getAmmoHairControler().getAmmoControler().updateConstraint(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint(), distanceConstraintProperties);
+				
 				ammoConstraints.push(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint());
 			}
 			AmmoHairControler.ParticleBodyDatas data=new AmmoHairControler.ParticleBodyDatas(ammoParticles,ammoConstraints);
 			
 			
-			
+			if(hairPhysicsType==HairData.TYPE_AMMO_BONE){
+			//create bone mesh
 			//position keep same
 			List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).transform(new CloneDivided(ammoMultipleScalar)).toList();
 			
 			//force up normal //THREE.Vector3(0,1,0)
-			Geometry clothBox=new PointsToGeometry().vertexNormal(null).createGeometry(positions, w, restDistance*ammoThick, true);
+			Geometry clothBox=new PointsToGeometry().vertexNormal(null).createGeometry(positions, w, restDistance*ammoThick, isConnectHorizontal());
 			
 			clothBox.setBones(new PlainBoneCreator().createBone(positions, w));
 			
@@ -942,7 +935,10 @@ public class HairCloth {
 			simulator.getAmmoHairControler().getAmmoControler().getScene().add(helper);
 			data.setSkeltonHelper(helper);
 			
-			helper.setVisible(false);//TODO move setting
+			helper.setVisible(false);//TODO get visible from setting
+			
+			
+			}
 			
 			simulator.getAmmoHairControler().setParticleData(this,data );
 		}else{
@@ -960,10 +956,14 @@ public class HairCloth {
 				}
 			}
 			
+			
+			//update mesh
+			if(hairPhysicsType==HairData.TYPE_AMMO_BONE){
 			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles,ammoMultipleScalar);
 			data.getSkeltonHelper().update();
 			
 			data.getSkinnedMesh().getGeometry().computeBoundingSphere();//for camera
+			}
 		}
 		
 		

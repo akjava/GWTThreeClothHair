@@ -89,13 +89,14 @@ public class ClothSimulator  {
 		ammoHairControler.getSpherehProperties().setRestitution(0);
 		
 		ammoHairControler.getClothProperties().setFriction(10);
-		ammoHairControler.getClothProperties().setRestitution(1);
+		ammoHairControler.getClothProperties().setRestitution(0);
 		ammoHairControler.getClothProperties().setDamping(.5,.5); //for lighter
-		ammoHairControler.getClothProperties().setDamping(0,0);
+		//ammoHairControler.getClothProperties().setDamping(0,0);
+		
 		ammoHairControler.getConstraintProperties().setEnableSpringsAll(true);
 		ammoHairControler.getConstraintProperties().setStiffnessAll(1);
-		ammoHairControler.getConstraintProperties().setDampingAll(0);
-		double mpi=Math.PI/4;
+		ammoHairControler.getConstraintProperties().setDampingAll(.5);
+		double mpi=Math.PI;
 		ammoHairControler.getConstraintProperties().setAngularLowerLimit(THREE.Vector3(-mpi, -mpi, -mpi));
 		ammoHairControler.getConstraintProperties().setAngularUpperLimit(THREE.Vector3(mpi, mpi, mpi));
 		
@@ -389,10 +390,13 @@ public class ClothSimulator  {
 		texture.setFlipY(false);
 		texture.setNeedsUpdate(true);
 		
+		Texture disp=THREE.TextureLoader().load("models/mbl3d/hairdisp.png");
+		disp.setFlipY(false);
+		
 		//displacementMap not good at plain when row-poly
 		
 		//TODO make property;
-		boolean isAmmoCloth=hairData.isConnectHorizontal();
+		boolean isNoNeedPlainCloth=hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE;
 		
 		
 		//little bit 
@@ -405,19 +409,19 @@ public class ClothSimulator  {
 				//.specular(0xffffff)
 				.shininess(5) //switch default same as texture otherwise not good at connection
 				//.wireframe(true)
-				//.specular(0xffffff)//TODO move editor
-				//.specularMap(texture)
+				.specular(0x888888)//TODO move editor
+				.specularMap(texture)
 				//.shininess(15)
-				.visible(!isAmmoCloth)
+				.visible(!isNoNeedPlainCloth)
 				
-				/*
-				.displacementMap(texture)
+				//hairdisp.png
+				.displacementMap(disp)
 				.displacementScale(16)
-				.displacementBias(4)
-				*/
+				//.displacementBias(4)
+				
 				
 				.bumpMap(texture)
-				.bumpScale(0.5)
+				.bumpScale(4)
 				
 				//.di
 				);
@@ -472,7 +476,9 @@ public class ClothSimulator  {
 			List<Vector3> noTargetedPinNormals=FluentIterable.from(hairData.getHairPins()).filter(HairPinPredicates.NoTargetOnly()).transform(new HairPinToNormal(characterMesh,true)).toList();
 			//List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).transform(new HairPinToNormal(characterMesh)).toList();
 			
-			//TODO make a switch
+			
+			//TODO make function
+			if(hairData.isExecAverageNormal()){
 			List<Vector3> averageNormals=Lists.newArrayList();
 			for(int i=0;i<noTargetedPinNormals.size();i++){
 				Vector3 normal=THREE.Vector3();
@@ -498,6 +504,7 @@ public class ClothSimulator  {
 			}
 			
 			noTargetedPinNormals=averageNormals;
+			}
 			
 			List<Vector3> normals=Lists.newArrayList();
 			//PROBLEMS not support custom 
@@ -716,7 +723,7 @@ public class ClothSimulator  {
 	//replace if ammo data exist
 	if(getAmmoHairControler().getAmmoData(selection.getClothData().getCloth())!=null){
 		ParticleBodyDatas datas=getAmmoHairControler().getAmmoData(selection.getClothData().getCloth());
-		if(datas.getSkinnedMesh()!=null){
+		if(datas.getSkinnedMesh()!=null){//AMMO_BONE mode
 			material=datas.getSkinnedMesh().getMaterial().gwtCastMeshPhongMaterial();
 		}
 	}

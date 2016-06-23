@@ -1,11 +1,13 @@
 package com.akjava.gwt.clothhair.client.hair;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
+import com.google.common.collect.Lists;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorDelegate;
 import com.google.gwt.editor.client.ValueAwareEditor;
@@ -16,12 +18,14 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.text.shared.Renderer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DoubleBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.ValueListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class HairDataEditor extends VerticalPanel implements Editor<HairData>,ValueAwareEditor<HairData>{
@@ -73,12 +77,16 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private CheckBox syncCheck;
 		private CheckBox connectHorizontalCheck;
 		
+		private CheckBox execAverageNormalEditor;
+		
 		private HairDataPanel hairDataPanel;
 		private LabeledInputRangeWidget2 mass;
 		private LabeledInputRangeWidget2 damping;
 		private DoubleBox thickEditor;
 		private DoubleBox extendOutsideRatioEditor;
 		private DoubleBox particleRadiusEditor;
+		private ValueListBox<HairType> hairTypeEditor;
+		private List<HairType> hairTypeList;
 		
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
@@ -217,6 +225,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			syncPanel.add(connectHorizontalCheck);
 			
 			
+			
+			
 			HorizontalPanel option1Panel=new HorizontalPanel();
 			option1Panel.setVerticalAlignment(ALIGN_MIDDLE);
 			this.add(option1Panel);
@@ -224,6 +234,39 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			extendOutsideRatioEditor = new DoubleBox();
 			extendOutsideRatioEditor.setWidth("80px");
 			option1Panel.add(extendOutsideRatioEditor);
+			
+			
+			execAverageNormalEditor=new CheckBox("average normals");
+			option1Panel.add(execAverageNormalEditor);
+			
+			hairTypeList = Lists.newArrayList(
+					new HairType("Simple Cloth",HairData.TYPE_SIMPLE_CLOTH),
+					new HairType("Ammo Plain Cloth",HairData.TYPE_AMMO_CLOTH),
+					new HairType("Ammo Bone Cloth",HairData.TYPE_AMMO_BONE)
+					);
+			
+			
+			HorizontalPanel typePanel=new HorizontalPanel();
+			typePanel.setVerticalAlignment(ALIGN_MIDDLE);
+			this.add(typePanel);
+			typePanel.add(new Label("Type"));
+			hairTypeEditor = new ValueListBox<HairDataEditor.HairType>(new Renderer<HairType>() {
+
+				@Override
+				public String render(HairType object) {
+					return object.label;
+				}
+
+				@Override
+				public void render(HairType object, Appendable appendable) throws IOException {
+					// TODO Auto-generated method stub
+					
+				}
+			});
+			hairTypeEditor.setValue(hairTypeList.get(0));
+			hairTypeEditor.setAcceptableValues(hairTypeList);
+			typePanel.add(hairTypeEditor);
+			
 			
 			this.add(new Label("Ammo specific"));
 			
@@ -269,10 +312,13 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setMass(mass.getValue());
 				value.setDamping(damping.getValue());
 				value.setConnectHorizontal(connectHorizontalCheck.getValue());
-				
+				if(hairTypeEditor.getValue()!=null){
+					value.setHairPhysicsType(hairTypeEditor.getValue().value);
+				}
+				value.setExecAverageNormal(execAverageNormalEditor.getValue());
 				value.setExtendOutsideRatio(extendOutsideRatioEditor.getValue());
-				value.setThick(thickEditor.getValue());
-				value.setParticleRadius(particleRadiusEditor.getValue());
+				value.setThickRatio(thickEditor.getValue());
+				value.setParticleRadiusRatio(particleRadiusEditor.getValue());
 				//no need getHairTextureData update,because these value are updated dynamic
 			}
 
@@ -280,6 +326,16 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			public void onPropertyChange(String... paths) {
 				// TODO Auto-generated method stub
 				
+			}
+			
+			public static class HairType{
+				private String label;
+				public HairType(String label, int value) {
+					super();
+					this.label = label;
+					this.value = value;
+				}
+				private int value;
 			}
 			
 
@@ -304,8 +360,15 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				connectHorizontalCheck.setValue(value.isConnectHorizontal());
 				
 				extendOutsideRatioEditor.setValue(value.getExtendOutsideRatio());
-				thickEditor.setValue(value.getThick());
-				particleRadiusEditor.setValue(value.getParticleRadius());
+				thickEditor.setValue(value.getThickRatio());
+				particleRadiusEditor.setValue(value.getParticleRadiusRatio());
+				if(value.getHairPhysicsType()>=0 && value.getHairPhysicsType()<hairTypeList.size()){
+				hairTypeEditor.setValue(hairTypeList.get(value.getHairPhysicsType()));
+				}else{
+					LogUtils.log("invalid hairtype skipped:"+value.getHairPhysicsType());
+				}
+				execAverageNormalEditor.setValue(value.isExecAverageNormal());
+				
 				if(hairTextureDataEditor==null){
 					LogUtils.log("no hairTextureDataEditor");
 				}

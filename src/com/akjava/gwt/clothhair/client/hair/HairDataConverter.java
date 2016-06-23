@@ -55,6 +55,12 @@ public class HairDataConverter extends Converter<HairData,String> {
 		
 		csv.add(String.valueOf(data.isConnectHorizontal()));//13
 		
+		csv.add(String.valueOf(data.getHairPhysicsType()));//14
+		csv.add(String.valueOf(data.getExtendOutsideRatio()));//15
+		csv.add(String.valueOf(data.getThickRatio()));//16
+		csv.add(String.valueOf(data.getParticleRadiusRatio()));//17
+		csv.add(String.valueOf(data.isExecAverageNormal()));//18
+		
 		return Joiner.on(",").join(csv);
 	}
 
@@ -138,6 +144,22 @@ public class HairDataConverter extends Converter<HairData,String> {
 		
 		if(csv.length>13){
 			data.setConnectHorizontal(Boolean.valueOf(csv[13]));
+		}
+		
+		if(csv.length>14){
+			data.setHairPhysicsType(Integer.valueOf(csv[14]));
+		}
+		if(csv.length>15){
+			data.setExtendOutsideRatio(Double.valueOf(csv[15]));
+		}
+		if(csv.length>16){
+			data.setThickRatio(Double.valueOf(csv[16]));
+		}
+		if(csv.length>17){
+			data.setParticleRadiusRatio(Double.valueOf(csv[17]));
+		}
+		if(csv.length>18){
+			data.setExecAverageNormal(Boolean.valueOf(csv[18]));
 		}
 		
 		return data;
