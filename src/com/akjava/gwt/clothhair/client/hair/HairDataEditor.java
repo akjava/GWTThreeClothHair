@@ -18,6 +18,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.DoubleBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -75,6 +76,9 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private HairDataPanel hairDataPanel;
 		private LabeledInputRangeWidget2 mass;
 		private LabeledInputRangeWidget2 damping;
+		private DoubleBox thickEditor;
+		private DoubleBox extendOutsideRatioEditor;
+		private DoubleBox particleRadiusEditor;
 		
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
@@ -212,6 +216,30 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			connectHorizontalCheck = new CheckBox();
 			syncPanel.add(connectHorizontalCheck);
 			
+			
+			HorizontalPanel option1Panel=new HorizontalPanel();
+			option1Panel.setVerticalAlignment(ALIGN_MIDDLE);
+			this.add(option1Panel);
+			option1Panel.add(new Label("extend:"));
+			extendOutsideRatioEditor = new DoubleBox();
+			extendOutsideRatioEditor.setWidth("80px");
+			option1Panel.add(extendOutsideRatioEditor);
+			
+			this.add(new Label("Ammo specific"));
+			
+			HorizontalPanel option1Pane2=new HorizontalPanel();
+			option1Pane2.setVerticalAlignment(ALIGN_MIDDLE);
+			this.add(option1Pane2);
+			option1Pane2.add(new Label("thick:"));
+			thickEditor = new DoubleBox();
+			thickEditor.setWidth("80px");
+			option1Pane2.add(thickEditor);
+			
+			option1Pane2.add(new Label("particleRadius:"));
+			particleRadiusEditor = new DoubleBox();
+			particleRadiusEditor.setWidth("80px");
+			option1Pane2.add(particleRadiusEditor);
+			
 		}
 		private Label createLabel(String name){
 			Label label=new Label(name);
@@ -241,6 +269,10 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setMass(mass.getValue());
 				value.setDamping(damping.getValue());
 				value.setConnectHorizontal(connectHorizontalCheck.getValue());
+				
+				value.setExtendOutsideRatio(extendOutsideRatioEditor.getValue());
+				value.setThick(thickEditor.getValue());
+				value.setParticleRadius(particleRadiusEditor.getValue());
 				//no need getHairTextureData update,because these value are updated dynamic
 			}
 
@@ -271,6 +303,9 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				damping.setValue(value.getDamping());
 				connectHorizontalCheck.setValue(value.isConnectHorizontal());
 				
+				extendOutsideRatioEditor.setValue(value.getExtendOutsideRatio());
+				thickEditor.setValue(value.getThick());
+				particleRadiusEditor.setValue(value.getParticleRadius());
 				if(hairTextureDataEditor==null){
 					LogUtils.log("no hairTextureDataEditor");
 				}

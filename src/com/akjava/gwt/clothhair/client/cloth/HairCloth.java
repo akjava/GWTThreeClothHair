@@ -378,6 +378,9 @@ public class HairCloth {
 	public boolean needConnectHorizontal(int v){
 		return (!cutHorizontalConnection || v<startCutHorizontalConnection);
 	}
+	
+	private double ammoThick;
+	
 	public HairCloth(HairData hairData,Mesh mesh){
 			
 		List<HairPin> normalPin=Lists.newArrayList();//trying cutom pin
@@ -395,6 +398,8 @@ public class HairCloth {
 		 * when small cut u setted, sometime connection seems faild.
 		 * 
 		 */
+		this.ammoThick=hairData.getThick();
+		this.ammoParticleSphereRadius=hairData.getParticleRadius();
 		
 		this.connectHorizontal=hairData.isConnectHorizontal();
 		//LogUtils.log("connect-horizontal:"+connectHorizontal);
@@ -740,7 +745,7 @@ public class HairCloth {
 		//made cannon object or sync cannon-object position
 	}
 	
-	//TODO allow editor?
+	//TODO allow editor?//no need after hair cloth option
 	int connectedEngine=PHYSICS_AMMO;
 	int noconnectedEngine=PHYSICS_CLOTH;
 	
@@ -766,7 +771,12 @@ public class HairCloth {
 		}
 		
 	}
-     double ammoMultipleScalar=0.2;//1;//0.1;//should be small,0.1 seems good,but need modify-function
+	double ammoParticleSphereRadius=0.5;//indivisual particle sphere radius
+	
+	//bigger value cloth would fly ( 0.5 is best.bigger easy to stuck,small easy to slip out)
+	
+	//TODO move ammohair controler and allow change from basic panel
+     double ammoMultipleScalar=0.01;//1;//0.1;//should be small,0.1 seems good,but need modify-function
 	 //double ammoMultipleScalar=1;
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
 	 private boolean visibleDummy=false;
@@ -839,7 +849,7 @@ public class HairCloth {
 				
 				
 				if(v==h){
-					baseMass*=100;// no effect
+					//baseMass*=100;// 
 				}
 				
 				
@@ -904,7 +914,7 @@ public class HairCloth {
 			List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).transform(new CloneDivided(ammoMultipleScalar)).toList();
 			
 			//force up normal //THREE.Vector3(0,1,0)
-			Geometry clothBox=new PointsToGeometry().vertexNormal(null).createGeometry(positions, w, restDistance, true);
+			Geometry clothBox=new PointsToGeometry().vertexNormal(null).createGeometry(positions, w, restDistance*ammoThick, true);
 			
 			clothBox.setBones(new PlainBoneCreator().createBone(positions, w));
 			
@@ -1151,7 +1161,7 @@ public class HairCloth {
 	}
 
 	private BodyAndMesh createAmmoParticle(ClothSimulator simulator,Vector3 p,double mass){
-		double s=restDistance*ammoMultipleScalar/2;
+		double s=restDistance*ammoMultipleScalar*ammoParticleSphereRadius;
 		
 		
 		

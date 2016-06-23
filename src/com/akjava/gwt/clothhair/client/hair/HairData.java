@@ -281,4 +281,39 @@ public void setHairPins(List<HairPin> hairPins) {
 	public void setHairTextureData(HairTextureData hairTextureData) {
 		this.hairTextureData = hairTextureData;
 	}
+	
+	
+	/*
+	 * 0.5 measn almost max,if more big conflict others
+	 */
+	private double particleRadius=0.5;//for ammo cloth
+	
+	public double getParticleRadius() {
+		return particleRadius;
+	}
+
+	public void setParticleRadius(double particleRadius) {
+		this.particleRadius = particleRadius;
+	}
+
+
+	private double thick=0.1;//for ammo cloth thick
+	public double getThick() {
+		return thick;
+	}
+
+	public void setThick(double thick) {
+		this.thick = thick;
+	}
+
+	public double getExtendOutsideRatio() {
+		return extendOutsideRatio;
+	}
+
+	public void setExtendOutsideRatio(double extendPosition) {
+		this.extendOutsideRatio = extendPosition;
+	}
+
+
+	private double extendOutsideRatio;
 }

@@ -11,6 +11,7 @@ import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler;
+import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler.ParticleBodyDatas;
 import com.akjava.gwt.clothhair.client.cannon.CannonControler;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairPinPredicates;
@@ -683,6 +684,17 @@ public class ClothSimulator  {
 	
 	//sync textures
 	MeshPhongMaterial material=selection.getMesh().getMaterial().gwtCastMeshPhongMaterial();
+	
+	
+	//replace if ammo data exist
+	if(getAmmoHairControler().getAmmoData(selection.getClothData().getCloth())!=null){
+		ParticleBodyDatas datas=getAmmoHairControler().getAmmoData(selection.getClothData().getCloth());
+		if(datas.getSkinnedMesh()!=null){
+			material=datas.getSkinnedMesh().getMaterial().gwtCastMeshPhongMaterial();
+		}
+	}
+	
+	
 	HairTextureData textureData=selection.getHairData().getHairTextureData();
 	//TODO support local or global
 	

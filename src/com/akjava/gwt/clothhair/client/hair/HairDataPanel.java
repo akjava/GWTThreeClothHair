@@ -1,6 +1,5 @@
 package com.akjava.gwt.clothhair.client.hair;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
@@ -13,7 +12,6 @@ import com.akjava.gwt.clothhair.client.cloth.ClothData;
 import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
 import com.akjava.gwt.clothhair.client.cloth.HairCloth;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
-import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToNormal;
 import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToVertex;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
 import com.akjava.gwt.html5.client.download.HTML5Download;
@@ -35,7 +33,6 @@ import com.akjava.gwt.three.client.js.core.BufferAttribute;
 import com.akjava.gwt.three.client.js.core.BufferGeometry;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.loaders.ImageLoader.ImageLoadHandler;
-import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Matrix3;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.LineSegments;
@@ -55,6 +52,8 @@ import com.google.common.collect.Maps;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.ImageData;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
@@ -484,6 +483,9 @@ public class HairDataPanel extends VerticalPanel{
 				if(!GWTThreeClothHair.INSTANCE.getClothSimulator().isUpdatingHairTextureMap()){
 					if(loadingDatas.isEmpty()){
 						cancel();
+						
+						//TODO ammo hair material
+						
 						storeDatas();
 						return;
 					}
@@ -952,14 +954,24 @@ public void updateHairDataLine(){
 	}
 	protected void addCloth(HairData hairData,boolean storeData) {
 		
-		HairMixedData cellData=GWTThreeClothHair.INSTANCE.getClothSimulator().addCloth(hairData);
+		final HairMixedData cellData=GWTThreeClothHair.INSTANCE.getClothSimulator().addCloth(hairData);
 		
 		cellObjects.addItem(cellData);
 		cellObjects.setSelected(cellData, true);
 		
 		if(storeData){
+			//TODO update ammo hair material,use schedule and just call update?
 			storeDatas();
 		}
+		
+		Scheduler.get().scheduleFinally(new ScheduledCommand() {
+			@Override
+			public void execute() {
+				GWTThreeClothHair.INSTANCE.getClothSimulator().update(0);//this make ammo-mesh
+				//re update hair data for ammo-hair
+				GWTThreeClothHair.INSTANCE.getClothSimulator().updateHairTextureData(cellData, true);
+			}
+		});
 	}
 	
 	private Vector3 _diff=THREE.Vector3();

@@ -74,7 +74,7 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 		);
 		//TODO add option
 		//if extend outside,extend-ratio
-		double extendRatio=hairData.isConnectHorizontal()?0.5:0;//right now connected use Cannon
+		double extendRatio=hairData.getExtendOutsideRatio();
 		Vector3 normal=hairPinToNormalFunction.apply(pin);
 		double distance=cloth.getRestDistance()/mesh.getScale().getX()*extendRatio;
 		Vector3 appendPos=normal.normalize().multiplyScalar(distance);

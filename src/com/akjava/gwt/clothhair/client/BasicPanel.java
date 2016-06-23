@@ -222,6 +222,7 @@ public class BasicPanel extends VerticalPanel{
 		ha.add(ammostep);
 		this.add(ha);
 		
+		//TODO fix effect new-add cloth
 		CheckBox ammoBoneCheck=new CheckBox("bone");
 		
 		ammoBoneCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
