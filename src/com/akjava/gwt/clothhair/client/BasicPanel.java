@@ -28,14 +28,20 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class BasicPanel extends VerticalPanel{
 
 	public BasicPanel(){
-		this.add(new HTML("<h4>Visible</h4>"));
+		TabPanel tab=new TabPanel();
+		this.add(tab);
+		VerticalPanel generalPanel=new VerticalPanel();
+		
+		tab.add(generalPanel,"General");
+		//this.add(new HTML("<h4>Visible</h4>"));
 		HorizontalPanel h1=new HorizontalPanel();
-		this.add(h1);
+		generalPanel.add(h1);
 		
 		h1.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
 		
@@ -106,13 +112,9 @@ public class BasicPanel extends VerticalPanel{
 		//h1.add(receiveShadowCheck);
 		receiveShadowCheck.setTitle("receive shadow self");
 		
-		this.add(new HTML("<h4>Camera</h4>"));
+		generalPanel.add(new HTML("<h4>Camera</h4>"));
 		LabeledInputRangeWidget2 near=new LabeledInputRangeWidget2("near", 0.1, 100, 0.1);
-		
-		
-		
-		
-		this.add(near);
+		generalPanel.add(near);
 		near.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Number> event) {
@@ -134,9 +136,9 @@ public class BasicPanel extends VerticalPanel{
 		h1.add(visibleVertexCheck);
 		
 		
-		this.add(new HTML("<h4>Texture</h4>"));
+		generalPanel.add(new HTML("<h4>Texture</h4>"));
 		HorizontalPanel textureButtons=new HorizontalPanel();
-		this.add(textureButtons);
+		generalPanel.add(textureButtons);
 		Button reload=new Button("reload texture",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -198,8 +200,8 @@ public class BasicPanel extends VerticalPanel{
 			
 		});
 		//basicPanel.add(test);
-		
-		this.add(new HTML("<h4>Ammo</h4>"));
+		VerticalPanel ammoPanel=new VerticalPanel();
+		tab.add(ammoPanel,"Ammo");
 		HorizontalPanel ha=new HorizontalPanel();
 		ha.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
 		CheckBox ammoStopCheck=new CheckBox("stop");
@@ -220,7 +222,7 @@ public class BasicPanel extends VerticalPanel{
 			}
 		});
 		ha.add(ammostep);
-		this.add(ha);
+		ammoPanel.add(ha);
 		
 		//TODO fix effect new-add cloth
 		CheckBox ammoBoneCheck=new CheckBox("bone");
@@ -236,7 +238,7 @@ public class BasicPanel extends VerticalPanel{
 		ha.add(ammoBoneCheck);
 		
 		//cannon controling
-		this.add(new HTML("<h4>Cannon</h4>"));
+		generalPanel.add(new HTML("<h4>Cannon</h4>"));
 		HorizontalPanel h2=new HorizontalPanel();
 		h2.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
 		CheckBox cannonStopCheck=new CheckBox("stop");
@@ -257,13 +259,13 @@ public class BasicPanel extends VerticalPanel{
 			}
 		});
 		h2.add(step);
-		this.add(h2);
+		generalPanel.add(h2);
 		
 		
-		this.add(new HTML("<h4>Three.js</h4>"));
+		generalPanel.add(new HTML("<h4>Three.js</h4>"));
 		HorizontalPanel h3=new HorizontalPanel();
 		h3.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
-		this.add(h3);
+		generalPanel.add(h3);
 		CheckBox antialiasCheck=new CheckBox();
 		h3.add(antialiasCheck);
 		h3.add(new Label("antialias(need reload page)"));
@@ -285,7 +287,7 @@ public class BasicPanel extends VerticalPanel{
 		});
 		
 		HorizontalPanel h4=new HorizontalPanel();
-		this.add(h4);
+		generalPanel.add(h4);
 		h4.add(new Label("Sky:"));
 		ColorBox bgColor=new ColorBox();
 		bgColor.setValue(ColorUtils.toCssColor(GWTThreeClothHair.INSTANCE.getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR, 0)));
@@ -327,8 +329,11 @@ public class BasicPanel extends VerticalPanel{
 		});
 		h4.add(groundColor);
 		
+		VerticalPanel lightPanel=new VerticalPanel();
+		tab.add(lightPanel,"Light");
 		
-		this.add(new HTML("<h4>Lights</h4>"));
-		this.add(new LightDataPanel(GWTThreeClothHairStorageKeys.KEY_LIGHTS,GWTThreeClothHair.INSTANCE.getStorageControler()));
+		lightPanel.add(new LightDataPanel(GWTThreeClothHairStorageKeys.KEY_LIGHTS,GWTThreeClothHair.INSTANCE.getStorageControler()));
+		
+		tab.selectTab(0);
 	}
 }

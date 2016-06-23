@@ -56,6 +56,12 @@ public class LightDataPanel extends VerticalPanel{
 	private String storageKey;
 	private StorageControler storageControler;
 	public LightDataPanel(String storageKey,StorageControler storageControler) {
+		
+		
+		CheckBox simpleLight=new CheckBox("simple 0xffffff");
+		
+		this.add(simpleLight);
+		
 		this.storageKey=storageKey;
 		this.storageControler=storageControler;
 		editor = new LightDataEditor();    
@@ -63,10 +69,10 @@ public class LightDataPanel extends VerticalPanel{
 		this.add(editor);
 		editor.setValue(null);
 
-
+		
 	
 	//create easy cell tables
-	SimpleCellTable<LightData> table=new SimpleCellTable<LightData>() {
+	final SimpleCellTable<LightData> table=new SimpleCellTable<LightData>() {
 		@Override
 		public void addColumns(CellTable<LightData> table) {
 			
@@ -111,7 +117,7 @@ public class LightDataPanel extends VerticalPanel{
 					return object.getName();
 				}
 			};
-			table.addColumn(nameColumn);
+			//table.addColumn(nameColumn); //sadly no space
 		}
 	};
 	this.add(table);
@@ -236,12 +242,55 @@ public class LightDataPanel extends VerticalPanel{
 	
 	//initial load from storage
 	String lines=storageControler.getValue(storageKey, null);
-	if(lines!=null){
+	if(lines!=null && !lines.isEmpty()){
 		Iterable<LightData> datas=new LightDataConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(lines));
 		for(LightData data:datas){
 			addData(data,false);
 		}
 	}
+	
+	simpleLight.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+		private String lastLight="";
+		@Override
+		public void onValueChange(ValueChangeEvent<Boolean> event) {
+			if(event.getValue()){
+				
+				lastLight=toStoreText();
+				LogUtils.log(lastLight);
+				String simpleLight=",1,16777215,1,0,0:0:0,false";
+				editor.setVisible(false);
+				table.setVisible(false);
+				clearAllData();
+			
+				//todo check validate
+			
+			 Iterable<LightData> newDatas=new LightDataConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(simpleLight));
+			 for(LightData newData:newDatas){
+				 addData(newData,false);
+				 //cellObjects.setSelected(newData, true);//maybe last selected
+			 }
+			 
+			storeData(lastLight);
+			 
+			}else{
+				//back
+				clearAllData();
+				editor.setVisible(true);
+				table.setVisible(true);
+					
+					//todo check validate
+				if(lastLight!=null && !lastLight.isEmpty()){//basically never without initialy empty
+				 Iterable<LightData> newDatas=new LightDataConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(lastLight));
+				 for(LightData newData:newDatas){
+					 addData(newData,false);
+					 cellObjects.setSelected(newData, true);//maybe last selected
+				 }
+				 storeData();
+				}
+			}
+		}
+		
+	});
 	
 }
 	
@@ -270,9 +319,15 @@ public class LightDataPanel extends VerticalPanel{
 		}
 	}
 	
-	public void storeData(){
-		 //store data
-		 String lines=toStoreText();
+	private void storeData(){
+		 storeData( toStoreText());
+	}
+	
+	private void storeData(String lines){
+		
+		 
+		// LogUtils.log("lines:"+lines.length());
+		 
 		 try {
 			storageControler.setValue(storageKey, lines);
 		} catch (StorageException e) {
