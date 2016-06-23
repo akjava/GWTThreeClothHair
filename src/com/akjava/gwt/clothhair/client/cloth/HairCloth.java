@@ -379,6 +379,11 @@ public class HairCloth {
 	private int hairPhysicsType;
 	public HairCloth(HairData hairData,Mesh mesh){
 			
+		if(hairData.getSizeOfU()==0){
+			LogUtils.log("HairCloth:invalid u-size");
+			return;
+		}
+		
 		List<HairPin> normalPin=Lists.newArrayList();//trying cutom pin
 		List<HairPin> customPin=Lists.newArrayList();
 		
@@ -878,6 +883,15 @@ public class HairCloth {
 				int p1=particles.indexOf(con.p1);
 				int p2=particles.indexOf(con.p2);
 				
+				int p1y=p1/(w+1);
+				int p2y=p2/(w+1);
+				
+				boolean testHalf=false;
+				
+				if(p1y>0 ){
+					//testHalf=true;
+				}
+				
 				BodyAndMesh bm1=ammoParticles.get(p1);
 				BodyAndMesh bm2=ammoParticles.get(p2);
 				
@@ -887,7 +901,19 @@ public class HairCloth {
 				
 				DistanceConstraintProperties distanceConstraintProperties=simulator.getAmmoHairControler().getConstraintProperties();
 				
+				double v=0.1;
+				if(testHalf){//trying tight maybe narrow is good for this
+					distanceConstraintProperties.setFrameInARelativePosRatio(v);
+					distanceConstraintProperties.setFrameInBRelativePosRatio(-v);
+				}else{
+					distanceConstraintProperties.setFrameInARelativePosRatio(0.5);
+					distanceConstraintProperties.setFrameInBRelativePosRatio(-0.5);
+				}
 				//not using distance here.
+				
+				//is half working?
+				
+				
 				
 				distanceConstraintProperties.updateFrameInA(transform1, pos1, pos2);
 				distanceConstraintProperties.updateFrameInB(transform2, pos1, pos2);

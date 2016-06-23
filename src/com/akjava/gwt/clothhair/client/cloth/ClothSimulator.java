@@ -94,16 +94,16 @@ public class ClothSimulator  {
 		//ammoHairControler.getClothProperties().setDamping(0,0);
 		
 		ammoHairControler.getConstraintProperties().setEnableSpringsAll(true);
-		ammoHairControler.getConstraintProperties().setStiffnessAll(1);
-		ammoHairControler.getConstraintProperties().setDampingAll(.5);
+		ammoHairControler.getConstraintProperties().setStiffnessAll(100);
+		ammoHairControler.getConstraintProperties().setDampingAll(.1);
 		double mpi=Math.PI;
 		ammoHairControler.getConstraintProperties().setAngularLowerLimit(THREE.Vector3(-mpi, -mpi, -mpi));
 		ammoHairControler.getConstraintProperties().setAngularUpperLimit(THREE.Vector3(mpi, mpi, mpi));
 		
 		
-		double v=0.5;
-		ammoHairControler.getConstraintProperties().setLinearLowerLimit(THREE.Vector3(-v, -v, -v));
-		ammoHairControler.getConstraintProperties().setLinearUpperLimit(THREE.Vector3(v, v,v));
+		double v=0.1;
+		//ammoHairControler.getConstraintProperties().setLinearLowerLimit(THREE.Vector3(-v, -v, -v));
+		//ammoHairControler.getConstraintProperties().setLinearUpperLimit(THREE.Vector3(v, v,v));
 	}
 
 	public CannonControler getCannonControler() {
@@ -398,7 +398,7 @@ public class ClothSimulator  {
 		//TODO make property;
 		boolean isNoNeedPlainCloth=hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE;
 		
-		
+		//TODO hairdisp & bump control
 		//little bit 
 		MeshPhongMaterial hairMaterial = THREE.MeshPhongMaterial(GWTParamUtils.
 				MeshPhongMaterial()
@@ -415,13 +415,13 @@ public class ClothSimulator  {
 				.visible(!isNoNeedPlainCloth)
 				
 				//hairdisp.png
-				.displacementMap(disp)
-				.displacementScale(16)
+				//.displacementMap(disp)
+				//.displacementScale(16)
 				//.displacementBias(4)
 				
 				
-				.bumpMap(texture)
-				.bumpScale(4)
+				//.bumpMap(texture)
+				//.bumpScale(4)
 				
 				//.di
 				);

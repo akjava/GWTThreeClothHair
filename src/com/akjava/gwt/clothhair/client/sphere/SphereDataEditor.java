@@ -54,6 +54,8 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		xRange.getLabel().setWidth("40px");
 		xRange.getRange().setWidth("220px");
 		
+		RangeButtons xButtons=new RangeButtons(xRange);
+		this.add(xButtons);
 		
 		yRange = new LabeledInputRangeWidget2("y", defaultValue.getY()-1.2,  defaultValue.getY()+1.2, .001);
 		this.add(yRange);
@@ -108,6 +110,9 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 				flush();
 			}
 		});
+		
+		RangeButtons scaleButtons=new RangeButtons(scaleRange);
+		this.add(scaleButtons);
 		
 		boneIndexBox = new ValueListBox<BoneData>(new Renderer<BoneData>() {
 

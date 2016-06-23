@@ -102,7 +102,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			this.hairDataPanel=hairDataPanel;
 			//hairPinEditor=SimpleEditor.of();
 			
-			uSize = new LabeledInputRangeWidget2("U-Size(W)", 0, 80, 1);
+			uSize = new LabeledInputRangeWidget2("U-Size(W)", 1, 80, 1);
 			this.add(uSize);
 			uSize.addtRangeListener(new ValueChangeHandler<Number>() {
 				
@@ -112,7 +112,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				}
 			});
 
-			vSize = new LabeledInputRangeWidget2("V-Size(H)", 0, 80, 1);
+			vSize = new LabeledInputRangeWidget2("V-Size(H)", 1, 80, 1);
 			this.add(vSize);
 			vSize.addtRangeListener(new ValueChangeHandler<Number>() {
 				
@@ -151,6 +151,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			this.add(h2);
 			h2.add(createLabel("narrow"));
 			narrowCheck = new CheckBox();
+			narrowCheck.setTitle("only work on simple cloth");
 			narrowCheck.setWidth("20px");
 			h2.add(narrowCheck);
 			narrowIndex = new LabeledInputRangeWidget2("index", 0, 40, 1);

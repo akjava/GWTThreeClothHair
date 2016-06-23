@@ -331,6 +331,7 @@ public class HairDataPanel extends VerticalPanel{
 					HairData copied=data.getHairData().clone();
 					driver.edit(copied);
 					updateDistanceLabel();
+					cellObjects.unselect();
 				}
 			}
 		});
@@ -452,8 +453,14 @@ public class HairDataPanel extends VerticalPanel{
 					if(cellObjects.getSelection()==null){
 						return;
 					}
+					String type="simple";
+					if(cellObjects.getSelection().getHairData().getHairPhysicsType()==HairData.TYPE_AMMO_BONE){
+						type="ammo_bone";
+					}else if(cellObjects.getSelection().getHairData().getHairPhysicsType()==HairData.TYPE_AMMO_CLOTH){
+						type="ammo_cloth";
+					}
 					String text=hairDataConverter.convert(cellObjects.getSelection().getHairData());
-					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair-selection.csv", "selection to download",true);
+					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair-"+type+".csv", "selection to download",true);
 					download.add(a);
 				}
 			});
