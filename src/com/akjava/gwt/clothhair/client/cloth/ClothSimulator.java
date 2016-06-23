@@ -469,8 +469,35 @@ public class ClothSimulator  {
 		
 		}else{
 			//only core pins,only use no-custom pin
-			List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).filter(HairPinPredicates.NoTargetOnly()).transform(new HairPinToNormal(characterMesh,true)).toList();
+			List<Vector3> noTargetedPinNormals=FluentIterable.from(hairData.getHairPins()).filter(HairPinPredicates.NoTargetOnly()).transform(new HairPinToNormal(characterMesh,true)).toList();
 			//List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).transform(new HairPinToNormal(characterMesh)).toList();
+			
+			//TODO make a switch
+			List<Vector3> averageNormals=Lists.newArrayList();
+			for(int i=0;i<noTargetedPinNormals.size();i++){
+				Vector3 normal=THREE.Vector3();
+				if(i-1<0){
+					if(data.getCloth().isConnectHorizontal()){
+						normal.add(noTargetedPinNormals.get(noTargetedPinNormals.size()-1));
+					}
+				}else{
+					normal.add(noTargetedPinNormals.get(i-1));
+				}
+				
+				normal.add(noTargetedPinNormals.get(i));
+				
+				if(i+1==noTargetedPinNormals.size()){
+					if(data.getCloth().isConnectHorizontal()){
+						normal.add(noTargetedPinNormals.get(0));
+					}
+				}else{
+					normal.add(noTargetedPinNormals.get(i+1));
+				}
+				normal.normalize();
+				averageNormals.add(normal);
+			}
+			
+			noTargetedPinNormals=averageNormals;
 			
 			List<Vector3> normals=Lists.newArrayList();
 			//PROBLEMS not support custom 
@@ -519,7 +546,7 @@ public class ClothSimulator  {
 				//LogUtils.log("main:"+index);
 				
 				normalSize++;
-				normals.add(pinNormals.get(i));
+				normals.add(noTargetedPinNormals.get(i));
 				
 				if(i!=noTargetPins.size()-1){
 					//has next;
@@ -532,7 +559,7 @@ public class ClothSimulator  {
 						Vector3 v=sub.clone().multiplyScalar(multiple).add(v1);
 						data.getCloth().particles.get(at).setAllPosition(v);
 						
-						normals.add(pinNormals.get(i).clone().add(pinNormals.get(i+1)).divideScalar(2));
+						normals.add(noTargetedPinNormals.get(i).clone().add(noTargetedPinNormals.get(i+1)).divideScalar(2));
 						//LogUtils.log("sub:"+at);
 						normalSize++;
 					}
@@ -544,7 +571,7 @@ public class ClothSimulator  {
 			}
 			
 			//LogUtils.log("normal-test"+normalSize+","+pinNormals.size()+","+(data.getCloth().getW()+1));
-			pinNormals=normals;
+			noTargetedPinNormals=normals;
 			//LogUtils.log("normal-pos:"+normals.size()+",pin "+pinNormals.size()+"append:"+normalSize);
 			
 			
@@ -565,9 +592,9 @@ public class ClothSimulator  {
 				//Vector3  start=normals.get(x).clone().normalize().multiplyScalar( data.getCloth().getRestDistance()*y ).add(pos);
 				//data.getCloth().particles.get(j).setAllPosition(start);
 			
-				if(pinNormals.size()==data.getCloth().getW()+1){
+				if(noTargetedPinNormals.size()==data.getCloth().getW()+1){
 				//	LogUtils.log("can use normal");
-					Vector3  normalPosition=pinNormals.get(x).clone().normalize().multiplyScalar( data.getCloth().getRestDistance()*y ).add(pos);
+					Vector3  normalPosition=noTargetedPinNormals.get(x).clone().normalize().multiplyScalar( data.getCloth().getRestDistance()*y ).add(pos);
 					data.getCloth().particles.get(j).setAllPosition(normalPosition);
 				}
 				

@@ -936,6 +936,7 @@ public class HairCloth {
 			SkinnedMesh clothBoxMesh = THREE.SkinnedMesh(clothBox,boxhMaterial);
 			data.setSkinnedMesh(clothBoxMesh);
 			simulator.getAmmoHairControler().getAmmoControler().getScene().add(clothBoxMesh);
+			clothBoxMesh.getGeometry().computeBoundingSphere();//for camera
 			
 			SkeletonHelper helper=THREE.SkeletonHelper(clothBoxMesh);
 			simulator.getAmmoHairControler().getAmmoControler().getScene().add(helper);
@@ -962,6 +963,7 @@ public class HairCloth {
 			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles,ammoMultipleScalar);
 			data.getSkeltonHelper().update();
 			
+			data.getSkinnedMesh().getGeometry().computeBoundingSphere();//for camera
 		}
 		
 		

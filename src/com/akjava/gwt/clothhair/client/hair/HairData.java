@@ -297,6 +297,11 @@ public void setHairPins(List<HairPin> hairPins) {
 	}
 
 
+	public static final int CLOTH=0;
+	public static final int AMMO_CLOTH=1;
+	private int hairType;
+	
+	
 	private double thick=0.1;//for ammo cloth thick
 	public double getThick() {
 		return thick;
