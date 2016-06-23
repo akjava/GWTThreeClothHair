@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.GWTThreeClothHairStorageKeys;
+import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler.ParticleBodyDatas;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
 import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
 import com.akjava.gwt.clothhair.client.cloth.HairCloth;
@@ -170,7 +171,8 @@ public class HairDataPanel extends VerticalPanel{
 			@Override
 			public void onValueChange(ValueChangeEvent<Boolean> event) {
 				for(HairMixedData data:cellObjects.getDatas()){
-					data.getMesh().setVisible(event.getValue());
+					updateHairVisible(data,event.getValue());
+					
 				}
 			}
 		});
@@ -467,6 +469,22 @@ public class HairDataPanel extends VerticalPanel{
 		 hairPanel.add(downloadPanels);
 	}
 	
+	private void updateHairVisible(HairMixedData data,boolean visible){
+		
+		
+		ParticleBodyDatas ammoData=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().getAmmoData(data.getClothData().getCloth());
+		if(ammoData!=null){
+			if(ammoData.getSkinnedMesh()!=null){
+				ammoData.getSkinnedMesh().setVisible(visible);
+				data.getMesh().setVisible(false);
+				return;
+			}
+			
+		}
+		
+		data.getMesh().setVisible(visible);
+	}
+	
 	/*
 	 * must wait hair texture update
 	 */
@@ -502,7 +520,8 @@ public class HairDataPanel extends VerticalPanel{
 	protected void updateSelectionHairVisible(Boolean value) {
 		if(!value){
 			for(HairMixedData data:cellObjects.getDatas()){
-				data.getMesh().setVisible(showHair.getValue());
+				updateHairVisible(data,showHair.getValue());
+				
 			}
 		}else{
 			HairMixedData selection=cellObjects.getSelection();
@@ -510,9 +529,10 @@ public class HairDataPanel extends VerticalPanel{
 			
 			for(HairMixedData data:cellObjects.getDatas()){
 				if(data==selection){
-					data.getMesh().setVisible(true);
+					updateHairVisible(data,true);
+					
 				}else{
-					data.getMesh().setVisible(false);
+					updateHairVisible(data,false);
 				}
 			}
 		}
