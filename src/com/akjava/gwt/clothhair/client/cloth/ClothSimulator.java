@@ -390,6 +390,10 @@ public class ClothSimulator  {
 		
 		//displacementMap not good at plain when row-poly
 		
+		//TODO make property;
+		boolean isAmmoCloth=hairData.isConnectHorizontal();
+		
+		
 		//little bit 
 		MeshPhongMaterial hairMaterial = THREE.MeshPhongMaterial(GWTParamUtils.
 				MeshPhongMaterial()
@@ -403,7 +407,7 @@ public class ClothSimulator  {
 				//.specular(0xffffff)//TODO move editor
 				//.specularMap(texture)
 				//.shininess(15)
-				
+				.visible(!isAmmoCloth)
 				
 				/*
 				.displacementMap(texture)

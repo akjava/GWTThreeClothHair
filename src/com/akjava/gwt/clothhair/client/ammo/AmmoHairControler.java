@@ -230,4 +230,14 @@ public class AmmoHairControler {
 	public String getInfo() {
 		return "TODO:getInfo()";
 	}
+
+
+	public void updateVisibleBone(Boolean value) {
+		for(ParticleBodyDatas bodyDatas:particleMap.values()){
+			if(bodyDatas.getSkeltonHelper()!=null){
+				bodyDatas.getSkeltonHelper().setVisible(value);
+			}
+		}
+		
+	}
 }
