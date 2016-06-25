@@ -79,7 +79,7 @@ public class AmmoHairControler {
 			
 			//i'm not sure any reason, add here
 			ammoControler.addBodyMesh(data.getAmmoParticles().get(i),1,2);
-			
+			//ammoControler.addBodyMesh(data.getAmmoParticles().get(i));
 		}
 		
 		/*
@@ -100,6 +100,7 @@ public class AmmoHairControler {
 
 			//i'm not sure any reason, add here
 			ammoControler.addBodyMesh(data.getAmmoSpheres().get(i),2,1);
+			//ammoControler.addBodyMesh(data.getAmmoSpheres().get(i));
 		}
 		
 		
@@ -139,6 +140,8 @@ public class AmmoHairControler {
 			ammoControler.getScene().remove(data.getSkeltonHelper());
 		}
 		
+		particleMap.remove(hairCloth);
+		
 		LogUtils.log("removeParticleData:bm="+data.getAmmoParticles().size()+",const="+data.getConstraints().length());
 		//LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
 	}
@@ -153,12 +156,12 @@ public class AmmoHairControler {
 	
 
 	public static class SphereBodyData{
-		List<SphereBodyAndMesh> cannonSpheres;
-		public SphereBodyData(List<SphereBodyAndMesh> cannonSpheres) {
+		List<BodyAndMesh> cannonSpheres;
+		public SphereBodyData(List<BodyAndMesh> cannonSpheres) {
 			super();
 			this.cannonSpheres = cannonSpheres;
 		}
-		public List<SphereBodyAndMesh> getAmmoSpheres() {
+		public List<BodyAndMesh> getAmmoSpheres() {
 			return cannonSpheres;
 		}
 	}
@@ -241,9 +244,25 @@ public class AmmoHairControler {
 		}
 		
 	}
+	private boolean visibleParticl;
+	public boolean isVisibleParticl() {
+		return visibleParticl;
+	}
+
+
 	public void updateVisibleParticle(Boolean value) {
+		visibleParticl=value;
 		for(ParticleBodyDatas bodyDatas:particleMap.values()){
 			for(BodyAndMesh bm:bodyDatas.getAmmoParticles()){
+				Mesh mesh=bm.getMesh();
+				if(mesh!=null){
+					mesh.getMaterial().setVisible(value);
+				}
+			}
+		}
+		
+		for(SphereBodyData sphereData:sphereMap.values()){
+			for(BodyAndMesh bm:sphereData.getAmmoSpheres()){
 				Mesh mesh=bm.getMesh();
 				if(mesh!=null){
 					mesh.getMaterial().setVisible(value);
