@@ -20,12 +20,13 @@ import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
+import com.akjava.gwt.threeammo.client.AmmoControler;
 import com.akjava.gwt.threeammo.client.AmmoUtils;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
+import com.akjava.gwt.threeammo.client.BoxBodyAndMesh;
 import com.akjava.gwt.threeammo.client.ConstraintAndLine;
 import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
 import com.akjava.gwt.threeammo.client.SphereBodyAndMesh;
-import com.akjava.gwt.threeammo.client.AmmoControler;
 import com.akjava.gwt.threeammo.client.bones.PlainBoneCreator;
 import com.akjava.gwt.threeammo.client.bones.PointsToGeometry;
 import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight;
@@ -1197,6 +1198,9 @@ public class HairCloth {
 		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x008800).visible(visibleDummy));//dummy
 		
 		SphereBodyAndMesh body=BodyAndMesh.createSphere(s, mass, p,material);
+		//BoxBodyAndMesh body=BodyAndMesh.createBox(THREE.Vector3(s*2,s/5,s*2), mass, p,material);
+		
+		
 		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getClothProperties());
 		body.getBody().setActivationState(Ammo.DISABLE_DEACTIVATION);
 		
