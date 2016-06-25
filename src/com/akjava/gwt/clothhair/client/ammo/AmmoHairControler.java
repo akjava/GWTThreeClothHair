@@ -12,7 +12,7 @@ import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.akjava.gwt.threeammo.client.BodyProperties;
 import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
 import com.akjava.gwt.threeammo.client.SphereBodyAndMesh;
-import com.akjava.gwt.threeammo.client.ThreeAmmoControler;
+import com.akjava.gwt.threeammo.client.AmmoControler;
 import com.akjava.gwt.threeammo.client.core.Ammo;
 import com.akjava.gwt.threeammo.client.core.btGeneric6DofSpringConstraint;
 import com.google.common.collect.Maps;
@@ -24,9 +24,9 @@ public class AmmoHairControler {
 	
 	private boolean stopped;
 
-	private ThreeAmmoControler ammoControler;
+	private AmmoControler ammoControler;
 
-	public ThreeAmmoControler getAmmoControler() {
+	public AmmoControler getAmmoControler() {
 		return ammoControler;
 	}
 
@@ -57,7 +57,7 @@ public class AmmoHairControler {
 
 	
 	public AmmoHairControler(Scene scene){
-		ammoControler = new ThreeAmmoControler(scene,Ammo.initWorld(0,-100,0));
+		ammoControler = new AmmoControler(scene,Ammo.initWorld(0,-100,0));
 	}
 	
 	Map<HairCloth,ParticleBodyDatas> particleMap=Maps.newHashMap();

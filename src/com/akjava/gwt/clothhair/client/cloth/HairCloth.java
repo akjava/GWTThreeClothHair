@@ -25,7 +25,7 @@ import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.akjava.gwt.threeammo.client.ConstraintAndMesh;
 import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
 import com.akjava.gwt.threeammo.client.SphereBodyAndMesh;
-import com.akjava.gwt.threeammo.client.ThreeAmmoControler;
+import com.akjava.gwt.threeammo.client.AmmoControler;
 import com.akjava.gwt.threeammo.client.bones.PlainBoneCreator;
 import com.akjava.gwt.threeammo.client.bones.PointsToGeometry;
 import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight;
@@ -875,7 +875,7 @@ public class HairCloth {
 
 			JsArray<btGeneric6DofSpringConstraint> ammoConstraints=JavaScriptUtils.createJSArray();
 			
-			ThreeAmmoControler controler=simulator.getAmmoHairControler().getAmmoControler();
+			AmmoControler controler=simulator.getAmmoHairControler().getAmmoControler();
 			btTransform transform1=controler.makeTransform();
 			btTransform transform2=controler.makeTransform();
 			for(int i=0;i<constrains.size();i++){
