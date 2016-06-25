@@ -22,7 +22,7 @@ import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.threeammo.client.AmmoUtils;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
-import com.akjava.gwt.threeammo.client.ConstraintAndMesh;
+import com.akjava.gwt.threeammo.client.ConstraintAndLine;
 import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
 import com.akjava.gwt.threeammo.client.SphereBodyAndMesh;
 import com.akjava.gwt.threeammo.client.AmmoControler;
@@ -31,8 +31,8 @@ import com.akjava.gwt.threeammo.client.bones.PointsToGeometry;
 import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight;
 import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight.WeightResult;
 import com.akjava.gwt.threeammo.client.core.Ammo;
-import com.akjava.gwt.threeammo.client.core.btGeneric6DofSpringConstraint;
 import com.akjava.gwt.threeammo.client.core.btTransform;
+import com.akjava.gwt.threeammo.client.core.constraints.btGeneric6DofSpringConstraint;
 import com.akjava.gwt.threeammo.client.functions.BodyAndMeshFunctions;
 import com.akjava.gwt.threeammo.client.functions.BodyAndMeshFunctions.CloneDivided;
 import com.github.gwtcannonjs.client.CANNON;
@@ -918,7 +918,8 @@ public class HairCloth {
 				distanceConstraintProperties.updateFrameInA(transform1, pos1, pos2);
 				distanceConstraintProperties.updateFrameInB(transform2, pos1, pos2);
 				
-				ConstraintAndMesh constraintAndMesh=simulator.getAmmoHairControler().getAmmoControler().createGeneric6DofSpringConstraintConstraint(bm1.getBody(), bm2.getBody(), transform1, transform2, distanceConstraintProperties.isDisableCollisionsBetweenLinkedBodies());
+				ConstraintAndLine constraintAndMesh=simulator.getAmmoHairControler().getAmmoControler().createGeneric6DofSpringConstraint(bm1, bm2, transform1, transform2, distanceConstraintProperties.isDisableCollisionsBetweenLinkedBodies());
+				constraintAndMesh.setVisibleLine(false);
 				
 				simulator.getAmmoHairControler().getAmmoControler().updateConstraint(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint(), distanceConstraintProperties);
 				
@@ -977,7 +978,7 @@ public class HairCloth {
 					Vector3 threePos=particles.get(i).getOriginal().clone().multiplyScalar(ammoMultipleScalar);
 					ammoParticles.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
 				}else{
-					Vector3 ammoPos=ammoParticles.get(i).getBody().getPosition();
+					Vector3 ammoPos=ammoParticles.get(i).getBody().getReadOnlyPosition();
 					particles.get(i).position.copy(ammoPos).divideScalar(ammoMultipleScalar);
 				}
 			}

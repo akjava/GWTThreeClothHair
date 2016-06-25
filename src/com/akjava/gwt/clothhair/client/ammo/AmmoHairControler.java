@@ -14,7 +14,7 @@ import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
 import com.akjava.gwt.threeammo.client.SphereBodyAndMesh;
 import com.akjava.gwt.threeammo.client.AmmoControler;
 import com.akjava.gwt.threeammo.client.core.Ammo;
-import com.akjava.gwt.threeammo.client.core.btGeneric6DofSpringConstraint;
+import com.akjava.gwt.threeammo.client.core.constraints.btGeneric6DofSpringConstraint;
 import com.google.common.collect.Maps;
 import com.google.gwt.core.client.JsArray;
 
