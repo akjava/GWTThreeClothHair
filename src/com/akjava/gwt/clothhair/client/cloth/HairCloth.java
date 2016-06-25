@@ -478,7 +478,16 @@ public class HairCloth {
 						}*/
 					}
 					
-					
+					//test cross on first one
+					if(v==0){
+						if(u!=0){
+							addConstrain(particles.get(index(u,v)), particles.get(index(u-1,v+1)), distance);
+						}
+						
+						if(u!=w-1){
+							addConstrain(particles.get(index(u,v)), particles.get(index(u+1,v+1)), distance);
+						}
+					}
 
 				}
 				
@@ -772,10 +781,10 @@ public class HairCloth {
 	//bigger value cloth would fly ( 0.5 is best.bigger easy to stuck,small easy to slip out)
 	
 	//TODO move ammohair controler and allow change from basic panel
-     double ammoMultipleScalar=0.01;//1;//0.1;//should be small,0.1 seems good,but need modify-function
+     double ammoMultipleScalar=0.1;//1;//0.1;//should be small,0.1 seems good,but need modify-function
 	 //double ammoMultipleScalar=1;
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
-	 private boolean visibleDummy=false;
+	 private boolean visibleDummy=false;//now working //set scale & pos
 	
 	 
 	private void simulateAmmo(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
@@ -837,14 +846,16 @@ public class HairCloth {
 			
 			List<BodyAndMesh> ammoParticles=Lists.newArrayList();
 			
+			double baseMass=1;//not so effect
 			for(int i=0;i<particles.size();i++){
 				Particle particle=particles.get(i);
 				int v=i/(w+1);
 				//this effect small,TODO more check
-				double baseMass=1;//not so effect
 				
 				
-				if(v==h){
+				
+				if(v>h/2){
+					//baseMass=0.5;
 					//baseMass*=100;// 
 				}
 				
@@ -869,7 +880,10 @@ public class HairCloth {
 				*/
 				
 				BodyAndMesh p=createAmmoParticle(simulator,particle.getOriginal().clone().multiplyScalar(ammoMultipleScalar), mass);
+				p.setAmmoMultipleScalar(ammoMultipleScalar);
 				ammoParticles.add(p);
+				
+				//baseMass*=0.99;
 			}
 			
 			//make constraint
@@ -887,10 +901,10 @@ public class HairCloth {
 				int p1y=p1/(w+1);
 				int p2y=p2/(w+1);
 				
-				boolean testHalf=false;
+				boolean useB=false;
 				
-				if(p1y>0 ){
-					//testHalf=true;
+				if(p1y>5 ){
+					//useB=true;
 				}
 				
 				BodyAndMesh bm1=ammoParticles.get(p1);
@@ -902,13 +916,13 @@ public class HairCloth {
 				
 				DistanceConstraintProperties distanceConstraintProperties=simulator.getAmmoHairControler().getConstraintProperties();
 				
-				double v=0.1;
-				if(testHalf){//trying tight maybe narrow is good for this
-					distanceConstraintProperties.setFrameInARelativePosRatio(v);
-					distanceConstraintProperties.setFrameInBRelativePosRatio(-v);
-				}else{
+				if(useB){//trying tight maybe narrow is good for this
 					distanceConstraintProperties.setFrameInARelativePosRatio(0.5);
 					distanceConstraintProperties.setFrameInBRelativePosRatio(-0.5);
+				}else{
+					//A alway fixed,never rotate
+					distanceConstraintProperties.setFrameInARelativePosRatio(0);
+					distanceConstraintProperties.setFrameInBRelativePosRatio(-1);
 				}
 				//not using distance here.
 				
@@ -1198,10 +1212,10 @@ public class HairCloth {
 		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x008800).visible(visibleDummy));//dummy
 		
 		SphereBodyAndMesh body=BodyAndMesh.createSphere(s, mass, p,material);
-		//BoxBodyAndMesh body=BodyAndMesh.createBox(THREE.Vector3(s*2,s/5,s*2), mass, p,material);
+		//BoxBodyAndMesh body=BodyAndMesh.createBox(THREE.Vector3(s*2,s*2,s*2), mass, p,material);
 		
 		
-		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getClothProperties());
+		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getParticleProperties());
 		body.getBody().setActivationState(Ammo.DISABLE_DEACTIVATION);
 		
 		

@@ -88,15 +88,15 @@ public class ClothSimulator  {
 		ammoHairControler.getSpherehProperties().setFriction(10);
 		ammoHairControler.getSpherehProperties().setRestitution(0);
 		
-		ammoHairControler.getClothProperties().setFriction(10);
-		ammoHairControler.getClothProperties().setRestitution(0);
-		ammoHairControler.getClothProperties().setDamping(.5,.5); //for lighter
+		ammoHairControler.getParticleProperties().setFriction(10);
+		ammoHairControler.getParticleProperties().setRestitution(0);
+		ammoHairControler.getParticleProperties().setDamping(.5,.9); //for lighter
 		//ammoHairControler.getClothProperties().setDamping(0,0);
 		
-		ammoHairControler.getConstraintProperties().setEnableSpringsAll(true);
-		ammoHairControler.getConstraintProperties().setStiffnessAll(100);
-		ammoHairControler.getConstraintProperties().setDampingAll(.1);
-		double mpi=Math.PI;
+		//ammoHairControler.getConstraintProperties().setEnableSpringsAll(true);
+		ammoHairControler.getConstraintProperties().setStiffnessAll(1);
+		ammoHairControler.getConstraintProperties().setDampingAll(.9);
+		double mpi=Math.PI/2;
 		ammoHairControler.getConstraintProperties().setAngularLowerLimit(THREE.Vector3(-mpi, -mpi, -mpi));
 		ammoHairControler.getConstraintProperties().setAngularUpperLimit(THREE.Vector3(mpi, mpi, mpi));
 		

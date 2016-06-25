@@ -6,13 +6,14 @@ import java.util.Map;
 import com.akjava.gwt.clothhair.client.cloth.HairCloth;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
+import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
+import com.akjava.gwt.threeammo.client.AmmoControler;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.akjava.gwt.threeammo.client.BodyProperties;
 import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
 import com.akjava.gwt.threeammo.client.SphereBodyAndMesh;
-import com.akjava.gwt.threeammo.client.AmmoControler;
 import com.akjava.gwt.threeammo.client.core.Ammo;
 import com.akjava.gwt.threeammo.client.core.constraints.btGeneric6DofSpringConstraint;
 import com.google.common.collect.Maps;
@@ -77,7 +78,7 @@ public class AmmoHairControler {
 		for(int i=0;i<data.getAmmoParticles().size();i++){
 			
 			//i'm not sure any reason, add here
-			ammoControler.addBodyMesh(data.getAmmoParticles().get(i));
+			ammoControler.addBodyMesh(data.getAmmoParticles().get(i),1,2);
 			
 		}
 		
@@ -98,7 +99,7 @@ public class AmmoHairControler {
 			//spehre seems ok!
 
 			//i'm not sure any reason, add here
-			ammoControler.addBodyMesh(data.getAmmoSpheres().get(i));
+			ammoControler.addBodyMesh(data.getAmmoSpheres().get(i),2,1);
 		}
 		
 		
@@ -175,7 +176,7 @@ public class AmmoHairControler {
 	}
 
 	private BodyProperties clothProperties=new BodyProperties();
-	public BodyProperties getClothProperties() {
+	public BodyProperties getParticleProperties() {
 		return clothProperties;
 	}
 
@@ -236,6 +237,17 @@ public class AmmoHairControler {
 		for(ParticleBodyDatas bodyDatas:particleMap.values()){
 			if(bodyDatas.getSkeltonHelper()!=null){
 				bodyDatas.getSkeltonHelper().setVisible(value);
+			}
+		}
+		
+	}
+	public void updateVisibleParticle(Boolean value) {
+		for(ParticleBodyDatas bodyDatas:particleMap.values()){
+			for(BodyAndMesh bm:bodyDatas.getAmmoParticles()){
+				Mesh mesh=bm.getMesh();
+				if(mesh!=null){
+					mesh.getMaterial().setVisible(value);
+				}
 			}
 		}
 		

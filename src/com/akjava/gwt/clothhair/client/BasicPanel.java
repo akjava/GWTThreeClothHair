@@ -237,6 +237,19 @@ public class BasicPanel extends VerticalPanel{
 		});
 		ha.add(ammoBoneCheck);
 		
+		
+		CheckBox particleBoneCheck=new CheckBox("particle");
+		
+		particleBoneCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().updateVisibleParticle(event.getValue());
+			}
+			
+		});
+		ha.add(particleBoneCheck);
+		
 		//cannon controling
 		generalPanel.add(new HTML("<h4>Cannon</h4>"));
 		HorizontalPanel h2=new HorizontalPanel();
