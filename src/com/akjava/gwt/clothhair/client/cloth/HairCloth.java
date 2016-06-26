@@ -791,7 +791,7 @@ public class HairCloth {
 	 double ammoMultipleScalar=1;
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
 	 private boolean visibleDummy=false;//now working //set scale & pos
-	
+	 private boolean visibleBone=false;
 	 
 	private void simulateAmmo(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
 
@@ -1073,7 +1073,7 @@ public class HairCloth {
 			simulator.getAmmoHairControler().getAmmoControler().getScene().add(helper);
 			data.setSkeltonHelper(helper);
 			
-			helper.setVisible(false);//TODO get visible from setting
+			helper.setVisible(visibleBone);//TODO get visible from setting
 			
 			
 			}

@@ -245,6 +245,7 @@ public class AmmoHairControler {
 
 
 	public void updateVisibleBone(Boolean value) {
+		visibleBone=value;
 		for(ParticleBodyDatas bodyDatas:particleMap.values()){
 			if(bodyDatas.getSkeltonHelper()!=null){
 				bodyDatas.getSkeltonHelper().setVisible(value);
@@ -252,6 +253,11 @@ public class AmmoHairControler {
 		}
 		
 	}
+	private boolean visibleBone;
+	public boolean isVisibleBone() {
+		return visibleBone;
+	}
+
 	private boolean visibleParticl;
 	public boolean isVisibleParticl() {
 		return visibleParticl;
