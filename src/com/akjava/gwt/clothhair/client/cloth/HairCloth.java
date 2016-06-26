@@ -2,6 +2,7 @@ package com.akjava.gwt.clothhair.client.cloth;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler;
@@ -15,10 +16,10 @@ import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
-import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
+import com.akjava.gwt.three.client.js.extras.helpers.BoundingBoxHelper;
 import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Quaternion;
@@ -31,7 +32,6 @@ import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.akjava.gwt.threeammo.client.BoxBodyAndMesh;
 import com.akjava.gwt.threeammo.client.ConstraintAndLine;
 import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
-import com.akjava.gwt.threeammo.client.SphereBodyAndMesh;
 import com.akjava.gwt.threeammo.client.bones.PlainBoneCreator;
 import com.akjava.gwt.threeammo.client.bones.PointsToGeometry;
 import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight;
@@ -760,7 +760,7 @@ public class HairCloth {
 	//before simulate
 	
 	public void beforeSimulate(ClothSimulator simulator,Geometry clothGeometry,List<Mesh> spheres){
-		//made cannon object or sync cannon-object position
+		
 	}
 	
 	
@@ -1068,10 +1068,12 @@ public class HairCloth {
 			data.setSkinnedMesh(clothBoxMesh);
 			simulator.getAmmoHairControler().getAmmoControler().getScene().add(clothBoxMesh);
 			clothBoxMesh.getGeometry().computeBoundingSphere();//for camera
+			clothBoxMesh.getGeometry().computeBoundingBox();
 			
 			SkeletonHelper helper=THREE.SkeletonHelper(clothBoxMesh);
 			simulator.getAmmoHairControler().getAmmoControler().getScene().add(helper);
 			data.setSkeltonHelper(helper);
+			
 			
 			helper.setVisible(visibleBone);//TODO get visible from setting
 			
@@ -1100,7 +1102,16 @@ public class HairCloth {
 			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles,ammoMultipleScalar);
 			data.getSkeltonHelper().update();
 			
-			data.getSkinnedMesh().getGeometry().computeBoundingSphere();//for camera
+				
+			Stopwatch watch3=LogUtils.stopwatch();
+			JsArray<Vector3> pos=JavaScriptUtils.createJSArray();
+			for(int i=0;i<ammoParticles.size();i+=10){ //reduce 
+				pos.push(ammoParticles.get(i).getMesh().getPosition());
+			}
+			data.getSkinnedMesh().getGeometry().getBoundingSphere().setFromPoints(pos);
+			//LogUtils.microsecond("computeSphere",watch3);
+				
+				//data.getSkinnedMesh().getGeometry().computeBoundingSphere();//for camera
 			}
 		}
 		
@@ -1318,8 +1329,8 @@ public class HairCloth {
 		
 		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x008800).visible(visibleDummy));//dummy
 		
-		SphereBodyAndMesh body=BodyAndMesh.createSphere(s, mass, p,material);
-		//BoxBodyAndMesh body=BodyAndMesh.createBox(THREE.Vector3(s*2,s*2,s*2), mass, p,material);
+		//SphereBodyAndMesh body=BodyAndMesh.createSphere(s, mass, p,material);
+		BoxBodyAndMesh body=BodyAndMesh.createBox(THREE.Vector3(s*2,s*2,s*2), mass, p,material);
 		
 		
 		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getParticleProperties());

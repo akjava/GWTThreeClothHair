@@ -104,7 +104,7 @@ public class AmmoHairControler {
 		}
 		
 		
-		LogUtils.log("set-sphere:"+channel+","+data.getAmmoSpheres().size());
+		LogUtils.log("set-sphere:channel="+channel+",sphere-count="+data.getAmmoSpheres().size());
 		
 		//LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
 	}

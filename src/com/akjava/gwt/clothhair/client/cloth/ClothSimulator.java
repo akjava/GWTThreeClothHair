@@ -82,7 +82,7 @@ public class ClothSimulator  {
 		
 		
 		sphereGeometry = THREE.SphereGeometry( 1, 20, 20 );
-		boxGeometry = THREE.BoxGeometry( 2, 2, 2 );
+		boxGeometry = THREE.BoxGeometry( 2, 2, 2,10,10,10 );
 		
 		canvas = CanvasUtils.createCanvas(256, 256);
 		canvas.setCoordinateSpaceWidth(512);
@@ -100,8 +100,9 @@ public class ClothSimulator  {
 		ammoHairControler.getParticleProperties().setDamping(.001,.001); //for lighter
 		//ammoHairControler.getClothProperties().setDamping(0,0);
 		
+		//ammoHairControler.getConstraintProperties().setDisableCollisionsBetweenLinkedBodies(false);
 		ammoHairControler.getConstraintProperties().setEnableSpringsAll(true);
-		ammoHairControler.getConstraintProperties().setStiffnessAll(1);
+		ammoHairControler.getConstraintProperties().setStiffnessAll(1000);
 		ammoHairControler.getConstraintProperties().setDampingAll(.001);
 		double mpi=Math.PI/2;
 		ammoHairControler.getConstraintProperties().setAngularLowerLimit(THREE.Vector3(-mpi, -mpi, -mpi));
@@ -385,7 +386,7 @@ public class ClothSimulator  {
 			collisionMesh = THREE.Mesh( sphereGeometry, material );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
 			}else {
 			//rotate here must be good?
-			Geometry geometry=boxGeometry.clone();
+			Geometry geometry=boxGeometry;
 			//geometry.applyMatrix(THREE.Matrix4().makeRotationFromQuaternion(data.getRotate()));
 			collisionMesh = THREE.Mesh( geometry, material );	
 			}

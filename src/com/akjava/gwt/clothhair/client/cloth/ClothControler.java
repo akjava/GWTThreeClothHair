@@ -181,6 +181,18 @@ public class ClothControler {
 				}
 			}
 			
+			/**
+			 * 
+			 how sync works
+			 
+			 pin-pos is never change without character moved.
+			 so make a diff from preposition and newposition.
+			 that is the moved.
+			 
+			 add all to help
+			 * 
+			 */
+			
 			int pinSize=generalPinVectors.size();
 			
 			int cw=data.getCloth().w/(pinSize-1);//TODO method
