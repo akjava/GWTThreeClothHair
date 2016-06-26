@@ -99,7 +99,7 @@ public class AmmoHairControler {
 			//spehre seems ok!
 
 			//i'm not sure any reason, add here
-			ammoControler.addBodyMesh(data.getAmmoSpheres().get(i),2,1);
+			addSphereBodyData(data.getAmmoSpheres().get(i));
 			//ammoControler.addBodyMesh(data.getAmmoSpheres().get(i));
 		}
 		
@@ -108,6 +108,14 @@ public class AmmoHairControler {
 		
 		//LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
 	}
+	
+	public void addSphereBodyData(BodyAndMesh bm){
+		ammoControler.addBodyMesh(bm,2,1);
+	}
+	public void removeSphereBodyData(BodyAndMesh bm){
+		ammoControler.destroyBodyAndMesh(bm);
+	}
+	
 	
 	public void removeSphereData(int channel){
 		SphereBodyData data=sphereMap.get(channel);

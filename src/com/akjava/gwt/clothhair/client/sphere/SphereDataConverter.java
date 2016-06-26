@@ -2,6 +2,7 @@ package com.akjava.gwt.clothhair.client.sphere;
 
 import java.util.List;
 
+import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.lib.common.utils.ValuesUtils;
 import com.google.common.base.Converter;
 import com.google.common.base.Joiner;
@@ -19,6 +20,8 @@ public class SphereDataConverter extends Converter<SphereData,String>{
 	protected String doForward(SphereData value) {
 		return Joiner.on(",").join(Doubles.asList(new double[]{value.getX(),value.getY(),value.getZ(),value.getSize()
 		,value.isEnabled()?1.0:0,value.getBoneIndex(),value.getChannel()		,value.isCopyHorizontal()?1.0:0
+				,value.getType(),
+				value.getRotate().getX(),value.getRotate().getY(),value.getRotate().getZ(),value.getRotate().getW()
 		}));
 	}
 
@@ -48,6 +51,20 @@ public class SphereDataConverter extends Converter<SphereData,String>{
 		if(values.length>7){
 			boolean copy=values[7]==1?true:false;
 			data.setCopyHorizontal(copy);
+		}
+		
+		if(values.length>8){
+			data.setType((int)values[8]);
+		}
+		
+		if(values.length>12){
+			double x=values[9];
+			double y=values[10];
+			double z=values[11];
+			double w=values[12];
+			
+			data.getRotate().set(x, y, z, w);
+			
 		}
 		
 		return data;

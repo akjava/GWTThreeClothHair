@@ -30,6 +30,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -83,6 +84,10 @@ public class SphereDataPanel extends VerticalPanel{
 		});
 		 this.add(test);
 		 */
+		 HorizontalPanel filterPanel=new HorizontalPanel();
+		 filterPanel.setVerticalAlignment(ALIGN_MIDDLE);
+		 this.add(filterPanel);
+		 filterPanel.add(new Label("Show speres:"));
 		 final ListBox filterBox=new ListBox();
 		 filterBox.addItem("All");
 		 filterBox.addItem("Selected Channel Only");
@@ -96,9 +101,9 @@ public class SphereDataPanel extends VerticalPanel{
 				updateSphereVisible();
 			}
 		});
-		 this.add(filterBox);
+		 filterPanel.add(filterBox);
 		 
-		 SimpleCellTable<SphereData> table=new SimpleCellTable<SphereData>() {
+		 SimpleCellTable<SphereData> table=new SimpleCellTable<SphereData>(20) {
 				@Override
 				public void addColumns(CellTable<SphereData> table) {
 					

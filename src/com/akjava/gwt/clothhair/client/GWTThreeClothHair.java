@@ -979,7 +979,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//link
 		
-		tab.selectTab(3);
+		tab.selectTab(0);
 	}
 	private Widget createHairPinPanel() {
 		hairPinPanel = new HairPinPanel();

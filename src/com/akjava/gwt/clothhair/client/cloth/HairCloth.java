@@ -10,14 +10,18 @@ import com.akjava.gwt.clothhair.client.cannon.CannonControler.SphereBodyData;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataUtils;
+import com.akjava.gwt.clothhair.client.sphere.JsSphereData;
+import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
+import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
+import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
@@ -783,8 +787,8 @@ public class HairCloth {
 	//bigger value cloth would fly ( 0.5 is best.bigger easy to stuck,small easy to slip out)
 	
 	//TODO move ammohair controler and allow change from basic panel
-     double ammoMultipleScalar=0.1;//1;//0.1;//should be small,0.1 seems good,but need modify-function
-	 //double ammoMultipleScalar=1;
+     //double ammoMultipleScalar=0.1;//1;//0.1;//should be small,0.1 seems good,but need modify-function
+	 double ammoMultipleScalar=1;
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
 	 private boolean visibleDummy=false;//now working //set scale & pos
 	
@@ -811,40 +815,112 @@ public class HairCloth {
 		
 		
 		if(needInitSphere){
-			List<BodyAndMesh> cannonSpheres=Lists.newArrayList();
+			List<BodyAndMesh> ammoSpheres=Lists.newArrayList();
 			for(int i=0;i<spheres.size();i++){
 				//seems no need sphere
 				Mesh sphereMesh=spheres.get(i);
-				LogUtils.log("sphere-scale:"+sphereMesh.getScale().getX());
-				BodyAndMesh body=createAmmoSphereBody(simulator,sphereMesh.getPosition().clone().multiplyScalar(ammoMultipleScalar),sphereMesh.getScale().getX()*ammoMultipleScalar);
+				//LogUtils.log("sphere-scale:"+sphereMesh.getScale().getX());
+				
+				//create boxy mesh real-character-size (character usually scaled * 1000)
+				
+				/*
+				 * 
+				 * sphereMesh.scale is same as CharacterMesh on 
+				 * 
+				 * sphereMesh.getScale().getX()*ammoMultipleScalar
+				 * 
+				 */
+				
+				BodyAndMesh body=createAmmoSphereBody(simulator,sphereMesh.getPosition().clone().multiplyScalar(ammoMultipleScalar),sphereMesh.getScale().getX()*ammoMultipleScalar,(JsSphereData)sphereMesh.getUserData().cast());
 				body.setAmmoMultipleScalar(ammoMultipleScalar);
-				cannonSpheres.add(body);	
+				ammoSpheres.add(body);	
 			}
 			
-			simulator.getAmmoHairControler().setSphereData(channel,new AmmoHairControler.SphereBodyData(cannonSpheres));
+			simulator.getAmmoHairControler().setSphereData(channel,new AmmoHairControler.SphereBodyData(ammoSpheres));
 			
 		}else{
 			AmmoHairControler.SphereBodyData data=simulator.getAmmoHairControler().getSphereData(channel);
-			List<BodyAndMesh> cannonSpheres=data.getAmmoSpheres();
+			List<BodyAndMesh> ammoCollisions=data.getAmmoSpheres();
 			for(int i=0;i<spheres.size();i++){
+				
+				boolean needReCreate=false;
+				
+				JsSphereData jsData=spheres.get(i).getUserData().cast();
+				BodyAndMesh bodyAndMesh=ammoCollisions.get(i);
+				if(jsData.getType()!=bodyAndMesh.getShapeType()){
+					LogUtils.log("jsDataType:"+jsData.getType()+",bodyShapeType="+bodyAndMesh.getShapeType());
+					needReCreate=true;
+				}
+				
+				if(!needReCreate){
+					double characterScale=simulator.getCharacterMesh().getScale().getX();
+					if(bodyAndMesh.getShapeType()==BodyAndMesh.TYPE_SPHERE){
+						double radius=bodyAndMesh.castToSphere().getRadius()/characterScale;
+						if(!isSame(4, radius, jsData.getRadius())){
+							LogUtils.log("sphere-radius:"+jsData.getRadius()+","+radius);
+							needReCreate=true;
+						}
+					}else{//box
+						
+						double radius=bodyAndMesh.castToBox().getBoxSize().getX()/2/characterScale;
+						//TODO support boxSize
+						if(!isSame(4, radius, jsData.getRadius())){
+							LogUtils.log("box-radius:"+jsData.getRadius()+","+radius);
+							needReCreate=true;
+						}
+						
+					}
+				}
+				
+				if(needReCreate){
+					LogUtils.log("sphere replaced");
+					simulator.getAmmoHairControler().removeSphereBodyData(bodyAndMesh);
+					
+					Mesh sphereMesh=spheres.get(i);
+					BodyAndMesh body=createAmmoSphereBody(simulator,sphereMesh.getPosition().clone().multiplyScalar(ammoMultipleScalar),sphereMesh.getScale().getX()*ammoMultipleScalar,(JsSphereData)sphereMesh.getUserData().cast());
+					body.setAmmoMultipleScalar(ammoMultipleScalar);
+					
+					
+					
+					ammoCollisions.set(i, body);//replace
+					simulator.getAmmoHairControler().addSphereBodyData(body);
+					continue;
+				}
+				
+				
+				
 				//TODO modify divided size
 				Vector3 threePos=spheres.get(i).getPosition().clone().multiplyScalar(ammoMultipleScalar);
-				cannonSpheres.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
+				ammoCollisions.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
 				
 				//cannonSpheres.get(i).getMesh().getPosition().copy(threePos);//for when resize
 				
+			
+				
+				
+				
 				//ThreeLog.log("sphere-position-updated:"+i,threePos);
+				//TODO fix re-create method
 				double radius=spheres.get(i).getScale().getX()*ammoMultipleScalar;
 				
-				if(cannonSpheres.get(i).getShapeType()==BodyAndMesh.TYPE_SPHERE){
-					SphereBodyAndMesh sphere=cannonSpheres.get(i).castToSphere();
+				if(ammoCollisions.get(i).getShapeType()==BodyAndMesh.TYPE_SPHERE){
+					/*
+					LogUtils.log(ammoCollisions.get(i).getShapeType()+","+BodyAndMesh.TYPE_SPHERE);
+					LogUtils.log(ammoCollisions.get(i));
+					SphereBodyAndMesh sphere=ammoCollisions.get(i).castToSphere();
 				if(!isSame(4,radius,sphere.getRadius())){
 					//resize it costly
 					LogUtils.log("sphere different-size-recreate:"+radius+","+sphere.getRadius());
-					simulator.getAmmoHairControler().getAmmoControler().setRadiusWithRecreate(radius, cannonSpheres.get(i));
+					simulator.getAmmoHairControler().getAmmoControler().setRadiusWithRecreate(radius, ammoCollisions.get(i));
 				}
+				*/
+					
 				}else{
-					//TODO box check
+				//	LogUtils.log("box rotate updated");
+					Quaternion q=spheres.get(i).getQuaternion();
+					
+					BodyAndMesh bm=ammoCollisions.get(i);
+					bm.getBody().setRotation(q);
 				}
 				
 				
@@ -1211,9 +1287,8 @@ public class HairCloth {
 	}
 	
 	
-	private boolean testUseBoxAsSphere=false;
 	//TODO option box or sphere
-	protected BodyAndMesh createAmmoSphereBody(ClothSimulator simulator,Vector3 position, double size) {
+	protected BodyAndMesh createAmmoSphereBody(ClothSimulator simulator,Vector3 position, double size,JsSphereData sphereData) {
 		
 		
 		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0xff0000)
@@ -1223,8 +1298,9 @@ public class HairCloth {
 		
 		//
 		BodyAndMesh body=null;
-		if(testUseBoxAsSphere){
+		if(sphereData.getType()==SphereData.TYPE_BOX){
 		body=BodyAndMesh.createBox(THREE.Vector3().setScalar(size*2), 0, position.getX(),position.getY(),position.getZ(),material);
+		//rotate later
 		}else{
 		body=BodyAndMesh.createSphere(size, 0, position.getX(),position.getY(),position.getZ(),material);	
 		}
@@ -1242,8 +1318,8 @@ public class HairCloth {
 		
 		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x008800).visible(visibleDummy));//dummy
 		
-		//SphereBodyAndMesh body=BodyAndMesh.createSphere(s, mass, p,material);
-		BoxBodyAndMesh body=BodyAndMesh.createBox(THREE.Vector3(s*2,s*2,s*2), mass, p,material);
+		SphereBodyAndMesh body=BodyAndMesh.createSphere(s, mass, p,material);
+		//BoxBodyAndMesh body=BodyAndMesh.createBox(THREE.Vector3(s*2,s*2,s*2), mass, p,material);
 		
 		
 		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getParticleProperties());

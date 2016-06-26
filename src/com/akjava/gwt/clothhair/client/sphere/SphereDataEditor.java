@@ -6,8 +6,11 @@ import java.util.List;
 
 import com.akjava.gwt.clothhair.client.SkeletonUtils;
 import com.akjava.gwt.clothhair.client.SkeletonUtils.BoneData;
-import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
+import com.akjava.gwt.three.client.java.ui.experiments.SimpleEulerEditor;
+import com.akjava.gwt.three.client.java.ui.experiments.SimpleEulerEditor.SimpleEulerEditorListener;
+import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.math.Euler;
 import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.google.common.collect.Lists;
 import com.google.gwt.editor.client.Editor;
@@ -25,6 +28,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.ValueListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -41,10 +45,36 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 	public SphereDataEditor(final SphereData defaultValue,SphereDataPanel panel){
 		this.defaultValue=defaultValue;
 		this.panel=panel;
+		
+		HorizontalPanel typePanel=new HorizontalPanel();
+		this.add(typePanel);
+		typePanel.setVerticalAlignment(ALIGN_MIDDLE);
+		typePanel.add(new Label("Type:"));
+		
+		typeEditor = new ListBox();
+		typeEditor.addItem("Sphere");
+		typeEditor.addItem("Box");
+		typePanel.add(typeEditor);
+		typeEditor.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				flush();
+			}
+		});
+		
+		TabPanel tab=new TabPanel();
+		this.add(tab);
+		
+		VerticalPanel positionPanel=new VerticalPanel();
+		tab.add(positionPanel,"Position");
+		tab.selectTab(0);
+		
 		HorizontalPanel h1=new HorizontalPanel();
-		this.add(h1);
+		positionPanel.add(h1);
+		
+		
 		xRange = new LabeledInputRangeWidget2("x", -.2, .2, .001);
-		this.add(xRange);
+		positionPanel.add(xRange);
 		xRange.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Number> event) {
@@ -55,10 +85,10 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		xRange.getRange().setWidth("220px");
 		
 		RangeButtons xButtons=new RangeButtons(xRange);
-		this.add(xButtons);
+		positionPanel.add(xButtons);
 		
 		yRange = new LabeledInputRangeWidget2("y", defaultValue.getY()-1.2,  defaultValue.getY()+1.2, .001);
-		this.add(yRange);
+		positionPanel.add(yRange);
 		yRange.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Number> event) {
@@ -69,10 +99,10 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		yRange.getRange().setWidth("220px");
 		
 		RangeButtons yButtons=new RangeButtons(yRange);
-		this.add(yButtons);
+		positionPanel.add(yButtons);
 		
 		zRange = new LabeledInputRangeWidget2("z", -.2, .2, .001);
-		this.add(zRange);
+		positionPanel.add(zRange);
 		zRange.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Number> event) {
@@ -81,7 +111,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		});
 		
 		RangeButtons zButtons=new RangeButtons(zRange);
-		this.add(zButtons);
+		positionPanel.add(zButtons);
 		
 		zRange.getLabel().setWidth("40px");
 		zRange.getRange().setWidth("220px");
@@ -103,7 +133,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		scaleRange.getLabel().setWidth("40px");
 		scaleRange.getRange().setWidth("220px");
 		
-		this.add(scaleRange);
+		positionPanel.add(scaleRange);
 		scaleRange.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<Number> event) {
@@ -112,7 +142,20 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		});
 		
 		RangeButtons scaleButtons=new RangeButtons(scaleRange);
-		this.add(scaleButtons);
+		positionPanel.add(scaleButtons);
+		
+		VerticalPanel rotatePanel=new VerticalPanel();
+		tab.add(rotatePanel,"rotate");
+		rotateEditor = new SimpleEulerEditor(new SimpleEulerEditorListener() {
+			@Override
+			public void onValueChanged(Euler value) {
+				flush();
+			}
+		});
+		rotatePanel.add(new Label("Rotate(for box)"));
+		rotatePanel.add(rotateEditor);
+		
+		
 		
 		boneIndexBox = new ValueListBox<BoneData>(new Renderer<BoneData>() {
 
@@ -202,6 +245,12 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			value.setChannel(channelBox.getSelectedIndex());
 			
 			value.setCopyHorizontal(copyHorizontalCheck.getValue());
+			
+			value.setType(typeEditor.getSelectedIndex());
+			
+			
+			value.getRotate().setFromEuler(rotateEditor.getValue());
+			
 			//sync here?
 			panel.onFlushed();
 		}
@@ -267,6 +316,8 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		private List<BoneData> boneDatas;
 		private ListBox channelBox;
 		private CheckBox copyHorizontalCheck;
+		private ListBox typeEditor;
+		private SimpleEulerEditor rotateEditor;
 		@Override
 		public void setValue(SphereData value) {
 			this.value=value;
@@ -280,6 +331,9 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 				yRange.setEnabled(false);
 				zRange.setEnabled(false);
 				scaleRange.setEnabled(false);
+				
+				rotateEditor.setEnabled(false);
+				typeEditor.setEnabled(false);
 				return;
 			}
 			
@@ -287,12 +341,18 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			yRange.setEnabled(true);
 			zRange.setEnabled(true);
 			scaleRange.setEnabled(true);
+			rotateEditor.setEnabled(true);
+			typeEditor.setEnabled(true);
 			
 			//no need flush here
 			xRange.setValue(value.getX());
 			yRange.setValue(value.getY());
 			zRange.setValue(value.getZ());
 			scaleRange.setValue(value.getSize());
+			
+			typeEditor.setSelectedIndex(value.getType());
+			rotateEditor.setValue(THREE.Euler().setFromQuaternion(value.getRotate()));
+			
 			
 			BoneData data=null;
 			for(BoneData boneData:boneDatas){

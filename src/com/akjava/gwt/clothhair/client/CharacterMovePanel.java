@@ -125,7 +125,7 @@ public class CharacterMovePanel extends VerticalPanel{
 			}
 		});
 		
-		this.add(new Label("Rotation"));
+		this.add(new Label("Rotation(Bugs.rotaion is broke box rotation.do rotate on root animation)"));
 		LabeledInputRangeWidget2 xRot=new LabeledInputRangeWidget2("x", -180, 180, 1);
 		xRot.getLabel().setWidth("20px");
 		xRot.getRange().setWidth("240px");

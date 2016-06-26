@@ -25,6 +25,15 @@ public class SkinningVertexCalculator {
 	}
 
 
+	public SkinnedMesh getSkinnedMesh() {
+		return skinnedMesh;
+	}
+
+	public void setSkinnedMesh(SkinnedMesh skinnedMesh) {
+		this.skinnedMesh = skinnedMesh;
+	}
+
+
 	private List<Vector3> result=Lists.newArrayList();
 	public List<Vector3> getResult() {
 		return result;

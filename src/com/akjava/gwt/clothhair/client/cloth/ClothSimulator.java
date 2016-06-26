@@ -7,20 +7,19 @@ import java.util.List;
 import java.util.Map;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair.SphereCalculatorAndMesh;
-import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler;
 import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler.ParticleBodyDatas;
 import com.akjava.gwt.clothhair.client.cannon.CannonControler;
 import com.akjava.gwt.clothhair.client.hair.HairData;
-import com.akjava.gwt.clothhair.client.hair.HairPinPredicates;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
 import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToNormal;
+import com.akjava.gwt.clothhair.client.hair.HairPinPredicates;
+import com.akjava.gwt.clothhair.client.sphere.JsSphereData;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
-import com.akjava.gwt.clothhair.client.texture.HairPatternDataEditor;
 import com.akjava.gwt.clothhair.client.texture.HairPatternDataUtils;
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.akjava.gwt.lib.client.CanvasUtils;
@@ -31,9 +30,15 @@ import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
+import com.akjava.gwt.three.client.js.core.Geometry;
+import com.akjava.gwt.three.client.js.extras.geometries.BoxGeometry;
 import com.akjava.gwt.three.client.js.extras.geometries.SphereGeometry;
+import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
+import com.akjava.gwt.three.client.js.math.Matrix4;
+import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
+import com.akjava.gwt.three.client.js.objects.Bone;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
@@ -64,7 +69,8 @@ public class ClothSimulator  {
 		this.characterMesh = characterMesh;
 	}
 
-	private SphereGeometry ballGeo;
+	private SphereGeometry sphereGeometry;
+	private BoxGeometry boxGeometry;
 	public ClothSimulator(Scene scene,SkinnedMesh characterMesh){
 		this.scene=scene;
 		this.characterMesh=characterMesh;
@@ -75,7 +81,8 @@ public class ClothSimulator  {
 		updateAmmoProperties();
 		
 		
-		ballGeo = THREE.SphereGeometry( 1, 20, 20 );
+		sphereGeometry = THREE.SphereGeometry( 1, 20, 20 );
+		boxGeometry = THREE.BoxGeometry( 2, 2, 2 );
 		
 		canvas = CanvasUtils.createCanvas(256, 256);
 		canvas.setCoordinateSpaceWidth(512);
@@ -193,13 +200,38 @@ public class ClothSimulator  {
 	
 
 	/*
-	 * called when flushed
+	 * called when flushed from SphereDataEditor via SphereDataPanel
 	 */
 	public void syncSphereDataAndSkinningVertexCalculator(SphereData data){
 		if(data==null){
 			return;
 		}
+		
+		SphereCalculatorAndMesh sm=sphereMeshMap.get(data);
+		JsSphereData jsData=sm.getMesh().getUserData().cast();
+		if(jsData==null){
+			LogUtils.log("syncSphereDataAndSkinningVertexCalculator:some how jsData is null");
+			return;
+		}
+		//difference case
+		if(jsData.getType()!=data.getType()){
+			//LogUtils.log("syncSphereDataAndSkinningVertexCalculator:replace body type");
+			removeSphereData(data);
+			addSphereData(data);
+			return;
+		}
+		
+		//update jsData
+		
+		//replace user data
+		sphereMeshMap.get(data).getMesh().setUserData(sphereDataToJsData(data));
+		
+		//same time just update size & miror
+		
 		SkinningVertexCalculator calculator=sphereMeshMap.get(data).getCalculator();
+		
+		
+		
 		for(SkinningVertex vertex:calculator.getSkinningVertexs()){
 			vertex.getSkinIndices().setX(data.getBoneIndex());
 		}
@@ -236,7 +268,7 @@ public class ClothSimulator  {
 			this.getClothControler().updateSphere(sphereMeshMap.get(data2).getMesh(), data2.getChannel());
 			
 		}else{
-			//no need
+			//no mirror anymore
 			SphereData data2=mirrorMap.get(data);
 			if(data2!=null){
 				removeSphereMesh(data2);
@@ -312,10 +344,12 @@ public class ClothSimulator  {
 	public void addSphereData(SphereData data){
 		MeshPhongMaterial ballMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(0x888888).side(THREE.DoubleSide).wireframe(true));
 		
-		Mesh sphere = THREE.Mesh( ballGeo, ballMaterial );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
+		Mesh sphere=createFromSphereData(data,ballMaterial);
+		
+		
 		scene.add( sphere );
 		
-		sphere.getScale().setScalar(data.getSize());
+		
 		
 		this.getClothControler().addSphere(sphere,data.getChannel());
 		
@@ -324,6 +358,7 @@ public class ClothSimulator  {
 		sphereMeshMap.put(data, new SphereCalculatorAndMesh(characterMesh, data.getBoneIndex(), sphere));
 		
 		if(data.isCopyHorizontal()){
+			//TODO fix rotation
 			SphereData data2=data.clone();
 			updateHorizontalMirror(data2);
 			mirrorMap.put(data, data2);
@@ -334,13 +369,44 @@ public class ClothSimulator  {
 	
 	private Map<SphereData,SphereData> mirrorMap=Maps.newHashMap();
 	
+	
+	private JsSphereData sphereDataToJsData(SphereData data){
+		JsSphereData jsData=JsSphereData.create();
+		jsData.setType(data.getType());
+		jsData.setRotate(data.getRotate().clone());
+		jsData.setRadius(data.getSize());
+		jsData.setBoneIndex(data.getBoneIndex());
+		return jsData;
+	}
+	
+	private Mesh createFromSphereData(SphereData data,Material material){
+		Mesh collisionMesh=null;
+		if(data.getType()==SphereData.TYPE_SPHERE){
+			collisionMesh = THREE.Mesh( sphereGeometry, material );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
+			}else {
+			//rotate here must be good?
+			Geometry geometry=boxGeometry.clone();
+			//geometry.applyMatrix(THREE.Matrix4().makeRotationFromQuaternion(data.getRotate()));
+			collisionMesh = THREE.Mesh( geometry, material );	
+			}
+		collisionMesh.getScale().setScalar(data.getSize());
+		collisionMesh.setUserData(sphereDataToJsData(data));
+		return collisionMesh;
+	}
+	
+	/**
+	 * called when mirror as isCopyHorizontal()
+	 * @param data
+	 * @param color
+	 * @return
+	 */
 	private SphereCalculatorAndMesh initSphereCalculatorAndMesh(SphereData data,int color){
 		MeshPhongMaterial ballMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(color).side(THREE.DoubleSide).wireframe(true));
-		
-		Mesh sphere = THREE.Mesh( ballGeo, ballMaterial );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
+		//TODO support box here
+		Mesh sphere = createFromSphereData(data,ballMaterial);//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
 		scene.add( sphere );
 		
-		sphere.getScale().setScalar(data.getSize());
+		
 		
 		this.getClothControler().addSphere(sphere,data.getChannel());
 		
@@ -360,6 +426,38 @@ public class ClothSimulator  {
 			//update sphere
 			sphereCalculatorAndMesh.getMesh().getScale().setScalar(size);
 			sphereCalculatorAndMesh.getMesh().getPosition().copy(sphereCalculatorAndMesh.getCalculator().getResult().get(0));
+			
+			JsSphereData jsData=sphereCalculatorAndMesh.getMesh().getUserData().cast();
+			if(jsData==null){
+				LogUtils.log("updateSphereMeshs:jsData is null");
+			}
+			
+			
+			//box shape need rotation.
+			if(jsData.getType()==SphereData.TYPE_BOX){
+			SkinnedMesh skinnedMesh=sphereCalculatorAndMesh.getCalculator().getSkinnedMesh();
+			
+			Matrix4 matrixWorldInv = THREE.Matrix4().getInverse( skinnedMesh.getMatrixWorld() );
+			Matrix4 boneMatrix =  THREE.Matrix4();
+			
+			Bone bone=skinnedMesh.getSkeleton().getBones().get(jsData.getBoneIndex());
+			
+			boneMatrix.multiplyMatrices( matrixWorldInv, bone.getMatrixWorld());
+			
+			/*
+			 * i trid this.some how not work correctly
+			 */
+			//Quaternion q=THREE.Quaternion().setFromRotationMatrix(bone.getMatrixWorld());
+			
+			Quaternion q=THREE.Quaternion().setFromRotationMatrix(boneMatrix);
+			q.multiplyQuaternions(q,jsData.getRotate());
+			
+			/*
+			
+			*/
+			
+			sphereCalculatorAndMesh.getMesh().setRotationFromQuaternion(q.normalize());
+			}
 		}
 	}
 	

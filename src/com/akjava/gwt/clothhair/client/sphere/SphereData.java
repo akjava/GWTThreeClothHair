@@ -1,9 +1,13 @@
 package com.akjava.gwt.clothhair.client.sphere;
 
 import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
 
 public class SphereData {
+public static final int TYPE_SPHERE=0;
+public static final int TYPE_BOX=1;
+	
 private Vector3 position=THREE.Vector3();
 private boolean enabled;
 private boolean copyHorizontal;
@@ -101,5 +105,23 @@ public void setSize(double size) {
 }
 
 private double size;
+
+private Quaternion rotate=THREE.Quaternion();
+private int type; //sphere or box
+public Quaternion getRotate() {
+	return rotate;
+}
+
+public void setRotate(Quaternion rotate) {
+	this.rotate = rotate;
+}
+
+public int getType() {
+	return type;
+}
+
+public void setType(int type) {
+	this.type = type;
+}
 
 }
