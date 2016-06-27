@@ -92,19 +92,37 @@ public class ClothSimulator  {
 	}
 	
 	private void updateAmmoProperties() {
+		
+		/*
+		 * setting 1
+		
 		ammoHairControler.getSpherehProperties().setFriction(0);
 		ammoHairControler.getSpherehProperties().setRestitution(0.5);
 		
 		ammoHairControler.getParticleProperties().setFriction(0);
 		ammoHairControler.getParticleProperties().setRestitution(0.5);
-		ammoHairControler.getParticleProperties().setDamping(.001,.001); //for lighter
+		ammoHairControler.getParticleProperties().setDamping(.001,.001);
+		ammoHairControler.getConstraintProperties().setEnableSpringsAll(true);
+		ammoHairControler.getConstraintProperties().setStiffnessAll(1000);
+		ammoHairControler.getConstraintProperties().setDampingAll(0);
+		*/
+		
+		ammoHairControler.getSpherehProperties().setFriction(10);
+		ammoHairControler.getSpherehProperties().setRestitution(0);
+		
+		ammoHairControler.getParticleProperties().setFriction(10);
+		ammoHairControler.getParticleProperties().setRestitution(0);
+		ammoHairControler.getParticleProperties().setDamping(.001,.001);
+		ammoHairControler.getConstraintProperties().setEnableSpringsAll(false);
+		//ammoHairControler.getConstraintProperties().setStiffnessAll(1000);
+		ammoHairControler.getConstraintProperties().setDampingAll(0);
+		
+		//for lighter
 		//ammoHairControler.getParticleProperties().setDamping(1,1); //for lighter
 		//ammoHairControler.getClothProperties().setDamping(0,0);
 		
 		//ammoHairControler.getConstraintProperties().setDisableCollisionsBetweenLinkedBodies(false);
-		ammoHairControler.getConstraintProperties().setEnableSpringsAll(true);
-		ammoHairControler.getConstraintProperties().setStiffnessAll(1000);
-		ammoHairControler.getConstraintProperties().setDampingAll(0);
+		
 		double mpi=Math.PI/2;
 		ammoHairControler.getConstraintProperties().setAngularLowerLimit(THREE.Vector3(-mpi, -mpi, -mpi));
 		ammoHairControler.getConstraintProperties().setAngularUpperLimit(THREE.Vector3(mpi, mpi, mpi));
@@ -578,10 +596,18 @@ public class ClothSimulator  {
 			//List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).transform(new HairPinToNormal(characterMesh)).toList();
 			
 			
-			//TODO add option?
-			//force replace -y
+			//TODO add vector3,now only -1y
+			if(hairData.isUseCustomNormal()){
+			
 			for(int i=0;i<noTargetedPinNormals.size();i++){
 				noTargetedPinNormals.get(i).copy(THREE.Vector3(0, -1, 0));
+			}
+			}else{
+				//test make origin iteration
+				for(int i=0;i<noTargetedPinNormals.size();i++){
+					Vector3 tmp=noTargetedPinNormals.get(i).clone();
+			//		noTargetedPinNormals.get(i).copy(THREE.Vector3(0, -1, 0).add(tmp).normalize());
+				}
 			}
 			
 			

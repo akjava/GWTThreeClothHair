@@ -97,6 +97,16 @@ public boolean isCutU() {
 	return cutU;
 }
 
+private boolean useCustomNormal;
+
+public boolean isUseCustomNormal() {
+	return useCustomNormal;
+}
+
+public void setUseCustomNormal(boolean useCustomNormal) {
+	this.useCustomNormal = useCustomNormal;
+}
+
 public void setCutU(boolean cutU) {
 	this.cutU = cutU;
 }

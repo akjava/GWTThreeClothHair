@@ -90,6 +90,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		
 		private DoubleBox syncForceLinearEditor;
 		private DoubleBox syncMoveLinearEditor;
+		
+		private CheckBox useCustomNormalEditor;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -227,8 +229,9 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			connectHorizontalCheck = new CheckBox();
 			syncPanel.add(connectHorizontalCheck);
 			
-			
-			
+			syncPanel.add(new Label("useCustomNormal:"));
+			useCustomNormalEditor=new CheckBox();
+			syncPanel.add(useCustomNormalEditor);
 			
 			HorizontalPanel option1Panel=new HorizontalPanel();
 			option1Panel.setVerticalAlignment(ALIGN_MIDDLE);
@@ -341,6 +344,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				
 				value.setSyncForceLinear(syncForceLinearEditor.getValue());
 				value.setSyncMoveLinear(syncMoveLinearEditor.getValue());
+				value.setUseCustomNormal(useCustomNormalEditor.getValue());
 				//no need getHairTextureData update,because these value are updated dynamic
 			}
 
@@ -387,6 +391,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				
 				syncForceLinearEditor.setValue(value.getSyncForceLinear());
 				syncMoveLinearEditor.setValue(value.getSyncMoveLinear());
+				
+				useCustomNormalEditor.setValue(value.isUseCustomNormal());
 				
 				if(value.getHairPhysicsType()>=0 && value.getHairPhysicsType()<hairTypeList.size()){
 				hairTypeEditor.setValue(hairTypeList.get(value.getHairPhysicsType()));
