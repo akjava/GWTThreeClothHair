@@ -573,8 +573,16 @@ public class ClothSimulator  {
 		
 		}else{
 			//only core pins,only use no-custom pin
+			//THIS IS IMMUTABLE
 			List<Vector3> noTargetedPinNormals=FluentIterable.from(hairData.getHairPins()).filter(HairPinPredicates.NoTargetOnly()).transform(new HairPinToNormal(characterMesh,true)).toList();
 			//List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).transform(new HairPinToNormal(characterMesh)).toList();
+			
+			
+			//TODO add option?
+			//force replace -y
+			for(int i=0;i<noTargetedPinNormals.size();i++){
+				noTargetedPinNormals.get(i).copy(THREE.Vector3(0, -1, 0));
+			}
 			
 			
 			//TODO make function

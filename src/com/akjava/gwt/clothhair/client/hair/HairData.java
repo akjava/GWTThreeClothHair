@@ -233,7 +233,7 @@ public void setSyncMoveLinear(double syncMoveLinear) {
 }
 
 
-private double syncMoveLinear=1;
+private double syncMoveLinear=0.5; //seems stable
 	
 //still format fixed
 public HairData clone(){
