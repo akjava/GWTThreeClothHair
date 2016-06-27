@@ -92,11 +92,11 @@ public class ClothSimulator  {
 	}
 	
 	private void updateAmmoProperties() {
-		ammoHairControler.getSpherehProperties().setFriction(10);
-		ammoHairControler.getSpherehProperties().setRestitution(0);
+		ammoHairControler.getSpherehProperties().setFriction(0);
+		ammoHairControler.getSpherehProperties().setRestitution(0.5);
 		
-		ammoHairControler.getParticleProperties().setFriction(10);
-		ammoHairControler.getParticleProperties().setRestitution(0);
+		ammoHairControler.getParticleProperties().setFriction(0);
+		ammoHairControler.getParticleProperties().setRestitution(0.5);
 		ammoHairControler.getParticleProperties().setDamping(.001,.001); //for lighter
 		//ammoHairControler.getParticleProperties().setDamping(1,1); //for lighter
 		//ammoHairControler.getClothProperties().setDamping(0,0);
