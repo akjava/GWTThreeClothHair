@@ -92,6 +92,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private DoubleBox syncMoveLinearEditor;
 		
 		private CheckBox useCustomNormalEditor;
+		private DoubleBox originalNormalRatioEditor;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -238,12 +239,16 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			this.add(option1Panel);
 			option1Panel.add(new Label("extend:"));
 			extendOutsideRatioEditor = new DoubleBox();
-			extendOutsideRatioEditor.setWidth("80px");
+			extendOutsideRatioEditor.setWidth("40px");
 			option1Panel.add(extendOutsideRatioEditor);
 			
 			
 			execAverageNormalEditor=new CheckBox("average normals");
 			option1Panel.add(execAverageNormalEditor);
+			
+			option1Panel.add(new Label("originRatio"));
+			originalNormalRatioEditor=new DoubleBox();
+			option1Panel.add(originalNormalRatioEditor);
 			
 			hairTypeList = Lists.newArrayList(
 					new HairType("Simple Cloth",HairData.TYPE_SIMPLE_CLOTH),
@@ -286,11 +291,11 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			
 			option1Pane2.add(new Label("particleRadius:"));
 			particleRadiusEditor = new DoubleBox();
-			particleRadiusEditor.setWidth("80px");
+			particleRadiusEditor.setWidth("40px");
 			option1Pane2.add(particleRadiusEditor);
 			
 			
-			this.add(new Label("below not stored yet"));
+			
 			HorizontalPanel option1Pane3=new HorizontalPanel();
 			option1Pane3.setVerticalAlignment(ALIGN_MIDDLE);
 			this.add(option1Pane3);
@@ -345,6 +350,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setSyncForceLinear(syncForceLinearEditor.getValue());
 				value.setSyncMoveLinear(syncMoveLinearEditor.getValue());
 				value.setUseCustomNormal(useCustomNormalEditor.getValue());
+				value.setOriginalNormalRatio(originalNormalRatioEditor.getValue());
 				//no need getHairTextureData update,because these value are updated dynamic
 			}
 
@@ -393,6 +399,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				syncMoveLinearEditor.setValue(value.getSyncMoveLinear());
 				
 				useCustomNormalEditor.setValue(value.isUseCustomNormal());
+				originalNormalRatioEditor.setValue(value.getOriginalNormalRatio());
 				
 				if(value.getHairPhysicsType()>=0 && value.getHairPhysicsType()<hairTypeList.size()){
 				hairTypeEditor.setValue(hairTypeList.get(value.getHairPhysicsType()));

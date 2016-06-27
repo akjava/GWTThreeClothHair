@@ -66,6 +66,8 @@ public class HairDataConverter extends Converter<HairData,String> {
 		
 		csv.add(String.valueOf(data.isUseCustomNormal()));//21
 		
+		csv.add(String.valueOf(data.getOriginalNormalRatio()));//21
+		
 		return Joiner.on(",").join(csv);
 	}
 
@@ -174,6 +176,9 @@ public class HairDataConverter extends Converter<HairData,String> {
 		}
 		if(csv.length>21){
 			data.setUseCustomNormal(Boolean.valueOf(csv[21]));
+		}
+		if(csv.length>22){
+			data.setOriginalNormalRatio(Double.valueOf(csv[22]));
 		}
 		return data;
 	}

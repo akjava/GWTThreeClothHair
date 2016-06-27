@@ -608,7 +608,7 @@ public class ClothSimulator  {
 				//test make origin iteration
 				for(int i=0;i<noTargetedPinNormals.size();i++){
 					Vector3 tmp=noTargetedPinNormals.get(i).clone().normalize();
-					Vector3 tmp2=THREE.Vector3(0, -1, 0).add(tmp.multiplyScalar(.4)).normalize();
+					Vector3 tmp2=THREE.Vector3(0, -1, 0).add(tmp.multiplyScalar(hairData.getOriginalNormalRatio())).normalize();
 					//ThreeLog.log("normal",tmp2);
 					noTargetedPinNormals.get(i).copy(tmp2);
 				}

@@ -97,6 +97,17 @@ public boolean isCutU() {
 	return cutU;
 }
 
+private double originalNormalRatio;
+
+public double getOriginalNormalRatio() {
+	return originalNormalRatio;
+}
+
+public void setOriginalNormalRatio(double originalNormalRatio) {
+	this.originalNormalRatio = originalNormalRatio;
+}
+
+
 private boolean useCustomNormal;
 
 public boolean isUseCustomNormal() {
