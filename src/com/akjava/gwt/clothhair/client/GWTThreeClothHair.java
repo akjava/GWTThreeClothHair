@@ -1,5 +1,6 @@
 package com.akjava.gwt.clothhair.client;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -72,6 +73,7 @@ import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.lib.common.utils.CSVUtils;
 import com.akjava.lib.common.utils.ValuesUtils;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayNumber;
@@ -295,8 +297,39 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 	public String textureUrl;
 
+	private void testLoop(){
+		//test js array twice first
+				List<Vector3> testList=Lists.newArrayList();
+				for(int i=0;i<1000;i++){
+					testList.add(THREE.Vector3());
+				}
+				Vector3 test=THREE.Vector3();
+				Stopwatch watch=LogUtils.stopwatch();
+				for(int j=0;j<1000;j++){
+				for(int i=0;i<1000;i++){
+					test.add(testList.get(i));
+				}
+				}
+				LogUtils.millisecond("loop-time", watch);
+				
+				JsArray<Vector3> testArray=JavaScriptUtils.createJSArray();
+				for(int i=0;i<1000;i++){
+					testArray.push(THREE.Vector3());
+				}
+				
+				Stopwatch watch2=LogUtils.stopwatch();
+				for(int j=0;j<1000;j++){
+				for(int i=0;i<1000;i++){
+					test.add(testArray.get(i));
+				}
+				}
+				LogUtils.millisecond("loop-time", watch2);
+	}
 	@Override
 	public void onInitializedThree() {
+		
+		
+		
 		INSTANCE=this;//must be first
 		clock=THREE.Clock();
 		clothSimulator=new ClothSimulator(scene,null);

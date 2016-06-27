@@ -28,6 +28,7 @@ import com.akjava.gwt.lib.client.ImageElementLoader;
 import com.akjava.gwt.lib.client.ImageElementUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
+import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
@@ -95,7 +96,7 @@ public class ClothSimulator  {
 		
 		/*
 		 * setting 1
-		
+		//this is easy recover
 		ammoHairControler.getSpherehProperties().setFriction(0);
 		ammoHairControler.getSpherehProperties().setRestitution(0.5);
 		
@@ -603,10 +604,13 @@ public class ClothSimulator  {
 				noTargetedPinNormals.get(i).copy(THREE.Vector3(0, -1, 0));
 			}
 			}else{
+				//TODO add bias
 				//test make origin iteration
 				for(int i=0;i<noTargetedPinNormals.size();i++){
-					Vector3 tmp=noTargetedPinNormals.get(i).clone();
-			//		noTargetedPinNormals.get(i).copy(THREE.Vector3(0, -1, 0).add(tmp).normalize());
+					Vector3 tmp=noTargetedPinNormals.get(i).clone().normalize();
+					Vector3 tmp2=THREE.Vector3(0, -1, 0).add(tmp.multiplyScalar(.4)).normalize();
+					//ThreeLog.log("normal",tmp2);
+					noTargetedPinNormals.get(i).copy(tmp2);
 				}
 			}
 			
