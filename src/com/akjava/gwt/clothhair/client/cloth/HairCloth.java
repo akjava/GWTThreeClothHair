@@ -37,7 +37,9 @@ import com.akjava.gwt.threeammo.client.bones.PointsToGeometry;
 import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight;
 import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight.WeightResult;
 import com.akjava.gwt.threeammo.client.core.Ammo;
+import com.akjava.gwt.threeammo.client.core.btRigidBody;
 import com.akjava.gwt.threeammo.client.core.btTransform;
+import com.akjava.gwt.threeammo.client.core.btVector3;
 import com.akjava.gwt.threeammo.client.core.constraints.btGeneric6DofSpringConstraint;
 import com.akjava.gwt.threeammo.client.functions.BodyAndMeshFunctions;
 import com.akjava.gwt.threeammo.client.functions.BodyAndMeshFunctions.CloneDivided;
@@ -383,8 +385,9 @@ public class HairCloth {
 	private double ammoThick;
 	
 	private int hairPhysicsType;
+	private HairData hairData;
 	public HairCloth(HairData hairData,Mesh mesh){
-			
+		this.hairData=hairData;
 		this.visibleDummy=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleParticl();
 		if(hairData.getSizeOfU()==0){
 			LogUtils.log("HairCloth:invalid u-size");
@@ -760,7 +763,37 @@ public class HairCloth {
 	//before simulate
 	
 	public void beforeSimulate(ClothSimulator simulator,Geometry clothGeometry,List<Mesh> spheres){
+		if(!syncMove){
+			return;
+		}
 		
+		if(simulator.getAmmoHairControler().isExistParticleData(this)){
+			AmmoHairControler.ParticleBodyDatas data=simulator.getAmmoHairControler().getAmmoData(this);
+			List<BodyAndMesh> ammoParticles=data.getAmmoParticles();
+			
+			Vector3 diff=THREE.Vector3();
+			diff.copy(particles.get(0).getOriginal().clone().sub(ammoParticles.get(0).getMesh().getPosition()));
+			
+			Vector3 move=diff.clone().multiplyScalar(hairData.getSyncMoveLinear());
+			Vector3 force=diff.clone().multiplyScalar(hairData.getSyncForceLinear());
+			
+			
+			//TODO custom pin support structure
+			btVector3 vector3=simulator.getAmmoHairControler().getAmmoControler().makeVector3();
+			for(int i=0;i<ammoParticles.size();i++){
+				if(isPinned(i)){
+					//Vector3 threePos=particles.get(i).getOriginal().clone().multiplyScalar(ammoMultipleScalar);
+					//ammoParticles.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
+				}else{
+					btRigidBody body=ammoParticles.get(i).getBody();
+					Vector3 pos=body.getReadOnlyPosition();
+					pos.add(move);
+					body.setPosition(pos);
+					
+					body.applyForce(vector3.copy(force));
+				}
+			}
+		}
 	}
 	
 	
@@ -791,7 +824,6 @@ public class HairCloth {
 	 double ammoMultipleScalar=1;
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
 	 private boolean visibleDummy=false;//now working //set scale & pos
-	 private boolean visibleBone=false;
 	 
 	private void simulateAmmo(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
 
@@ -1075,7 +1107,7 @@ public class HairCloth {
 			data.setSkeltonHelper(helper);
 			
 			
-			helper.setVisible(visibleBone);//TODO get visible from setting
+			helper.setVisible(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone());//TODO get visible from setting
 			
 			
 			}
@@ -1084,15 +1116,17 @@ public class HairCloth {
 		}else{
 			AmmoHairControler.ParticleBodyDatas data=simulator.getAmmoHairControler().getAmmoData(this);
 			List<BodyAndMesh> ammoParticles=data.getAmmoParticles();
-			
+			Vector3 threePos=THREE.Vector3();//share and improve fps
 			//basically never changed length
 			for(int i=0;i<ammoParticles.size();i++){
 				if(isPinned(i)){
-					Vector3 threePos=particles.get(i).getOriginal().clone().multiplyScalar(ammoMultipleScalar);
+					threePos.copy(particles.get(i).getOriginal()).multiplyScalar(ammoMultipleScalar);
 					ammoParticles.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
 				}else{
-					Vector3 ammoPos=ammoParticles.get(i).getBody().getReadOnlyPosition();
+					if(hairPhysicsType!=HairData.TYPE_AMMO_BONE){
+					Vector3 ammoPos=ammoParticles.get(i).getBody().getReadOnlyPosition(threePos);
 					particles.get(i).position.copy(ammoPos).divideScalar(ammoMultipleScalar);
+					}
 				}
 			}
 			
@@ -1100,8 +1134,10 @@ public class HairCloth {
 			//update mesh
 			if(hairPhysicsType==HairData.TYPE_AMMO_BONE){
 			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles,ammoMultipleScalar);
-			data.getSkeltonHelper().update();
 			
+			if(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone()){
+				data.getSkeltonHelper().update();
+			}
 				
 			Stopwatch watch3=LogUtils.stopwatch();
 			JsArray<Vector3> pos=JavaScriptUtils.createJSArray();
@@ -1115,7 +1151,7 @@ public class HairCloth {
 			}
 		}
 		
-		
+		//LogUtils.millisecond("total", watch);
 	}
 	
 	public native final boolean isSame(int c,double value1,double value2)/*-{

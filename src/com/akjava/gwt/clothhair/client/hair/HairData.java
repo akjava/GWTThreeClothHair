@@ -214,7 +214,26 @@ public void setChannel(int channel) {
 
 private double mass=.1;
 private boolean syncMove;//no fake physics;
-	
+
+private double syncForceLinear=0;
+public double getSyncForceLinear() {
+	return syncForceLinear;
+}
+
+public void setSyncForceLinear(double syncForceLinear) {
+	this.syncForceLinear = syncForceLinear;
+}
+
+public double getSyncMoveLinear() {
+	return syncMoveLinear;
+}
+
+public void setSyncMoveLinear(double syncMoveLinear) {
+	this.syncMoveLinear = syncMoveLinear;
+}
+
+
+private double syncMoveLinear=1;
 	
 //still format fixed
 public HairData clone(){

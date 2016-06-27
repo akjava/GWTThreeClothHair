@@ -98,12 +98,13 @@ public class ClothSimulator  {
 		ammoHairControler.getParticleProperties().setFriction(10);
 		ammoHairControler.getParticleProperties().setRestitution(0);
 		ammoHairControler.getParticleProperties().setDamping(.001,.001); //for lighter
+		//ammoHairControler.getParticleProperties().setDamping(1,1); //for lighter
 		//ammoHairControler.getClothProperties().setDamping(0,0);
 		
 		//ammoHairControler.getConstraintProperties().setDisableCollisionsBetweenLinkedBodies(false);
 		ammoHairControler.getConstraintProperties().setEnableSpringsAll(true);
 		ammoHairControler.getConstraintProperties().setStiffnessAll(1000);
-		ammoHairControler.getConstraintProperties().setDampingAll(.001);
+		ammoHairControler.getConstraintProperties().setDampingAll(0);
 		double mpi=Math.PI/2;
 		ammoHairControler.getConstraintProperties().setAngularLowerLimit(THREE.Vector3(-mpi, -mpi, -mpi));
 		ammoHairControler.getConstraintProperties().setAngularUpperLimit(THREE.Vector3(mpi, mpi, mpi));

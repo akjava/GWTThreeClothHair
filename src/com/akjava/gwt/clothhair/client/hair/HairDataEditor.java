@@ -88,6 +88,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private ValueListBox<HairType> hairTypeEditor;
 		private List<HairType> hairTypeList;
 		
+		private DoubleBox syncForceLinearEditor;
+		private DoubleBox syncMoveLinearEditor;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -276,13 +278,29 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			this.add(option1Pane2);
 			option1Pane2.add(new Label("thick:"));
 			thickEditor = new DoubleBox();
-			thickEditor.setWidth("80px");
+			thickEditor.setWidth("40px");
 			option1Pane2.add(thickEditor);
 			
 			option1Pane2.add(new Label("particleRadius:"));
 			particleRadiusEditor = new DoubleBox();
 			particleRadiusEditor.setWidth("80px");
 			option1Pane2.add(particleRadiusEditor);
+			
+			
+			this.add(new Label("below not stored yet"));
+			HorizontalPanel option1Pane3=new HorizontalPanel();
+			option1Pane3.setVerticalAlignment(ALIGN_MIDDLE);
+			this.add(option1Pane3);
+			
+			option1Pane3.add(new Label("syncForceLinear:"));
+			syncForceLinearEditor = new DoubleBox();
+			syncForceLinearEditor.setWidth("40px");
+			option1Pane3.add(syncForceLinearEditor);
+			
+			option1Pane3.add(new Label("syncMoveLinear:"));
+			syncMoveLinearEditor = new DoubleBox();
+			syncMoveLinearEditor.setWidth("40px");
+			option1Pane3.add(syncMoveLinearEditor);
 			
 		}
 		private Label createLabel(String name){
@@ -320,6 +338,9 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setExtendOutsideRatio(extendOutsideRatioEditor.getValue());
 				value.setThickRatio(thickEditor.getValue());
 				value.setParticleRadiusRatio(particleRadiusEditor.getValue());
+				
+				value.setSyncForceLinear(syncForceLinearEditor.getValue());
+				value.setSyncMoveLinear(syncMoveLinearEditor.getValue());
 				//no need getHairTextureData update,because these value are updated dynamic
 			}
 
@@ -363,6 +384,10 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				extendOutsideRatioEditor.setValue(value.getExtendOutsideRatio());
 				thickEditor.setValue(value.getThickRatio());
 				particleRadiusEditor.setValue(value.getParticleRadiusRatio());
+				
+				syncForceLinearEditor.setValue(value.getSyncForceLinear());
+				syncMoveLinearEditor.setValue(value.getSyncMoveLinear());
+				
 				if(value.getHairPhysicsType()>=0 && value.getHairPhysicsType()<hairTypeList.size()){
 				hairTypeEditor.setValue(hairTypeList.get(value.getHairPhysicsType()));
 				}else{
