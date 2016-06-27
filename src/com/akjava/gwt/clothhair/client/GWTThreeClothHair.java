@@ -1012,7 +1012,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//link
 		
-		tab.selectTab(0);
+		tab.selectTab(3);
 	}
 	private Widget createHairPinPanel() {
 		hairPinPanel = new HairPinPanel();
@@ -1175,7 +1175,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 
 
-	public Mesh getCharacterMesh() {
+	public SkinnedMesh getCharacterMesh() {
 		return characterMesh;
 	}
 	

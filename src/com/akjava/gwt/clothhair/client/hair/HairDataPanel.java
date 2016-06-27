@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.GWTThreeClothHairStorageKeys;
+import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
 import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler.ParticleBodyDatas;
 import com.akjava.gwt.clothhair.client.cloth.ClothData;
 import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
@@ -29,12 +30,18 @@ import com.akjava.gwt.lib.client.experimental.ImageDataUtils;
 import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
+import com.akjava.gwt.three.client.gwt.boneanimation.AnimationBone;
+import com.akjava.gwt.three.client.gwt.materials.MeshPhongMaterialParameter;
+import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.BufferAttribute;
 import com.akjava.gwt.three.client.js.core.BufferGeometry;
 import com.akjava.gwt.three.client.js.core.Face3;
+import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.loaders.ImageLoader.ImageLoadHandler;
+import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Matrix3;
+import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.LineSegments;
 import com.akjava.gwt.three.client.js.objects.Mesh;
@@ -474,7 +481,67 @@ public class HairDataPanel extends VerticalPanel{
 		 //add
 		 hairPanel.add(uploadPanel);
 		 hairPanel.add(downloadPanels);
+		 
+		 HorizontalPanel testPanel=new HorizontalPanel();
+		 this.add(testPanel);
+		 Button test=new Button("test",new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(cellObjects.getSelection()==null){
+					return;
+				}
+				convertSelectionToGeometry(cellObjects.getSelection());
+			}
+		});
+		 testPanel.add(test);
 	}
+	
+	protected void convertSelectionToGeometry(HairMixedData selection) {
+		ParticleBodyDatas data=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().getAmmoData(selection.getClothData().getCloth());
+		if(data.getSkinnedMesh()==null){
+			LogUtils.log("convertSelectionToGeometry:now only suuport skinnedMesh");
+		}
+		
+		SkinnedMesh character=GWTThreeClothHair.INSTANCE.getCharacterMesh();
+		
+		LogUtils.log(character.getGeometry().getBones().get(0));
+		
+		//AnimationBone ab=character.getGeometry().getBones().get(0).clone();
+		
+		
+		Geometry geometry=makeSkeltonAnimationAppliedGeometry(data.getSkinnedMesh());
+		
+		Matrix4 matrix4=THREE.Matrix4();
+		matrix4.makeScale(1.0/character.getScale().getX(), 1.0/character.getScale().getY(), 1.0/character.getScale().getZ());
+		geometry.applyMatrix(matrix4);
+		
+		/*
+		 * error
+		 * HREE.WebGLProgram: shader error:  0 gl.VALIDATE_STATUS false gl.getProgramInfoLog invalid shaders
+		 */
+		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0xff0000));//.skinning(true)
+		
+		Mesh newMesh=THREE.Mesh(geometry, material);
+		newMesh.setScale(character.getScale().getX(), character.getScale().getY(), character.getScale().getZ());
+		
+		//newMesh.setScale(100, 100, 100);
+		GWTThreeClothHair.INSTANCE.getScene().add(newMesh);
+		
+	}
+	
+	public Geometry makeSkeltonAnimationAppliedGeometry(SkinnedMesh mesh){
+		Geometry geometry=mesh.getGeometry().clone();
+		
+		LogUtils.log("vertex-size:"+geometry.getVertices().length());
+		for(int i=0;i<geometry.getVertices().length();i++){
+		Vector3 transformed=SkinningVertexCalculator.transformSkinningVertex(mesh,i,geometry.getVertices().get(i));
+		geometry.getVertices().get(i).copy(transformed);
+		}
+		
+		return geometry;
+	}
+	
 	
 	private void updateHairVisible(HairMixedData data,boolean visible){
 		
