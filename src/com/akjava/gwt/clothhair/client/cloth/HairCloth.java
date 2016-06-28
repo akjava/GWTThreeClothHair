@@ -2,7 +2,6 @@ package com.akjava.gwt.clothhair.client.cloth;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler;
@@ -16,10 +15,10 @@ import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
+import com.akjava.gwt.three.client.java.geometry.PointsToGeometry;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
-import com.akjava.gwt.three.client.js.extras.helpers.BoundingBoxHelper;
 import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Quaternion;
@@ -33,7 +32,6 @@ import com.akjava.gwt.threeammo.client.BoxBodyAndMesh;
 import com.akjava.gwt.threeammo.client.ConstraintAndLine;
 import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
 import com.akjava.gwt.threeammo.client.bones.PlainBoneCreator;
-import com.akjava.gwt.threeammo.client.bones.PointsToGeometry;
 import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight;
 import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight.WeightResult;
 import com.akjava.gwt.threeammo.client.core.Ammo;
@@ -1077,7 +1075,7 @@ public class HairCloth {
 			List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).transform(new CloneDivided(ammoMultipleScalar)).toList();
 			
 			//force up normal //THREE.Vector3(0,1,0)
-			Geometry clothBox=new PointsToGeometry().vertexNormal(null).createGeometry(positions, w, restDistance*ammoThick, isConnectHorizontal());
+			Geometry clothBox=new PointsToGeometry().debug(true).flipNormal(true).reverseFirstSurface(true).createGeometry(positions, w, restDistance*ammoThick, isConnectHorizontal());
 			
 			clothBox.setBones(new PlainBoneCreator().createBone(positions, w));
 			
@@ -1093,7 +1091,7 @@ public class HairCloth {
 					.skinning(true)
 					.visible(true)
 					//.wireframe(true)//wire frame
-					.side(THREE.DoubleSide)
+					//.side(THREE.DoubleSide)
 					);
 			
 			SkinnedMesh clothBoxMesh = THREE.SkinnedMesh(clothBox,boxhMaterial);
