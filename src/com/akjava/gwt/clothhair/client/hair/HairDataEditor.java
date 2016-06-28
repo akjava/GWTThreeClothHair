@@ -236,6 +236,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			
 			HorizontalPanel option1Panel=new HorizontalPanel();
 			option1Panel.setVerticalAlignment(ALIGN_MIDDLE);
+			option1Panel.setSpacing(2);
 			this.add(option1Panel);
 			option1Panel.add(new Label("extend:"));
 			extendOutsideRatioEditor = new DoubleBox();
@@ -248,7 +249,9 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			
 			option1Panel.add(new Label("originRatio"));
 			originalNormalRatioEditor=new DoubleBox();
+			originalNormalRatioEditor.setTitle("works when use custom normal.added custom to origin * ratio.1 measn half-half");
 			option1Panel.add(originalNormalRatioEditor);
+			originalNormalRatioEditor.setWidth("40px");
 			
 			hairTypeList = Lists.newArrayList(
 					new HairType("Simple Cloth",HairData.TYPE_SIMPLE_CLOTH),
@@ -289,8 +292,9 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			thickEditor.setWidth("40px");
 			option1Pane2.add(thickEditor);
 			
-			option1Pane2.add(new Label("particleRadius:"));
+			option1Pane2.add(new Label("particleRadiusR:"));
 			particleRadiusEditor = new DoubleBox();
+			particleRadiusEditor.setTitle("ratio 0.5 is max.can visible on particle setting");
 			particleRadiusEditor.setWidth("40px");
 			option1Pane2.add(particleRadiusEditor);
 			

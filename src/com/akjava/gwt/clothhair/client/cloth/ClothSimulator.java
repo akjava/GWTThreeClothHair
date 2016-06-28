@@ -601,17 +601,11 @@ public class ClothSimulator  {
 			if(hairData.isUseCustomNormal()){
 			
 			for(int i=0;i<noTargetedPinNormals.size();i++){
-				noTargetedPinNormals.get(i).copy(THREE.Vector3(0, -1, 0));
+				Vector3 tmp=noTargetedPinNormals.get(i).clone().normalize();
+				Vector3 tmp2=THREE.Vector3(0, -1, 0).add(tmp.multiplyScalar(hairData.getOriginalNormalRatio())).normalize();
+				//ThreeLog.log("normal",tmp2);
+				noTargetedPinNormals.get(i).copy(tmp2);
 			}
-			}else{
-				//TODO add bias
-				//test make origin iteration
-				for(int i=0;i<noTargetedPinNormals.size();i++){
-					Vector3 tmp=noTargetedPinNormals.get(i).clone().normalize();
-					Vector3 tmp2=THREE.Vector3(0, -1, 0).add(tmp.multiplyScalar(hairData.getOriginalNormalRatio())).normalize();
-					//ThreeLog.log("normal",tmp2);
-					noTargetedPinNormals.get(i).copy(tmp2);
-				}
 			}
 			
 			

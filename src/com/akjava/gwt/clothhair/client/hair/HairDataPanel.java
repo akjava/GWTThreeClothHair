@@ -30,7 +30,6 @@ import com.akjava.gwt.lib.client.experimental.ImageDataUtils;
 import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
-import com.akjava.gwt.three.client.gwt.boneanimation.AnimationBone;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.BufferAttribute;
 import com.akjava.gwt.three.client.js.core.BufferGeometry;
@@ -46,7 +45,6 @@ import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.gwt.threeammo.client.bones.CloseVertexAutoWeight;
-import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight;
 import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight.WeightResult;
 import com.akjava.lib.common.utils.CSVUtils;
 import com.akjava.lib.common.utils.ColorUtils;
@@ -61,6 +59,7 @@ import com.google.common.collect.Maps;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.ImageData;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.ImageElement;
@@ -70,6 +69,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Timer;
@@ -438,16 +439,16 @@ public class HairDataPanel extends VerticalPanel{
 		 //downloads
 		 HorizontalPanel downloadPanels=new HorizontalPanel();
 		 downloadPanels.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
-		 final HorizontalPanel download=new HorizontalPanel();
+		 downloadArea = new HorizontalPanel();
 		 
 		 Button downloadBt=new Button("download",new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				download.clear();
+				downloadArea.clear();
 				String text=toStoreText();
 				Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair.csv", "click to download",true);
-				download.add(a);
+				downloadArea.add(a);
 			}
 		});
 		 downloadPanels.add(downloadBt);
@@ -457,7 +458,7 @@ public class HairDataPanel extends VerticalPanel{
 				
 				@Override
 				public void onClick(ClickEvent event) {
-					download.clear();
+					downloadArea.clear();
 					if(cellObjects.getSelection()==null){
 						return;
 					}
@@ -469,14 +470,14 @@ public class HairDataPanel extends VerticalPanel{
 					}
 					String text=hairDataConverter.convert(cellObjects.getSelection().getHairData());
 					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair-"+type+".csv", "selection to download",true);
-					download.add(a);
+					downloadArea.add(a);
 				}
 			});
 			 downloadPanels.add(downloadSelectionBt);
 			
 			 downloadSelectionBt.setTitle("download selection only");
 		 
-			 downloadPanels.add(download);
+			 downloadPanels.add(downloadArea);
 		 
 		 
 		 //add
@@ -520,28 +521,46 @@ public class HairDataPanel extends VerticalPanel{
 		
 		//geometry.setBones(AnimationBone.gwtClone(character.getGeometry().getBones()));
 		
+		geometry.gwtSetInfluencesPerVertex(4);
 		geometry.setBones(character.getGeometry().getBones());
 		
 		//TODO average
 		WeightResult result=new CloseVertexAutoWeight().autoWeight(geometry, characterMesh.getGeometry());
 		
-		//TODO more improve
+		//TODO need more improve,totally not good
 		//WeightResult result=new SimpleAutoWeight(4).autoWeight(geometry, geometry.getBones(),Lists.newArrayList(0));
 		
 		result.insertToGeometry(geometry);
+		
 		/*
 		 * error
 		 * HREE.WebGLProgram: shader error:  0 gl.VALIDATE_STATUS false gl.getProgramInfoLog invalid shaders
 		 */
-		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0xff0000).skinning(true));
+		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x00ff00).skinning(true));
 		
-		SkinnedMesh newMesh=THREE.SkinnedMesh(geometry, material);
+		
+		
+		JSONObject object=geometry.gwtJSONWithBone();
+		downloadArea.clear();
+		
+		Anchor a=HTML5Download.get().generateTextDownloadLink(object.toString(), "geometry.json", "geometry to download",true);
+		downloadArea.add(a);
+		
+		String text=object.toString();
+		//this is XXXX 4.4 FORMAT
+		JavaScriptObject js=JSONParser.parseStrict(text).isObject().get("data").isObject().getJavaScriptObject();
+		LogUtils.log("json-parsed");
+		
+		Geometry loadedGeometry=THREE.JSONLoader().parse(js).getGeometry();
+		
+		LogUtils.log("loaded:");
+		
+		
+		SkinnedMesh newMesh=THREE.SkinnedMesh(loadedGeometry, material);
 		newMesh.setScale(character.getScale().getX(), character.getScale().getY(), character.getScale().getZ());
 		newMesh.setSkeleton(character.getSkeleton());//can share the bone
 		
-		//newMesh.setScale(100, 100, 100);
 		GWTThreeClothHair.INSTANCE.getScene().add(newMesh);
-		
 	}
 	
 	public Geometry makeSkeltonAnimationAppliedGeometry(SkinnedMesh mesh){
@@ -1142,6 +1161,8 @@ public void updateHairDataLine(){
 	private CheckBox showSelectionHair;
 
 	private CheckBox showHair;
+
+	private HorizontalPanel downloadArea;
 	
 	private void clearAllHairData(){
 		for(HairMixedData data:ImmutableList.copyOf(cellObjects.getDatas())){
