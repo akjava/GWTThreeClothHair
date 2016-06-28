@@ -31,8 +31,6 @@ import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
 import com.akjava.gwt.three.client.gwt.boneanimation.AnimationBone;
-import com.akjava.gwt.three.client.gwt.materials.MeshPhongMaterialParameter;
-import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.BufferAttribute;
 import com.akjava.gwt.three.client.js.core.BufferGeometry;
@@ -47,6 +45,9 @@ import com.akjava.gwt.three.client.js.objects.LineSegments;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.textures.Texture;
+import com.akjava.gwt.threeammo.client.bones.CloseVertexAutoWeight;
+import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight;
+import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight.WeightResult;
 import com.akjava.lib.common.utils.CSVUtils;
 import com.akjava.lib.common.utils.ColorUtils;
 import com.google.common.base.Function;
@@ -512,18 +513,31 @@ public class HairDataPanel extends VerticalPanel{
 		
 		Geometry geometry=makeSkeltonAnimationAppliedGeometry(data.getSkinnedMesh());
 		
+		
 		Matrix4 matrix4=THREE.Matrix4();
 		matrix4.makeScale(1.0/character.getScale().getX(), 1.0/character.getScale().getY(), 1.0/character.getScale().getZ());
 		geometry.applyMatrix(matrix4);
 		
+		//geometry.setBones(AnimationBone.gwtClone(character.getGeometry().getBones()));
+		
+		geometry.setBones(character.getGeometry().getBones());
+		
+		//TODO average
+		WeightResult result=new CloseVertexAutoWeight().autoWeight(geometry, characterMesh.getGeometry());
+		
+		//TODO more improve
+		//WeightResult result=new SimpleAutoWeight(4).autoWeight(geometry, geometry.getBones(),Lists.newArrayList(0));
+		
+		result.insertToGeometry(geometry);
 		/*
 		 * error
 		 * HREE.WebGLProgram: shader error:  0 gl.VALIDATE_STATUS false gl.getProgramInfoLog invalid shaders
 		 */
-		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0xff0000));//.skinning(true)
+		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0xff0000).skinning(true));
 		
-		Mesh newMesh=THREE.Mesh(geometry, material);
+		SkinnedMesh newMesh=THREE.SkinnedMesh(geometry, material);
 		newMesh.setScale(character.getScale().getX(), character.getScale().getY(), character.getScale().getZ());
+		newMesh.setSkeleton(character.getSkeleton());//can share the bone
 		
 		//newMesh.setScale(100, 100, 100);
 		GWTThreeClothHair.INSTANCE.getScene().add(newMesh);
