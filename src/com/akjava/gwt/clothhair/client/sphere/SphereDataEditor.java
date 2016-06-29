@@ -7,10 +7,12 @@ import java.util.List;
 import com.akjava.gwt.clothhair.client.SkeletonUtils;
 import com.akjava.gwt.clothhair.client.SkeletonUtils.BoneData;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
+import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.java.ui.experiments.SimpleEulerEditor;
 import com.akjava.gwt.three.client.java.ui.experiments.SimpleEulerEditor.SimpleEulerEditorListener;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.math.Euler;
+import com.akjava.gwt.three.client.js.math.Vector4;
 import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.google.common.collect.Lists;
 import com.google.gwt.editor.client.Editor;
@@ -71,6 +73,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		
 		HorizontalPanel h1=new HorizontalPanel();
 		positionPanel.add(h1);
+		
 		
 		
 		xRange = new LabeledInputRangeWidget2("x", -.2, .2, .001);
