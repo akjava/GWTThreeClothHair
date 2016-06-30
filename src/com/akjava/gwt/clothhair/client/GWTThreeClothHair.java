@@ -127,6 +127,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	public ClothSimulator getClothSimulator() {
 		return clothSimulator;
 	}
+	
+	
+	
 	@Override
 	public void animate(double timestamp) {
 		

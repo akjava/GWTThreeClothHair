@@ -497,6 +497,28 @@ public class HairDataPanel extends VerticalPanel{
 			}
 		});
 		 testPanel.add(test);
+		 
+		 FileUploadForm testUpload=FileUtils.createSingleTextFileUploadForm(new DataURLListener() {
+			
+			@Override
+			public void uploaded(File file, String text) {
+				JavaScriptObject js=JSONParser.parseLenient(text).isObject().get("data").isObject().getJavaScriptObject();
+				LogUtils.log("json-parsed");
+				
+				Geometry loadedGeometry=THREE.JSONLoader().parse(js).getGeometry();
+				
+				LogUtils.log("loaded:");
+				MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x00ff00).skinning(true));
+				SkinnedMesh character=GWTThreeClothHair.INSTANCE.getCharacterMesh();
+				
+				SkinnedMesh newMesh=THREE.SkinnedMesh(loadedGeometry, material);
+				newMesh.setScale(character.getScale().getX(), character.getScale().getY(), character.getScale().getZ());
+				newMesh.setSkeleton(character.getSkeleton());//can share the bone
+				
+				GWTThreeClothHair.INSTANCE.getScene().add(newMesh);
+			}
+		}, true);
+		 testPanel.add(testUpload);
 	}
 	
 	protected void convertSelectionToGeometry(HairMixedData selection) {
