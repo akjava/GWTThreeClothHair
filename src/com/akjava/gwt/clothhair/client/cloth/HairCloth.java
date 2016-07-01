@@ -15,6 +15,8 @@ import com.akjava.gwt.clothhair.client.sphere.SphereData;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
+import com.akjava.gwt.three.client.java.bone.SimpleAutoWeight;
+import com.akjava.gwt.three.client.java.bone.WeightResult;
 import com.akjava.gwt.three.client.java.geometry.PointsToGeometry;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
@@ -32,8 +34,6 @@ import com.akjava.gwt.threeammo.client.BoxBodyAndMesh;
 import com.akjava.gwt.threeammo.client.ConstraintAndLine;
 import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
 import com.akjava.gwt.threeammo.client.bones.PlainBoneCreator;
-import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight;
-import com.akjava.gwt.threeammo.client.bones.SimpleAutoWeight.WeightResult;
 import com.akjava.gwt.threeammo.client.core.Ammo;
 import com.akjava.gwt.threeammo.client.core.btRigidBody;
 import com.akjava.gwt.threeammo.client.core.btTransform;
@@ -1075,7 +1075,7 @@ public class HairCloth {
 			List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).transform(new CloneDivided(ammoMultipleScalar)).toList();
 			
 			//force up normal //THREE.Vector3(0,1,0)
-			Geometry clothBox=new PointsToGeometry().debug(true).flipNormal(true).reverseFirstSurface(true).createGeometry(positions, w, restDistance*ammoThick, isConnectHorizontal());
+			Geometry clothBox=new PointsToGeometry().debug(false).flipNormal(true).reverseFirstSurface(true).createGeometry(positions, w, restDistance*ammoThick, isConnectHorizontal());
 			
 			clothBox.setBones(new PlainBoneCreator().createBone(positions, w));
 			
