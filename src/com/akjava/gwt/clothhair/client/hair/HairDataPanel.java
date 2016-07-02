@@ -602,7 +602,11 @@ public class HairDataPanel extends VerticalPanel{
 				Geometry loadedGeometry=THREE.JSONLoader().parse(js).getGeometry();
 				
 				LogUtils.log("loaded:");
-				MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x00ff00).skinning(true));
+				MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial()
+						.color(GWTThreeClothHair.INSTANCE.getGlobalHairColor())
+						.skinning(true)
+						.side(THREE.DoubleSide)
+						);
 				SkinnedMesh character=GWTThreeClothHair.INSTANCE.getCharacterMesh();
 				
 				SkinnedMesh newMesh=THREE.SkinnedMesh(loadedGeometry, material);
