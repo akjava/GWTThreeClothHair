@@ -685,7 +685,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		double t=System.currentTimeMillis();
 		return GWTHTMLUtils.getInputValueById(id, null)+"?t="+t;
 	}
-	public double paramDouble(String id,double defaultValue){
+	public static double paramDouble(String id,double defaultValue){
 		return ValuesUtils.toDouble(GWTHTMLUtils.getInputValueById(id,null),defaultValue);
 	}
 	
