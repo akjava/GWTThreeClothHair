@@ -359,7 +359,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		rendererContainer.addMouseMoveHandler(new MouseMoveHandler() {
 			@Override
 			public void onMouseMove(MouseMoveEvent event) {
-				onDocumentMouseMove(event);
+				doMouseMove(event);
 			}
 		});
 		
@@ -388,6 +388,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		controls = THREEExp.OrbitControls(camera,rendererContainer.getElement() );
 		controls.setTarget(THREE.Vector3( 0, cameraY, 0 ));
+		controls.getMouseButtons().set("ORBIT", THREE.MOUSE.MIDDLE);
+		controls.getMouseButtons().set("ZOOM", 3);//3 is not exist,for ignore left button
 		controls.update();
 
 		
@@ -763,6 +765,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 	
 	protected void doMouseDown(MouseDownEvent event) {
+		if(event.getNativeButton()!=NativeEvent.BUTTON_LEFT){
+			return;
+		}
 		double mx=event.getX();
 		double my=event.getY();
 		/*
@@ -1134,7 +1139,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	 */
 	private MeshPhongMaterial hairMaterial;
 	
-	protected void onDocumentMouseMove(MouseMoveEvent event) {
+	protected void doMouseMove(MouseMoveEvent event) {
 		mouseX = ( event.getClientX() - windowHalfX );
 		mouseY = ( event.getClientY() - windowHalfY )*2;
 	}
