@@ -314,6 +314,8 @@ public class HairDataPanel extends VerticalPanel{
 					secondSelection=data.getHairData().getHairPins().get(1);
 					if(data.getHairData().getHairPins().size()>2){
 						thirdSelection=data.getHairData().getHairPins().get(2);
+					}else{
+						thirdSelection=null;
 					}
 					updateHairPinsByThreePoints();
 					}else{
@@ -400,6 +402,7 @@ public class HairDataPanel extends VerticalPanel{
 				//editor edit
 				hairDataEditor.getHairTextureDataEditor().setValue(selection.getHairData().getHairTextureData());
 			}};
+			
 			
 			
 		//
@@ -980,6 +983,7 @@ private void clearAllPoints(){
 		verticalDistanceLabel.setText(
 				("V:"+vdistanceh).substring(0,7)+" ratio="+String.valueOf(ratio).substring(0,4)
 						);
+		
 	}
 
 	private HairDataConverter hairDataConverter=new HairDataConverter();
@@ -1043,10 +1047,15 @@ private void clearAllPoints(){
 List<HairPin> hairPins=Lists.newArrayList();
 
 public void updateHairPinsByThreePoints(){
+	if(firstSelection==null || secondSelection==null){
+		LogUtils.log("invalidly call updateHairPinsByThreePoints but first or second is null");
+	}
 	hairPins.clear();
 	hairPins.add(firstSelection);
 	hairPins.add(secondSelection);
-	hairPins.add(thirdSelection);
+	if(thirdSelection!=null){
+		hairPins.add(thirdSelection);
+	}
 }
 
 	
@@ -1055,7 +1064,7 @@ public void updateHairDataLine(){
 	updateDistanceLabel();
 	
 	if(hairPins.size()<2){
-		//i'M not sure why limit 2?
+		//cloth need two point.
 		//return;
 	}
 	

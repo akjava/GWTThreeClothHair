@@ -38,6 +38,7 @@ import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Quaternion;
+import com.akjava.gwt.three.client.js.math.Vector2;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Bone;
 import com.akjava.gwt.three.client.js.objects.Mesh;
@@ -566,8 +567,48 @@ public class ClothSimulator  {
 		HairMixedData cellData=new HairMixedData(hairData,data,clothMesh);
 		
 		
-		//temporaly
 		
+		if(hairData.getHairPins().size()==2){
+			Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
+			Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
+			//TODO move and fix
+			int cw=hairData.getSizeOfU();
+			int ch=hairData.getSizeOfV();
+			
+			Vector2 center=THREE.Vector2(v1.getX(), v1.getZ());
+			Vector2 point=THREE.Vector2(v2.getX(), v2.getZ());
+			List<Vector3> corePositions=Lists.newArrayList();
+			double perAngle=360/(cw+1);
+			ThreeLog.log("center",center);
+			ThreeLog.log("point",point);
+			for(int i=0;i<=cw;i++){
+				Vector2 rotated=point.clone().rotateAround(center, Math.toRadians(perAngle*i));
+				ThreeLog.log("angle:"+(perAngle*i),rotated);
+				corePositions.add(THREE.Vector3(rotated.getX(), v1.getY(), rotated.getY()));
+			}
+			
+			for(int i=0;i<=cw;i++){
+				data.getCloth().particles.get(i).setAllPosition(corePositions.get(i));
+				
+			}
+			
+			//for(int i=cw+1;i<data.getCloth().particles.size();i++){
+				//data.getCloth().particles.get(i).setAllPosition(v1);
+				//linked
+				for(int j=data.getCloth().getW()+1;j<data.getCloth().particles.size();j++){
+					int x=j%(data.getCloth().getW()+1);
+					int y=j/(data.getCloth().getW()+1);
+					
+					Vector3 delta=corePositions.get(x).clone().sub(v1).setY(0);
+					Vector3 newPosition=delta.multiplyScalar(y).add(corePositions.get(x));
+					
+					ThreeLog.log("j="+j+",x="+x+",y="+y,newPosition);
+					
+					data.getCloth().particles.get(j).setAllPosition(newPosition);
+				}
+			//}
+			
+		}else 
 		if(hairData.getHairPins().size()<3){//TODO merge 3pin
 		Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
 		Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
@@ -586,9 +627,7 @@ public class ClothSimulator  {
 			data.getCloth().particles.get(i).setAllPosition(v);
 		}
 		
-		for(int i=cw+1;i<data.getCloth().particles.size();i++){
-			data.getCloth().particles.get(i).setAllPosition(v1);
-		}
+		
 		
 		}else{
 			//only core pins,only use no-custom pin

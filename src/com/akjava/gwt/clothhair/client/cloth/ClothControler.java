@@ -5,8 +5,10 @@ import java.util.Map;
 
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.lib.client.LogUtils;
+import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Geometry;
+import com.akjava.gwt.three.client.js.math.Vector2;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.google.common.collect.Lists;
@@ -135,6 +137,27 @@ public class ClothControler {
 			return;
 		}
 		
+		if(data.getCalculator().getResult().size()==2){
+			//TODO merge method
+			Vector3 v1=data.getCalculator().getResult().get(0);
+			Vector3 v2=data.getCalculator().getResult().get(1);
+			//TODO move and fix
+			int cw=data.getCloth().w;
+			
+			Vector2 center=THREE.Vector2(v1.getX(), v1.getZ());
+			Vector2 point=THREE.Vector2(v2.getX(), v2.getZ());
+			List<Vector3> corePositions=Lists.newArrayList();
+			double perAngle=360/(cw+1);
+			for(int i=0;i<=cw;i++){
+				Vector2 rotated=point.clone().rotateAround(center, Math.toRadians(perAngle*i));
+				corePositions.add(THREE.Vector3(rotated.getX(), v1.getY(), rotated.getY()));
+			}
+			
+			for(int i=0;i<=cw;i++){
+				data.getCloth().particles.get(i).setAllPosition(corePositions.get(i));
+			}
+			//TODO sync
+		}else 
 		if(data.getCalculator().getResult().size()<3){//2pins
 			int cw=data.getCloth().w;
 			Vector3 v1=data.getCalculator().getResult().get(0);

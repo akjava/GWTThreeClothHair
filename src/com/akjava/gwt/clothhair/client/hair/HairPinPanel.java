@@ -112,6 +112,11 @@ public class HairPinPanel extends VerticalPanel{
 	}
 	
 	public void setHairPins(List<HairPin> pins){
+		for(int i=0;i<pins.size();i++){
+			if(pins.get(i)==null){
+				LogUtils.log("setHairPins() invalidly contain null pin");
+			}
+		}
 		cellObjects.setDatas(pins);
 		cellObjects.update();
 		updatePinText();
