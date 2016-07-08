@@ -578,7 +578,7 @@ public class ClothSimulator  {
 			Vector2 center=THREE.Vector2(v1.getX(), v1.getZ());
 			Vector2 point=THREE.Vector2(v2.getX(), v2.getZ());
 			List<Vector3> corePositions=Lists.newArrayList();
-			double perAngle=360/(cw+1);
+			double perAngle=360/(cw); //not support connect-horizontal
 			ThreeLog.log("center",center);
 			ThreeLog.log("point",point);
 			for(int i=0;i<=cw;i++){

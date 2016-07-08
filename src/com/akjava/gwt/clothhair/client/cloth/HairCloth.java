@@ -1079,7 +1079,7 @@ public class HairCloth {
 			
 			clothBox.setBones(new PlainBoneCreator().createBone(positions, w));
 			
-			int influence=1;
+			int influence=4;
 			WeightResult result=new SimpleAutoWeight(influence).autoWeight(clothBox, clothBox.getBones(),Lists.newArrayList(0));//ignore root
 			result.insertToGeometry(clothBox);
 			//LogUtils.log(result.toString());

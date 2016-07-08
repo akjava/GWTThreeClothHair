@@ -147,7 +147,7 @@ public class ClothControler {
 			Vector2 center=THREE.Vector2(v1.getX(), v1.getZ());
 			Vector2 point=THREE.Vector2(v2.getX(), v2.getZ());
 			List<Vector3> corePositions=Lists.newArrayList();
-			double perAngle=360/(cw+1);
+			double perAngle=360/(cw);
 			for(int i=0;i<=cw;i++){
 				Vector2 rotated=point.clone().rotateAround(center, Math.toRadians(perAngle*i));
 				corePositions.add(THREE.Vector3(rotated.getX(), v1.getY(), rotated.getY()));
