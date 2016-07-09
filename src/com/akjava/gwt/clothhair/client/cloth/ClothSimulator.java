@@ -516,7 +516,7 @@ public class ClothSimulator  {
 		//displacementMap not good at plain when row-poly
 		
 		//TODO make property;
-		boolean isNoNeedPlainCloth=hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE;
+		boolean isNoNeedPlainCloth=hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_CLOTH || hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_HAIR;
 		
 		//TODO hairdisp & bump control
 		//little bit 

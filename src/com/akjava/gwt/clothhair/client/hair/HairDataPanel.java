@@ -467,10 +467,12 @@ public class HairDataPanel extends VerticalPanel{
 						return;
 					}
 					String type="simple";
-					if(cellObjects.getSelection().getHairData().getHairPhysicsType()==HairData.TYPE_AMMO_BONE){
-						type="ammo_bone";
+					if(cellObjects.getSelection().getHairData().getHairPhysicsType()==HairData.TYPE_AMMO_BONE_CLOTH){
+						type="ammo_bone_cloth";
 					}else if(cellObjects.getSelection().getHairData().getHairPhysicsType()==HairData.TYPE_AMMO_CLOTH){
 						type="ammo_cloth";
+					}else if(cellObjects.getSelection().getHairData().getHairPhysicsType()==HairData.TYPE_AMMO_BONE_HAIR){
+						type="ammo_bone_hair";
 					}
 					String text=hairDataConverter.convert(cellObjects.getSelection().getHairData());
 					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair-"+type+".csv", "selection to download",true);
