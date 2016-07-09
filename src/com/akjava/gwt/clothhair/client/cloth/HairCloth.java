@@ -99,7 +99,19 @@ public class HairCloth {
 		gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
 	}
 	
+	/**
+	 * on circle mode(when point has only two point,start first or second)
+	 */
+	private boolean startCircleCenter=true;
 	
+	public boolean isStartCircleCenter() {
+		return startCircleCenter;
+	}
+	public void setStartCircleCenter(boolean startCircleCenter) {
+		this.startCircleCenter = startCircleCenter;
+	}
+
+
 	double DAMPING = 0.03;
 	double DRAG = 1.0 - DAMPING;
 	double MASS = .1;

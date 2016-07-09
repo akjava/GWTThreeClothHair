@@ -566,7 +566,7 @@ public class ClothSimulator  {
 		
 		HairMixedData cellData=new HairMixedData(hairData,data,clothMesh);
 		
-		
+		boolean startCenter=data.getCloth().isStartCircleCenter();//start circle from center or not
 		
 		if(hairData.getHairPins().size()==2){
 			Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
@@ -584,11 +584,20 @@ public class ClothSimulator  {
 			for(int i=0;i<=cw;i++){
 				Vector2 rotated=point.clone().rotateAround(center, Math.toRadians(perAngle*i));
 				ThreeLog.log("angle:"+(perAngle*i),rotated);
+				
 				corePositions.add(THREE.Vector3(rotated.getX(), v1.getY(), rotated.getY()));
+				
 			}
 			
 			for(int i=0;i<=cw;i++){
-				data.getCloth().particles.get(i).setAllPosition(corePositions.get(i));
+				if(startCenter){
+					data.getCloth().particles.get(i).setAllPosition(v1);
+					}
+				else{
+					data.getCloth().particles.get(i).setAllPosition(corePositions.get(i));
+				}
+				
+				
 				
 			}
 			
@@ -600,7 +609,13 @@ public class ClothSimulator  {
 					int y=j/(data.getCloth().getW()+1);
 					
 					Vector3 delta=corePositions.get(x).clone().sub(v1).setY(0);
-					Vector3 newPosition=delta.multiplyScalar(y).add(corePositions.get(x));
+					Vector3 newPosition=delta.multiplyScalar(y);
+					if(startCenter){
+						newPosition.add(v1);
+						//no need
+					}else{
+						newPosition.add(corePositions.get(x));
+					}
 					
 					ThreeLog.log("j="+j+",x="+x+",y="+y,newPosition);
 					

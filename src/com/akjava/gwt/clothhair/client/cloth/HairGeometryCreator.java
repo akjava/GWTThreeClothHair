@@ -30,15 +30,19 @@ public class HairGeometryCreator {
 	}
 	public JsArray<Geometry> createGeometry(List<Vector3> positions,int slices){
 		checkArgument(positions.size()>1,"HairGeometryCreator:need atleast 2 points");
-		
+		checkArgument(positions.size()>slices,"need at least slices");
 		JsArray<Geometry> geometries=JavaScriptUtils.createJSArray();
 		
 		
 		int horizontalVertexCount=slices+1;
 		int verticalVertexCount=positions.size()/horizontalVertexCount;
 		
-		double distance=positions.get(0).distanceTo(positions.get(1));
-		
+		double distance=0;
+		if(positions.size()<horizontalVertexCount){
+			distance=positions.get(0).distanceTo(positions.get(1));
+		}else{
+			distance=positions.get(0).distanceTo(positions.get(horizontalVertexCount));
+		}
 		JsArray<Vector2> pts=JavaScriptUtils.createJSArray();
 		pts.push(THREE.Vector2(distance*horizontalThick,-distance*verticalThick));
 		pts.push(THREE.Vector2(distance*horizontalThick,distance*verticalThick));

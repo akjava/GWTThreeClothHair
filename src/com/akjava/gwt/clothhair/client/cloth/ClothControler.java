@@ -137,6 +137,8 @@ public class ClothControler {
 			return;
 		}
 		
+		boolean startCenter=data.getCloth().isStartCircleCenter();
+		
 		if(data.getCalculator().getResult().size()==2){
 			//TODO merge method
 			Vector3 v1=data.getCalculator().getResult().get(0);
@@ -154,10 +156,14 @@ public class ClothControler {
 			}
 			
 			for(int i=0;i<=cw;i++){
-				data.getCloth().particles.get(i).setAllPosition(corePositions.get(i));
+				if(startCenter){
+					data.getCloth().particles.get(i).setAllPosition(v1);
+				}else{
+					data.getCloth().particles.get(i).setAllPosition(corePositions.get(i));
+				}
 			}
 			//TODO sync
-		}else 
+		}else //old one not reach code
 		if(data.getCalculator().getResult().size()<3){//2pins
 			int cw=data.getCloth().w;
 			Vector3 v1=data.getCalculator().getResult().get(0);
