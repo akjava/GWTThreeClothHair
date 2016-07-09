@@ -21,6 +21,7 @@ import com.akjava.gwt.three.client.java.geometry.PointsToGeometry;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
+import com.akjava.gwt.three.client.js.core.Object3D;
 import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Quaternion;
@@ -1055,12 +1056,14 @@ public class HairCloth {
 					//useB=true;
 				}
 				
+				
 				BodyAndMesh bm1=ammoParticles.get(p1);
 				BodyAndMesh bm2=ammoParticles.get(p2);
 				
 				//already multiple when created
 				Vector3 pos1=bm1.getMesh().getPosition();//.multiplyScalar(ammoMultipleScalar);
 				Vector3 pos2=bm2.getMesh().getPosition();//.multiplyScalar(ammoMultipleScalar);
+				
 				
 				DistanceConstraintProperties distanceConstraintProperties=simulator.getAmmoHairControler().getConstraintProperties();
 				
