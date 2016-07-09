@@ -111,6 +111,16 @@ public class HairCloth {
 		this.startCircleCenter = startCircleCenter;
 	}
 
+	//i'm not sure any advantage when true,maybe no need,there were bug of circling
+	private boolean startAndEndSameCircle=false;
+
+
+	public boolean isStartAndEndSameCircle() {
+		return startAndEndSameCircle;
+	}
+	public void setStartAndEndSameCircle(boolean startAndEndSameCircle) {
+		this.startAndEndSameCircle = startAndEndSameCircle;
+	}
 
 	double DAMPING = 0.03;
 	double DRAG = 1.0 - DAMPING;
@@ -1140,12 +1150,12 @@ public class HairCloth {
 				//Geometry clothBox=new PointsToGeometry().debug(false).flipNormal(true).reverseFirstSurface(true).createGeometry(positions, w, restDistance*ammoThick, isConnectHorizontal());
 				
 				//I'm not sure why circle effect vertical thick
-				
-				Geometry clothBox=HairGeometryCreator.merge(new HairGeometryCreator().verticalThick(hairData.getThickRatio()).createGeometry(positions, w));
+				//shape would rotate differenctly on path
+				Geometry clothBox=HairGeometryCreator.merge(new HairGeometryCreator().horizontalThick(hairData.getThickRatio()).verticalThick(hairData.getThickRatio()).createGeometry(positions, w));
 				
 				clothBox.setBones(new PlainBoneCreator().createBone(positions, w));
 				
-				int influence=1;
+				int influence=2;
 				WeightResult result=new SimpleAutoWeight(influence).autoWeight(clothBox, clothBox.getBones(),Lists.newArrayList(0));//ignore root
 				result.insertToGeometry(clothBox);
 				//LogUtils.log(result.toString());

@@ -567,6 +567,7 @@ public class ClothSimulator  {
 		HairMixedData cellData=new HairMixedData(hairData,data,clothMesh);
 		
 		boolean startCenter=data.getCloth().isStartCircleCenter();//start circle from center or not
+		boolean startAndEndSame=data.getCloth().isStartAndEndSameCircle();
 		
 		if(hairData.getHairPins().size()==2){
 			Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
@@ -574,11 +575,12 @@ public class ClothSimulator  {
 			//TODO move and fix
 			int cw=hairData.getSizeOfU();
 			int ch=hairData.getSizeOfV();
+			int angleSplit=startAndEndSame?cw:cw+1;
 			
 			Vector2 center=THREE.Vector2(v1.getX(), v1.getZ());
 			Vector2 point=THREE.Vector2(v2.getX(), v2.getZ());
 			List<Vector3> corePositions=Lists.newArrayList();
-			double perAngle=360/(cw); //not support connect-horizontal
+			double perAngle=360.0/(angleSplit); //not support connect-horizontal
 			ThreeLog.log("center",center);
 			ThreeLog.log("point",point);
 			for(int i=0;i<=cw;i++){

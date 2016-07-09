@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.List;
 
 import com.akjava.gwt.lib.client.JavaScriptUtils;
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
 import com.akjava.gwt.three.client.gwt.extras.geometries.ExtrudeGeometryParameter;
 import com.akjava.gwt.three.client.js.THREE;
@@ -20,6 +21,7 @@ public class HairGeometryCreator {
 	private double horizontalThick=0.5;
 	private double verticalThick=0.5;
 	
+	private boolean mergeLastEdge=true;
 	public HairGeometryCreator horizontalThick(double v){
 		horizontalThick=v;
 		return this;
@@ -50,6 +52,8 @@ public class HairGeometryCreator {
 		pts.push(THREE.Vector2(-distance*horizontalThick,-distance*verticalThick));
 		
 		Shape shape=THREE.Shape(pts);
+		int lastVertexSize=shape.getPoints(12).length();//default curve
+		
 		
 		for(int i=0;i<horizontalVertexCount;i++){
 			JsArray<Vector3> poses=JavaScriptUtils.createJSArray();
@@ -66,8 +70,31 @@ public class HairGeometryCreator {
 					
 					
 			ExtrudeGeometry geometry=THREE.ExtrudeGeometry(shape, options);
+			//merge last
+			//LogUtils.log("last-size:"+lastVertexSize+",total="+geometry.getVertices().length());
+			
+			if(mergeLastEdge){
+			Vector3 pos=THREE.Vector3();
+			for(int j=0;j<lastVertexSize;j++){
+				int at=geometry.getVertices().length()-1-j;
+				pos.add(geometry.getVertices().get(at));
+			}
+			pos.divideScalar(lastVertexSize);
+			
+			for(int j=0;j<lastVertexSize;j++){
+				int at=geometry.getVertices().length()-1-j;
+				geometry.getVertices().get(at).copy(pos);
+			}
+			}
+			
+			
 			geometries.push(geometry);
 		}
+		
+		
+		
+		
+		
 		return geometries;
 	}
 	
