@@ -87,16 +87,16 @@ public class HairCloth {
 	 * somehow it's break ,shoudl re-add
 	 */
 	public void initGravity(double MASS,double DAMPING,double GRAVITY){
-		this.DAMPING=DAMPING;
+		this.PLAIN_CLOTH_DAMPING=DAMPING;
 		this.DRAG = 1.0 - DAMPING;
-		this.MASS=MASS;
+		this.PLAIN_CLOTH_MASS=MASS;
 		this.GRAVITY=GRAVITY;
 		gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
 	}
 	public void initGravities(double MASS,double DAMPING){
-		this.DAMPING=DAMPING;
+		this.PLAIN_CLOTH_DAMPING=DAMPING;
 		this.DRAG = 1.0 - DAMPING;
-		this.MASS=MASS;
+		this.PLAIN_CLOTH_MASS=MASS;
 		gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
 	}
 	
@@ -123,9 +123,9 @@ public class HairCloth {
 		this.startAndEndSameCircle = startAndEndSameCircle;
 	}
 
-	double DAMPING = 0.03;
-	double DRAG = 1.0 - DAMPING;
-	double MASS = .1;
+	double PLAIN_CLOTH_DAMPING = 0.03;
+	double DRAG = 1.0 - PLAIN_CLOTH_DAMPING;
+	double PLAIN_CLOTH_MASS = .1;
 	double restDistance = 25;
 
 
@@ -143,7 +143,7 @@ public class HairCloth {
 	//var cloth = new Cloth(xSegs, ySegs);
 
 	double GRAVITY = 981 * 1.4; // 
-	Vector3 gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
+	Vector3 gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(PLAIN_CLOTH_MASS);
 
 
 	//double TIMESTEP = 9.0 / 1000;
@@ -411,7 +411,7 @@ public class HairCloth {
 		this.hairData=hairData;
 		this.visibleDummy=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleParticl();
 		if(hairData.getSizeOfU()==0){
-			LogUtils.log("HairCloth:invalid u-size");
+			LogUtils.log("HairCloth:invalid u-size 0");
 			return;
 		}
 		
@@ -468,7 +468,7 @@ public class HairCloth {
 			for (int v=0;v<=h;v++) {
 				for (int u=0;u<=w;u++) {
 					particles.add(
-						new Particle((double)u/w*width, (double)v/h*height, 0, MASS)
+						new Particle((double)u/w*width, (double)v/h*height, 0, PLAIN_CLOTH_MASS)
 					);
 				}
 			}

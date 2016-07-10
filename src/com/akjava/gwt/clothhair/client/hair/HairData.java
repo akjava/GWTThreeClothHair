@@ -270,7 +270,15 @@ public void setHairPins(List<HairPin> hairPins) {
 
 
 	public static class HairPin{
+		/*
+		 * when particles created pin is used first row and usize increase first row.
+		 * 
+		 * however when user set this,this is pin used for specific particle be static-pin
+		 * main purpose of this technic is pin first row and last row.
+		 * but this really make 
+		 */
 		private int targetClothIndex=-1;
+		
 		
 		public int getTargetClothIndex() {
 			return targetClothIndex;
