@@ -451,4 +451,6 @@ public void setHairPins(List<HairPin> hairPins) {
 	 * use  restdistance * extendOutsideRatio
 	 */
 	private double extendOutsideRatio;
+	
+	
 }
