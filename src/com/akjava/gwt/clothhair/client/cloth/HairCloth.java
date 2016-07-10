@@ -1,5 +1,8 @@
 package com.akjava.gwt.clothhair.client.cloth;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +58,7 @@ import com.google.gwt.core.client.JsArray;
 
 
 /**
- * THIS is CANNON SUPPORT VERSION
+ * Contain HairData
  * @author aki
  *
  */
@@ -73,8 +76,12 @@ public class HairCloth {
 	// Real-time Cloth Animation http://www.darwin3d.com/gamedev/articles/col0599.pdf
 
 	
-	
-	
+	public int getChannel(){
+		return hairData.getChannel();
+	}
+	public boolean isSyncMove(){
+		return hairData.isSyncMove();
+	}
 	
 	/**
 	 * 
@@ -90,17 +97,18 @@ public class HairCloth {
 		this.PLAIN_CLOTH_DAMPING=DAMPING;
 		this.DRAG = 1.0 - DAMPING;
 		this.PLAIN_CLOTH_MASS=MASS;
-		this.GRAVITY=GRAVITY;
-		gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
+		this.PLAIN_CLOTH_GRAVITY_BASE=GRAVITY;
+		plain_cloth_gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
 	}
 	public void initGravities(double MASS,double DAMPING){
 		this.PLAIN_CLOTH_DAMPING=DAMPING;
 		this.DRAG = 1.0 - DAMPING;
 		this.PLAIN_CLOTH_MASS=MASS;
-		gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(MASS);
+		plain_cloth_gravity = THREE.Vector3( 0, -PLAIN_CLOTH_GRAVITY_BASE, 0 ).multiplyScalar(MASS);
 	}
 	
 	/**
+	 * TODO add format
 	 * on circle mode(when point has only two point,start first or second)
 	 */
 	private boolean startCircleCenter=true;
@@ -129,27 +137,30 @@ public class HairCloth {
 	double restDistance = 25;
 
 
+	/*
+	 * TODO fix when circle mode
+	 */
 	public double getRestDistance() {
 		return restDistance;
 	}
 
 
-	private static int xSegs = 10; //
-	private static int ySegs = 10; //
+	//private static int xSegs = 10; //
+	//private static int ySegs = 10; //
 
 	//must be javascript function ParametricGeometry use this function
 	JavaScriptObject clothFunction;
 
 	//var cloth = new Cloth(xSegs, ySegs);
 
-	double GRAVITY = 981 * 1.4; // 
-	Vector3 gravity = THREE.Vector3( 0, -GRAVITY, 0 ).multiplyScalar(PLAIN_CLOTH_MASS);
+	double PLAIN_CLOTH_GRAVITY_BASE = 981 * 1.4; // 
+	Vector3 plain_cloth_gravity = THREE.Vector3( 0, -PLAIN_CLOTH_GRAVITY_BASE, 0 ).multiplyScalar(PLAIN_CLOTH_MASS);
 
 
 	//double TIMESTEP = 9.0 / 1000;
-	double TIMESTEP = 18.0 / 1000;//i'm not sure what is this
+	double PLAIN_CLOTH_TIMESTEP = 18.0 / 1000;//i'm not sure what is this
 	
-	double TIMESTEP_SQ = TIMESTEP * TIMESTEP;
+	double TIMESTEP_SQ = PLAIN_CLOTH_TIMESTEP * PLAIN_CLOTH_TIMESTEP;
 
 	private int[] pins;
 
@@ -163,7 +174,7 @@ public class HairCloth {
 		this.pins = pins;
 	}
 
-
+	//TODO support ammo
 	boolean wind = true;
 	double windStrength = 2;
 	Vector3 windForce = THREE.Vector3(0,0,0);
@@ -293,12 +304,18 @@ public class HairCloth {
 		p2.position.sub(correctionHalf);
 	}
 	
+	/**
+	 * (normalPin.size()-1)*hairData.getSizeOfU()
+	 */
 	int w;
 	public int getW() {
 		return w;
 	}
 
 
+	/**
+	 * right now same of sizeOfV
+	 */
 	int h;
 	
 	private List<Constrain> constrains=new ArrayList<Constrain>();
@@ -366,15 +383,13 @@ public class HairCloth {
 	}
 	*/
 	
-	private boolean connectHorizontal=false;
+	//private boolean connectHorizontal=false;
 	
 	
 	public boolean isConnectHorizontal() {
-		return connectHorizontal;
+		return hairData.isConnectHorizontal();
 	}
-	public void setConnectHorizontal(boolean loopHorizontal) {
-		this.connectHorizontal = loopHorizontal;
-	}
+
 	public static int calcurateParticleSize(List<HairPin> pins,int sizeOfU,int sizeOfH){
 		return calcurateWSize(pins,sizeOfU)*(sizeOfH+1);
 	}
@@ -389,10 +404,10 @@ public class HairCloth {
 		return w;
 	}
 	
-	private int sizeOfU;
+	//private int sizeOfU;
 	
-	private boolean cutHorizontalConnection;
-	private int startCutHorizontalConnection;
+	//private boolean cutHorizontalConnection;
+	//private int startCutHorizontalConnection;
 	
 	public static int calcurateHorizontalPin(int normalPinSize,int sizeOfU){
 		return (normalPinSize-1)*sizeOfU+1;
@@ -400,20 +415,19 @@ public class HairCloth {
 	
 	//ignore 0 index
 	public boolean needConnectHorizontal(int v){
-		return (!cutHorizontalConnection || v<startCutHorizontalConnection);
+		return (!hairData.isCutU() || v<hairData.getStartCutUIndexV());
 	}
 	
-	private double ammoThick;
+	//private double ammoThick;
 	
-	private int hairPhysicsType;
+	//private int hairPhysicsType;
 	private HairData hairData;
 	public HairCloth(HairData hairData,Mesh mesh){
-		this.hairData=hairData;
+		checkArgument(hairData.getSizeOfU()!=0,"HairCloth:invalid u-size 0");
+		checkNotNull(mesh,"HairCloth:mesh is null");
+		this.hairData=hairData.clone();
 		this.visibleDummy=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleParticl();
-		if(hairData.getSizeOfU()==0){
-			LogUtils.log("HairCloth:invalid u-size 0");
-			return;
-		}
+		
 		
 		List<HairPin> normalPin=Lists.newArrayList();//trying cutom pin
 		List<HairPin> customPin=Lists.newArrayList();
@@ -430,19 +444,19 @@ public class HairCloth {
 		 * when small cut u setted, sometime connection seems faild.
 		 * 
 		 */
-		this.ammoThick=hairData.getThickRatio();
-		this.ammoParticleSphereRadius=hairData.getParticleRadiusRatio();
-		this.hairPhysicsType=hairData.getHairPhysicsType();
+		//this.ammoThick=hairData.getThickRatio();
+		//this.ammoParticleSphereRadius=hairData.getParticleRadiusRatio();
+		//this.hairPhysicsType=hairData.getHairPhysicsType();
 		
-		this.connectHorizontal=hairData.isConnectHorizontal();
+		//this.connectHorizontal=hairData.isConnectHorizontal();
 		//LogUtils.log("connect-horizontal:"+connectHorizontal);
-		this.cutHorizontalConnection=hairData.isCutU();
-		this.startCutHorizontalConnection=hairData.getStartCutUIndexV();
+		//this.cutHorizontalConnection=hairData.isCutU();
+		//this.startCutHorizontalConnection=hairData.getStartCutUIndexV();
 		
 		
 			//TODO support 0 sizeOfU
 			this.w = (normalPin.size()-1)*hairData.getSizeOfU();
-			sizeOfU=hairData.getSizeOfU();
+			//sizeOfU=hairData.getSizeOfU();
 			
 			this.h = hairData.getSizeOfV();
 			
@@ -457,8 +471,8 @@ public class HairCloth {
 			clothFunction=plane(width,height);
 			restDistance=width/(w);
 			
-			this.channel=hairData.getChannel();
-			this.syncMove=hairData.isSyncMove();
+			//this.channel=hairData.getChannel();
+			//this.syncMove=hairData.isSyncMove();
 			
 			initPins();
 			
@@ -554,7 +568,7 @@ public class HairCloth {
 			
 			
 			//loop-horizontal
-			if(connectHorizontal){
+			if(hairData.isConnectHorizontal()){
 			for (int v=0;v<=h;v++) {
 				int u=w;
 				
@@ -659,8 +673,8 @@ public class HairCloth {
 	}
 
 	//TODO store
-	boolean syncMove=false;
-	int channel;//for sphere;
+	//boolean syncMove=false;
+	//int channel;//for sphere;
 	
 	
 	
@@ -701,7 +715,7 @@ public class HairCloth {
 		for (int i=0, il = particles.size()
 				;i<il;i++) {
 			Particle particle = particles.get(i);
-			particle.addForce(gravity);
+			particle.addForce(plain_cloth_gravity);
 
 			particle.integrate(TIMESTEP_SQ);
 		}
@@ -784,7 +798,7 @@ public class HairCloth {
 	//before simulate
 	
 	public void beforeSimulate(ClothSimulator simulator,Geometry clothGeometry,List<Mesh> spheres){
-		if(!syncMove){
+		if(!hairData.isSyncMove()){
 			return;
 		}
 		
@@ -832,10 +846,10 @@ public class HairCloth {
 		//not support Wind yet
 		
 		
-		if(hairPhysicsType==HairData.TYPE_SIMPLE_CLOTH){
+		if(hairData.getHairPhysicsType()==HairData.TYPE_SIMPLE_CLOTH){
 			simulateCloth(time,clothGeometry,spheres);
 			return;
-		}else if(isAmmoType(hairPhysicsType)){
+		}else if(isAmmoType(hairData.getHairPhysicsType())){
 			simulateAmmo(simulator,time,clothGeometry,spheres);
 		}
 			else{//CANNON.js
@@ -844,7 +858,7 @@ public class HairCloth {
 		}
 		
 	}
-	double ammoParticleSphereRadius=0.5;//indivisual particle sphere radius
+	//double ammoParticleSphereRadius=0.5;//indivisual particle sphere radius
 	
 	//bigger value cloth would fly ( 0.5 is best.bigger easy to stuck,small easy to slip out)
 	
@@ -856,8 +870,7 @@ public class HairCloth {
 	 
 	private void simulateAmmo(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
 
-		//default simulate cannon
-		
+		int channel=hairData.getChannel();
 		
 		
 		Stopwatch watch=Stopwatch.createStarted();
@@ -1102,13 +1115,13 @@ public class HairCloth {
 			AmmoHairControler.ParticleBodyDatas data=new AmmoHairControler.ParticleBodyDatas(ammoParticles,ammoConstraints);
 			
 			
-			if(hairPhysicsType==HairData.TYPE_AMMO_BONE_CLOTH){
+			if(hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_CLOTH){
 			//create bone mesh
 			//position keep same
 			List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).transform(new CloneDivided(ammoMultipleScalar)).toList();
 			
 			//force up normal //THREE.Vector3(0,1,0)
-			Geometry clothBox=new PointsToGeometry().debug(false).flipNormal(true).reverseFirstSurface(true).createGeometry(positions, w, restDistance*ammoThick, isConnectHorizontal());
+			Geometry clothBox=new PointsToGeometry().debug(false).flipNormal(true).reverseFirstSurface(true).createGeometry(positions, w, restDistance*hairData.getThickRatio(), isConnectHorizontal());
 			
 			//I'm not sure why circle effect vertical thick
 			
@@ -1144,7 +1157,7 @@ public class HairCloth {
 			helper.setVisible(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone());//TODO get visible from setting
 			
 			
-			}else  if(hairPhysicsType==HairData.TYPE_AMMO_BONE_HAIR){
+			}else  if(hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_HAIR){
 				//create bone mesh
 				//position keep same
 				List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).transform(new CloneDivided(ammoMultipleScalar)).toList();
@@ -1200,7 +1213,7 @@ public class HairCloth {
 					threePos.copy(particles.get(i).getOriginal()).multiplyScalar(ammoMultipleScalar);
 					ammoParticles.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
 				}else{
-					if(!isBoneType(hairPhysicsType)){
+					if(!isBoneType(hairData.getHairPhysicsType())){
 					Vector3 ammoPos=ammoParticles.get(i).getBody().getReadOnlyPosition(threePos);
 					particles.get(i).position.copy(ammoPos).divideScalar(ammoMultipleScalar);
 					}
@@ -1209,7 +1222,7 @@ public class HairCloth {
 			
 			
 			//update mesh
-			if(isBoneType(hairPhysicsType)){
+			if(isBoneType(hairData.getHairPhysicsType())){
 			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles,ammoMultipleScalar);
 			
 			if(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone()){
@@ -1237,7 +1250,7 @@ public class HairCloth {
 
 	private void simulateCannon(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
 
-		//default simulate cannon
+		int channel=hairData.getChannel();
 		
 		Stopwatch watch=Stopwatch.createStarted();
 		
@@ -1436,7 +1449,7 @@ public class HairCloth {
 	}
 
 	private BodyAndMesh createAmmoParticle(ClothSimulator simulator,Vector3 p,double mass){
-		double s=restDistance*ammoMultipleScalar*ammoParticleSphereRadius;
+		double s=restDistance*ammoMultipleScalar*hairData.getParticleRadiusRatio();
 		
 		
 		

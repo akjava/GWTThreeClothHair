@@ -6,6 +6,11 @@ import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 
+/**
+ * serializable data
+ * @author aki
+ *
+ */
 public class HairData {
 	
 private boolean visible;
@@ -26,6 +31,8 @@ private boolean execAverageNormal=true;
 public boolean isExecAverageNormal() {
 	return execAverageNormal;
 }
+
+
 
 public void setExecAverageNormal(boolean execAverageNormal) {
 	this.execAverageNormal = execAverageNormal;

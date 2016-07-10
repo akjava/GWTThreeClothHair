@@ -70,7 +70,7 @@ public class ClothControler {
 			HairCloth cloth=data.getCloth();
 			Geometry clothGeometry=data.getClothGeometry();
 			
-			cloth.beforeSimulate(simulator,clothGeometry,getSphereList(cloth.channel));//set otherwhere?
+			cloth.beforeSimulate(simulator,clothGeometry,getSphereList(cloth.getChannel()));//set otherwhere?
 			}
 	}
 	
@@ -98,7 +98,7 @@ public class ClothControler {
 			//support-matrix4
 			
 			//should switch to sphere
-			cloth.afterSimulate(simulator,time,clothGeometry,getSphereList(cloth.channel));//set otherwhere?
+			cloth.afterSimulate(simulator,time,clothGeometry,getSphereList(cloth.getChannel()));//set otherwhere?
 		}
 		
 		renderCloth();//cloth-vertex to three.js object
@@ -184,7 +184,7 @@ public class ClothControler {
 				data.getCloth().particles.get(i).setAllPosition(v);
 			}
 			
-			if(data.getCloth().syncMove){
+			if(data.getCloth().isSyncMove()){
 				for(int i=cw;i<data.getCloth().particles.size();i++){
 					data.getCloth().particles.get(i).position.sub(diff);
 					data.getCloth().particles.get(i).previous.sub(diff);
@@ -269,7 +269,7 @@ public class ClothControler {
 			
 			
 			//complete sync
-			if(data.getCloth().syncMove){
+			if(data.getCloth().isSyncMove()){
 				for(int i=cw;i<data.getCloth().particles.size();i++){
 					data.getCloth().particles.get(i).position.sub(diff);
 					data.getCloth().particles.get(i).previous.sub(diff);

@@ -11,7 +11,10 @@ import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
-
+/*
+ * contain HairCloth and Mesh
+ * 
+ */
 public class ClothData {
 private HairCloth cloth;
 private Mesh clothMesh;
