@@ -71,6 +71,11 @@ public class HairCloth {
 	public int getChannel(){
 		return hairData.getChannel();
 	}
+	
+	/**
+	 * if ammo cloth use ammoMultipleScalar is 1  better
+	 * @return
+	 */
 	public boolean isSyncMove(){
 		return hairData.isSyncMove();
 	}
@@ -789,7 +794,7 @@ public class HairCloth {
 	//before simulate
 	
 	public void beforeSimulate(ClothSimulator simulator,Geometry clothGeometry,List<Mesh> spheres){
-		if(!hairData.isSyncMove()){
+		if(!isSyncMove()){
 			return;
 		}
 		
@@ -805,8 +810,8 @@ public class HairCloth {
 			Vector3 diff=THREE.Vector3();
 			diff.copy(particles.get(0).getOriginal().clone().sub(ammoParticles.get(0).getMesh().getPosition()));
 			
-			Vector3 move=diff.clone().multiplyScalar(hairData.getSyncMoveLinear());
-			Vector3 force=diff.clone().multiplyScalar(hairData.getSyncForceLinear());
+			Vector3 move=diff.clone().multiplyScalar(hairData.getSyncMoveLinear()*ammoMultipleScalar);
+			Vector3 force=diff.clone().multiplyScalar(hairData.getSyncForceLinear()*ammoMultipleScalar);
 			
 			
 			//TODO custom pin support structure
@@ -860,7 +865,9 @@ public class HairCloth {
 	
 	//TODO move ammohair controler and allow change from basic panel
      //double ammoMultipleScalar=0.1;//1;//0.1;//should be small,0.1 seems good,but need modify-function
-	 double ammoMultipleScalar=1;
+	
+	//very important,if use sync ,value should 1 so far 
+	double ammoMultipleScalar=.1;
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
 	 
 	 
