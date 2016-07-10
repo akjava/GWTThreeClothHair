@@ -418,7 +418,6 @@ public class HairCloth {
 		checkArgument(hairData.getSizeOfU()!=0,"HairCloth:invalid u-size 0");
 		checkNotNull(mesh,"HairCloth:mesh is null");
 		this.hairData=hairData.clone();
-		this.visibleDummy=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleParticl();
 		
 		
 		List<HairPin> normalPin=Lists.newArrayList();//trying cutom pin
@@ -863,11 +862,14 @@ public class HairCloth {
      //double ammoMultipleScalar=0.1;//1;//0.1;//should be small,0.1 seems good,but need modify-function
 	 double ammoMultipleScalar=1;
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
-	 private boolean visibleDummy=false;//now working //set scale & pos
 	 
+	 
+	private boolean visibleDummy;
 	private void simulateAmmo(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
 
 		int channel=hairData.getChannel();
+		
+		visibleDummy=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleParticl();
 		
 		
 		Stopwatch watch=Stopwatch.createStarted();
@@ -1249,7 +1251,6 @@ public class HairCloth {
 
 	
 	protected BodyAndMesh createAmmoSphereBody(ClothSimulator simulator,Vector3 position, double size,JsSphereData sphereData) {
-		
 		
 		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0xff0000)
 				.visible(visibleDummy)); //controld by panel basci/ammo
