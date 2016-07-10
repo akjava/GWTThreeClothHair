@@ -97,6 +97,7 @@ public class ClothSimulator  {
 		
 		/*
 		 * setting 1
+		 */
 		//this is easy recover
 		ammoHairControler.getSpherehProperties().setFriction(0);
 		ammoHairControler.getSpherehProperties().setRestitution(0.5);
@@ -105,10 +106,11 @@ public class ClothSimulator  {
 		ammoHairControler.getParticleProperties().setRestitution(0.5);
 		ammoHairControler.getParticleProperties().setDamping(.001,.001);
 		ammoHairControler.getConstraintProperties().setEnableSpringsAll(true);
-		ammoHairControler.getConstraintProperties().setStiffnessAll(1000);
+		ammoHairControler.getConstraintProperties().setStiffnessAll(10);//1000 is too strong?
 		ammoHairControler.getConstraintProperties().setDampingAll(0);
-		*/
 		
+		
+		/* I'm not sure how effect
 		ammoHairControler.getSpherehProperties().setFriction(10);
 		ammoHairControler.getSpherehProperties().setRestitution(0);
 		
@@ -118,6 +120,7 @@ public class ClothSimulator  {
 		ammoHairControler.getConstraintProperties().setEnableSpringsAll(false);
 		//ammoHairControler.getConstraintProperties().setStiffnessAll(1000);
 		ammoHairControler.getConstraintProperties().setDampingAll(0);
+		*/
 		
 		//for lighter
 		//ammoHairControler.getParticleProperties().setDamping(1,1); //for lighter
