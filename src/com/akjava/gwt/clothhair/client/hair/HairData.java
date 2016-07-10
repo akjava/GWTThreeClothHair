@@ -177,6 +177,10 @@ public static final int EDGE_FIRST=1;
 public static final int EDGE_CENTEr=2;
 public static final int EDGE_LAST=3;
 private int edgeMode;
+/**
+ * @deprecated
+ * @return
+ */
 public int getEdgeMode() {
 	return edgeMode;
 }
@@ -184,7 +188,10 @@ public int getEdgeMode() {
 public void setEdgeMode(int edgeMode) {
 	this.edgeMode = edgeMode;
 }
-
+/**
+ * @deprecated
+ * @return
+ */
 public double getEdgeModeScale() {
 	return edgeModeScale;
 }

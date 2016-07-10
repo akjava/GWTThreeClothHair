@@ -171,16 +171,21 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			h3.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 			this.add(h3);
 			
+			/**
+			 * edgeMode is deprecated
+			 * 
+			 */
+			
 			edgeMode = new ListBox();
 			edgeMode.addItem("none");
 			edgeMode.addItem("first");
 			edgeMode.addItem("center");
 			edgeMode.addItem("end");
-			h3.add(edgeMode);
+			//h3.add(edgeMode);
 			edgeMode.setWidth("80px");
 			edgeScale = new LabeledInputRangeWidget2("scale", 0.25, 4, 0.01);
 			edgeScale.getLabel().setWidth("40px");
-			h3.add(edgeScale);
+			//h3.add(edgeScale);
 			
 			//channel
 			

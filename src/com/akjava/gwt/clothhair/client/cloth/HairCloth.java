@@ -867,6 +867,7 @@ public class HairCloth {
      //double ammoMultipleScalar=0.1;//1;//0.1;//should be small,0.1 seems good,but need modify-function
 	
 	//very important,if use sync ,value should 1 so far 
+	//TODO make global setting
 	double ammoMultipleScalar=.1;
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
 	 
