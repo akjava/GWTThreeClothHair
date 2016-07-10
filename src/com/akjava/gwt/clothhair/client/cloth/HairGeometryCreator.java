@@ -35,6 +35,8 @@ public class HairGeometryCreator {
 		checkArgument(positions.size()>slices,"need at least slices");
 		JsArray<Geometry> geometries=JavaScriptUtils.createJSArray();
 		
+		LogUtils.log("HairGeometryCreator:createGeometry() vthick="+verticalThick+",hthick="+horizontalThick);
+		
 		
 		int horizontalVertexCount=slices+1;
 		int verticalVertexCount=positions.size()/horizontalVertexCount;

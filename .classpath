@@ -12,7 +12,6 @@
 	<classpathentry kind="lib" path="/GWTLib2011/lib/jsr305.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GWTJSZip"/>
 	<classpathentry kind="lib" path="/threeTest/lib/akjavastatgwt_120820.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/GWTCannonCustom"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GWTThreeAmmo"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
