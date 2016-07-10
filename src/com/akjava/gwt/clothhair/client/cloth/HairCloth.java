@@ -8,8 +8,6 @@ import java.util.List;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler;
-import com.akjava.gwt.clothhair.client.cannon.CannonControler.ParticleBodyData;
-import com.akjava.gwt.clothhair.client.cannon.CannonControler.SphereBodyData;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataUtils;
@@ -24,7 +22,6 @@ import com.akjava.gwt.three.client.java.geometry.PointsToGeometry;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
-import com.akjava.gwt.three.client.js.core.Object3D;
 import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Quaternion;
@@ -45,11 +42,6 @@ import com.akjava.gwt.threeammo.client.core.btVector3;
 import com.akjava.gwt.threeammo.client.core.constraints.btGeneric6DofSpringConstraint;
 import com.akjava.gwt.threeammo.client.functions.BodyAndMeshFunctions;
 import com.akjava.gwt.threeammo.client.functions.BodyAndMeshFunctions.CloneDivided;
-import com.github.gwtcannonjs.client.CANNON;
-import com.github.gwtcannonjs.client.constraints.DistanceConstraint;
-import com.github.gwtcannonjs.client.math.Vec3;
-import com.github.gwtcannonjs.client.objects.Body;
-import com.github.gwtcannonjs.client.shapes.Sphere;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
@@ -1248,183 +1240,9 @@ public class HairCloth {
 	return value1.toFixed(c)==value2.toFixed(c);
 	}-*/;
 
-	private void simulateCannon(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
-
-		int channel=hairData.getChannel();
-		
-		Stopwatch watch=Stopwatch.createStarted();
-		
-		boolean needInitSphere=false;
-		if(!simulator.getCannonControler().isExistSphereData(channel)){
-			needInitSphere=true;
-		}else{
-		SphereBodyData cannonSpheres=simulator.getCannonControler().getSphereData(channel);
-		if(spheres.size()!=cannonSpheres.getCannonSpheres().length()){
-			needInitSphere=true;
-			simulator.getCannonControler().removeSphereData(channel);
-			
-			}
-			
-		}
-		
-		
-		if(needInitSphere){
-			JsArray<Body> cannonSpheres=JavaScriptUtils.createJSArray();
-			for(int i=0;i<spheres.size();i++){
-				Mesh sphereMesh=spheres.get(i);
-				Body body=createSphereBody(simulator,sphereMesh.getPosition().clone().divideScalar(1000),sphereMesh.getScale().getX()/1000);
-				cannonSpheres.push(body);	
-			}
-			
-			simulator.getCannonControler().setSphereData(channel,new SphereBodyData(cannonSpheres));
-			
-		}else{
-			SphereBodyData data=simulator.getCannonControler().getSphereData(channel);
-			JsArray<Body> cannonSpheres=data.getCannonSpheres();
-			for(int i=0;i<spheres.size();i++){
-				Vector3 threePos=spheres.get(i).getPosition().clone().divideScalar(1000);
-				cannonSpheres.get(i).getPosition().set(threePos.getX(),threePos.getY(),threePos.getZ());
-				double radius=spheres.get(i).getScale().getX()/1000;
-				for(int j=0;j<cannonSpheres.get(i).getShapes().length();j++){
-					Sphere sphere=cannonSpheres.get(i).getShapes().get(j).cast();
-					sphere.setRadius(radius);
-				}
-				//cannonSpheres.get(i).set
-				//sadly not support size yet
-			}
-		}
-		
-		if(!simulator.getCannonControler().isExistParticleData(this)){
-			
-			
-			JsArray<Body> cannonParticles=JavaScriptUtils.createJSArray();
-			JsArray<DistanceConstraint> cannonConstraints=JavaScriptUtils.createJSArray();
-			for(int i=0;i<particles.size();i++){
-				Particle particle=particles.get(i);
-				int v=i/(w+1);
-				//this effect small,TODO more check
-				double baseMass=1;//this is very important
-				
-				
-				
-				/*
-				 * trid last one is heavy,but not so good
-				
-				*/
-				if(!needConnectHorizontal(v)){
-					//LogUtils.log(v);
-					//baseMass=0.05;//try less effect,i'm not sure still this is useful
-				}
-				
-				double mass=isPinned(i)?0:baseMass;
-				
-				/*
-				 * noeffect,try to less pin and keep loose
-				mass=baseMass;//test no pin
-				if(i%sizeOfU==0 && isPinned(i)){//try to loose
-					mass=0;
-				}
-				*/
-				
-				Body p=createParticle(simulator,particle.getOriginal().clone().divideScalar(1000), mass);
-				cannonParticles.push(p);
-			}
-			
-			
-			for(int i=0;i<constrains.size();i++){
-				Constrain con=constrains.get(i);
-				int p1=particles.indexOf(con.p1);
-				int p2=particles.indexOf(con.p2);
-				//max force is no effect?.at least set 1 or Too gravity.
-				cannonConstraints.push(CANNON.newDistanceConstraint(cannonParticles.get(p1),cannonParticles.get(p2),con.distance/1000));
-			}
-			
-			
-			
-			
-			simulator.getCannonControler().setParticleData(this, new ParticleBodyData(cannonParticles,cannonConstraints));
-		}else{
-			ParticleBodyData data=simulator.getCannonControler().getCannonData(this);
-			JsArray<Body> cannonParticles=data.getCannonParticles();
-			
-			//basically never changed length
-			for(int i=0;i<cannonParticles.length();i++){
-				if(isPinned(i)){
-					Vector3 threePos=particles.get(i).getOriginal().clone().divideScalar(1000);
-					cannonParticles.get(i).getPosition().set(threePos.getX(),threePos.getY(),threePos.getZ());
-				}else{
-					Vec3 cannonPos=cannonParticles.get(i).getPosition();
-					particles.get(i).position.set(cannonPos.getX(),cannonPos.getY(),cannonPos.getZ()).multiplyScalar(1000);
-				}
-			}
-			
-			
-			
-			
-		}
-		
-		
-		
-		//sphere out,not work so good
-		//TODO switch
-		
-		/*
-		 * Vector3 diff = THREE.Vector3();
-		for (int i=0;i<particles.size();i++) {
-			if(isPinned(i)){
-				continue;
-			}
-			Particle particle = particles.get(i);
-			Vector3 pos = particle.getPosition();
-			
-			for(Mesh mesh:spheres){
-				diff.subVectors(pos, mesh.getPosition());
-				if (diff.length() < mesh.getScale().getX()) {
-					String before=ThreeLog.get(pos);
-					diff.normalize().multiplyScalar(mesh.getScale().getX());
-					
-					
-					pos.copy(mesh.getPosition()).add(diff);
-					String after=ThreeLog.get(pos);
-					LogUtils.log(i+","+before+","+after);
-					//pos.copy(mesh.getPosition()).add(diff);
-					//LogUtils.log("scale-out");
-					//break;//?
-				}
-				
-			}
-		}
-		*/
-		
-		//around 0-1 ms
-		
-		//LogUtils.log("simulate-time:"+watch.elapsed(TimeUnit.MILLISECONDS)+" ms");
-		
-	}
 	
 
 	
-	protected Body createSphereBody(ClothSimulator simulator,Vector3 position, double size) {
-		
-		com.github.gwtcannonjs.client.shapes.Sphere sphereShape = CANNON.newSphere(size);
-		
-		//need more try and error,not good at cloth,not smooth
-		//com.github.gwtcannonjs.client.shapes.Box sphereShape = CANNON.newBox(CANNON.newVec3(size, size, size));
-		
-		Body sphereBody  = CANNON.newBody(CANNON.newBodyOptions().withMass(0)
-				.withMaterial(simulator.getCannonControler().getSphereMaterial())
-				);
-		
-		sphereBody.addShape(sphereShape);
-		
-		
-		sphereBody.getPosition().set(position.getX(),position.getY(),position.getZ());//sphereBody.position.set(0,0,0);
-		return sphereBody;
-		
-	}
-	
-	
-	//TODO option box or sphere
 	protected BodyAndMesh createAmmoSphereBody(ClothSimulator simulator,Vector3 position, double size,JsSphereData sphereData) {
 		
 		
@@ -1466,33 +1284,7 @@ public class HairCloth {
 		return body;
 	}
 	
-	private Body createParticle(ClothSimulator simulator,Vector3 p,double mass){
-		Body particle = CANNON.newBody(CANNON.newBodyOptions().withMass(mass)
-				.withMaterial(simulator.getCannonControler().getClothMaterial())
-		
-				);
-		double s=restDistance/1000/2;
-		
-		//so so work,maybe slow
-		particle.addShape(CANNON.newSphere(s));
-		//seems impossible
-		//particle.addShape(CANNON.newBox(CANNON.newVec3(s, s, s)));
-		//particle.addShape(CANNON.newParticle());
-		
-		
-		//this seems works when extremly dynamic movement
-		particle.setAngularDamping(0.99);
-		particle.setLinearDamping(0.99);
-		
-		//particle.linearDamping = 0.5;
-		particle.getPosition().set(//particle.position.set(
-		p.getX(),
-		p.getY(),
-		p.getZ()
-		);
-		
-		return particle;
-	}
+
 	
 
 }

@@ -11,7 +11,6 @@ import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler;
 import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler.ParticleBodyDatas;
-import com.akjava.gwt.clothhair.client.cannon.CannonControler;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
@@ -55,7 +54,7 @@ import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.event.dom.client.ErrorEvent;
 
 public class ClothSimulator  {
-	private CannonControler cannonControler;
+	
 	private AmmoHairControler ammoHairControler;
 	public AmmoHairControler getAmmoHairControler() {
 		return ammoHairControler;
@@ -77,7 +76,7 @@ public class ClothSimulator  {
 		this.scene=scene;
 		this.characterMesh=characterMesh;
 		clothControler=new ClothControler();
-		cannonControler=new CannonControler();
+		
 		ammoHairControler=new AmmoHairControler(scene);
 		
 		updateAmmoProperties();
@@ -138,15 +137,6 @@ public class ClothSimulator  {
 		//ammoHairControler.getConstraintProperties().setLinearUpperLimit(THREE.Vector3(v, v,v));
 	}
 
-	public CannonControler getCannonControler() {
-		return cannonControler;
-	}
-
-
-
-	public void setCannonControler(CannonControler cannonControler) {
-		this.cannonControler = cannonControler;
-	}
 
 	private ClothControler clothControler;
 	
@@ -169,11 +159,7 @@ public class ClothSimulator  {
 		getClothControler().beforeSimulate(this);
 		
 		
-		if(cannonControler.isEnabled()){//TODO move setting
-			int iteration=1; //iteration totally kill fps,but reduce shaking
-			for(int i=0;i<iteration;i++)
-			cannonControler.getWorld().step(1.0/60);
-		}
+		
 		
 		if(ammoHairControler.isEnabled()){
 			//LogUtils.log("ammo-update");

@@ -250,29 +250,7 @@ public class BasicPanel extends VerticalPanel{
 		});
 		ha.add(particleBoneCheck);
 		
-		//cannon controling
-		generalPanel.add(new HTML("<h4>Cannon</h4>"));
-		HorizontalPanel h2=new HorizontalPanel();
-		h2.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
-		CheckBox cannonStopCheck=new CheckBox("stop");
-		
-		cannonStopCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				GWTThreeClothHair.INSTANCE.getCannonControler().setStopped(event.getValue());
-			}
-			
-		});
-		h2.add(cannonStopCheck);
-		Button step=new Button("step",new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GWTThreeClothHair.INSTANCE.getCannonControler().getWorld().step(1.0/60);
-			}
-		});
-		h2.add(step);
-		generalPanel.add(h2);
+	
 		
 		
 		generalPanel.add(new HTML("<h4>Three.js</h4>"));
