@@ -936,14 +936,14 @@ public class HairCloth {
 				if(!needReCreate){
 					double characterScale=simulator.getCharacterMesh().getScale().getX();
 					if(bodyAndMesh.getShapeType()==BodyAndMesh.TYPE_SPHERE){
-						double radius=bodyAndMesh.castToSphere().getRadius()/characterScale;
+						double radius=bodyAndMesh.castToSphere().getRadius()/ammoMultipleScalar/characterScale;
 						if(!isSame(4, radius, jsData.getRadius())){
 							LogUtils.log("sphere-radius:"+jsData.getRadius()+","+radius);
 							needReCreate=true;
 						}
 					}else{//box
 						
-						double radius=bodyAndMesh.castToBox().getBoxSize().getX()/2/characterScale;
+						double radius=bodyAndMesh.castToBox().getBoxSize().getX()/2/ammoMultipleScalar/characterScale;
 						//TODO support boxSize
 						if(!isSame(4, radius, jsData.getRadius())){
 							LogUtils.log("box-radius:"+jsData.getRadius()+","+radius);
