@@ -1112,6 +1112,9 @@ public class HairCloth {
 				distanceConstraintProperties.updateFrameInA(transform1, pos1, pos2);
 				distanceConstraintProperties.updateFrameInB(transform2, pos1, pos2);
 				
+				//try to fixed length but not good
+				//transform2.getOrigin().copy(pos2.clone().sub(pos1).normalize().multiplyScalar(restDistance*ammoMultipleScalar));//keep length
+				
 				ConstraintAndLine constraintAndMesh=simulator.getAmmoHairControler().getAmmoControler().createGeneric6DofSpringConstraint(bm1, bm2, transform1, transform2, distanceConstraintProperties.isDisableCollisionsBetweenLinkedBodies());
 				constraintAndMesh.setVisibleLine(false);
 				

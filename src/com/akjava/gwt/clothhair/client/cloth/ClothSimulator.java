@@ -764,12 +764,14 @@ public class ClothSimulator  {
 				int x=j%(data.getCloth().getW()+1);
 				int y=j/(data.getCloth().getW()+1);
 				//LogUtils.log(j+"="+x);
-				Vector3 pos=data.getCloth().particles.get(x).getOriginal();
+				Vector3 pos=data.getCloth().particles.get(x).getOriginal().clone();
 				//copy upper x
 				
 				//open widely
 				data.getCloth().particles.get(j).setAllPosition(pos);
 				
+				//try to narrow but faild
+				//pos.add(noTargetedPinNormals.get(x).clone().normalize().multiplyScalar( -data.getCloth().getRestDistance()*0.5 ));
 				
 				//LogUtils.log("distance:"+(data.getCloth().getRestDistance()*10*y));
 				//plus-y
