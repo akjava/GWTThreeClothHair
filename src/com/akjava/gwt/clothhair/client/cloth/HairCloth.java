@@ -794,6 +794,11 @@ public class HairCloth {
 			return;
 		}
 		
+		if(!simulator.getAmmoHairControler().isEnabled()){
+			
+			return;
+		}
+		
 		if(simulator.getAmmoHairControler().isExistParticleData(this)){
 			AmmoHairControler.ParticleBodyDatas data=simulator.getAmmoHairControler().getAmmoData(this);
 			List<BodyAndMesh> ammoParticles=data.getAmmoParticles();
