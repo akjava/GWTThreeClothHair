@@ -14,25 +14,43 @@ import com.google.common.collect.Lists;
 public class HairData {
 
 /*
- * show this hair or not ,not serialized for viewing 	
+ * show this hair or not ,not serialized for viewing 
+ * not storing	
  */
 private boolean visible;
+public boolean isVisible() {
+	return visible;
+}
 
+public void setVisible(boolean visible) {
+	this.visible = visible;
+}
 /*
  * connect to first and last
  * 
- *  actual geometry is difference.
+ *  actual geometry is difference on physics-type.
  *  
  *  PLAIN_CLOTH,AMMO_CLOTH has a space between connection.
  *  
+ *  AMMO_BONE_HAIR no effect on geometry,but linked with constraint(joint)
+ *  
+ *  bugs
+ *  if connected,therea are not adding extra sizeOfU between first and last,usually it make a hole.
+ *  so when connected ,you should add last point as same as first or near first.
  *  
  */
 private boolean connectHorizontal;
+public boolean isConnectHorizontal() {
+	return connectHorizontal;
+}
 
+public void setConnectHorizontal(boolean connectHorizontal) {
+	this.connectHorizontal = connectHorizontal;
+}
 
 /*
  * cloth made by normals.
- * if use execAverageNormal more natural curved mesh made.
+ * if use execAverageNormal more natural curved mesh made.(take care of next of both side vertex)
  * 
  * it's effect on connected horizontal 
  * 
@@ -44,38 +62,31 @@ private boolean execAverageNormal=true;
 public boolean isExecAverageNormal() {
 	return execAverageNormal;
 }
-
-
-
 public void setExecAverageNormal(boolean execAverageNormal) {
 	this.execAverageNormal = execAverageNormal;
 }
 
-public boolean isConnectHorizontal() {
-	return connectHorizontal;
-}
-
-public void setConnectHorizontal(boolean connectHorizontal) {
-	this.connectHorizontal = connectHorizontal;
-}
-
-//not store
-public boolean isVisible() {
-	return visible;
-}
-
-public void setVisible(boolean visible) {
-	this.visible = visible;
-}
-
-
+/*
+ * Hair pin is the data position,skinning-indices,skinning-weights
+ * right now only support relative position from character-mesh
+ * so pin contain only faceindex and vertexIndex(0-3) of face
+ * 
+ * basically pin is used for first static rows column.
+ * if you set target,the target particle become static.(but this is not work on ammo)
+ * 
+ * 
+ * 1 pin only is not suppported (TODO as rope)
+ * 2 pin only make special circle,good work on ammo
+ */
 private List<HairPin> hairPins=Lists.newArrayList();
-
-private int sizeOfU=8;	//w
-public int getSizeOfU() {
-	return sizeOfU;
+public List<HairPin> getHairPins() {
+return hairPins;
 }
 
+/**
+ * 
+ * @return pin-size which has no target and used for first row column.
+ */
 public int countNormalPin(){
 	int result=0;
 	for(HairPin pin:hairPins){
@@ -86,62 +97,69 @@ public int countNormalPin(){
 	return result;
 }
 
+/**
+ * how many face has each NormalPin
+ * 
+ * (normalPinSize-1)*SizeOfU == horizontal vertex (if connected add extra one to geometry)
+ * 
+ * Interpolate linear.
+ */
+private int sizeOfU=8;
+public int getSizeOfU() {
+	return sizeOfU;
+}
 public void setSizeOfU(int sizeOfU) {
 	this.sizeOfU = sizeOfU;
 }
 
+/*
+ * vertical number of face
+ * usually face's height is same as width.
+ */
+private int sizeOfV=8;
 public int getSizeOfV() {
 	return sizeOfV;
 }
-
 public void setSizeOfV(int sizeOfV) {
 	this.sizeOfV = sizeOfV;
 }
 
+/**
+width * sizeOfU
+usually height is same as width
+
+this complete works on plain-cloth
+this effect particle size
+
+bugs,no effect on 2 pin circle-mode
+
+if particle ratio is small large sizeOfU make hole easily
+ */
 
 private double scaleOfU=1.0;
-
 public double getScaleOfU() {
 	return scaleOfU;
 }
-
 public void setScaleOfU(double scaleOfU) {
 	this.scaleOfU = scaleOfU;
 }
 
 
-private int sizeOfV=8;	//h
-
+/**
+ * cut horizontal constraints(joint)
+ */
 private boolean cutU;
 public boolean isCutU() {
 	return cutU;
 }
-
-private double originalNormalRatio;
-
-public double getOriginalNormalRatio() {
-	return originalNormalRatio;
-}
-
-public void setOriginalNormalRatio(double originalNormalRatio) {
-	this.originalNormalRatio = originalNormalRatio;
-}
-
-
-private boolean useCustomNormal;
-
-public boolean isUseCustomNormal() {
-	return useCustomNormal;
-}
-
-public void setUseCustomNormal(boolean useCustomNormal) {
-	this.useCustomNormal = useCustomNormal;
-}
-
 public void setCutU(boolean cutU) {
 	this.cutU = cutU;
 }
 
+/**
+ when start cut 0 means no horizontal connection 
+ */
+private int startCutUIndexV;
 public int getStartCutUIndexV() {
 	return startCutUIndexV;
 }
@@ -150,19 +168,50 @@ public void setStartCutUIndexV(int startCutUIndexV) {
 	this.startCutUIndexV = startCutUIndexV;
 }
 
+/*
+ on the default normal extrude outside and this make bottom's face having large width like skirt.
+ 
+ right now only use -1y normal,or not
+ */
+private boolean useCustomNormal;
+public boolean isUseCustomNormal() {
+	return useCustomNormal;
+}
 
+public void setUseCustomNormal(boolean useCustomNormal) {
+	this.useCustomNormal = useCustomNormal;
+}
 
-private int startCutUIndexV;
+/*
+ * ratio to merge to custom-normal
+ */
+private double originalNormalRatio;
+public double getOriginalNormalRatio() {
+	return originalNormalRatio;
+}
 
+public void setOriginalNormalRatio(double originalNormalRatio) {
+	this.originalNormalRatio = originalNormalRatio;
+}
+
+/**
+ it works on plain-cloth and not so good working.
+ 
+ TODO support ammo-bone-hair
+ */
 private boolean doNarrow;
 public boolean isDoNarrow() {
 	return doNarrow;
 }
-
 public void setDoNarrow(boolean doNarrow) {
 	this.doNarrow = doNarrow;
 }
 
+/*
+ * when start of stacks(sizeOfV)
+ */
+
+private int startNarrowIndexV=1;
 public int getStartNarrowIndexV() {
 	return startNarrowIndexV;
 }
@@ -170,26 +219,17 @@ public int getStartNarrowIndexV() {
 public void setStartNarrowIndexV(int startNarrowIndexV) {
 	this.startNarrowIndexV = startNarrowIndexV;
 }
-
+/*
+ * each time width*narrowScale.
+ */
+private double narrowScale=0.9;
 public double getNarrowScale() {
 	return narrowScale;
 }
-
 public void setNarrowScale(double narrowScale) {
 	this.narrowScale = narrowScale;
 }
 
-
-
-
-private int startNarrowIndexV=1;
-private double narrowScale=0.9;
-
-public static final int EDGE_NONE=0;
-public static final int EDGE_FIRST=1;
-public static final int EDGE_CENTEr=2;
-public static final int EDGE_LAST=3;
-private int edgeMode;
 /**
  * @deprecated
  * @return
@@ -197,10 +237,33 @@ private int edgeMode;
 public int getEdgeMode() {
 	return edgeMode;
 }
-
+/**
+ * @deprecated
+ */
 public void setEdgeMode(int edgeMode) {
 	this.edgeMode = edgeMode;
 }
+/**
+ * @deprecated
+ */
+public static final int EDGE_NONE=0;
+/**
+ * @deprecated
+ */
+public static final int EDGE_FIRST=1;
+/**
+ * @deprecated
+ */
+public static final int EDGE_CENTEr=2;
+/**
+ * @deprecated
+ */
+public static final int EDGE_LAST=3;
+/**
+ * @deprecated
+ */
+private int edgeMode;
+
 /**
  * @deprecated
  * @return
@@ -208,40 +271,52 @@ public void setEdgeMode(int edgeMode) {
 public double getEdgeModeScale() {
 	return edgeModeScale;
 }
-
+/**
+ * @deprecated
+ */
 public void setEdgeModeScale(double edgeModeScale) {
 	this.edgeModeScale = edgeModeScale;
 }
-
-
-
+/**
+ * @deprecated
+ */
 private double edgeModeScale=1.5;
 
-//TODO hair material
 
-	public List<HairPin> getHairPins() {
-	return hairPins;
-}
-	
-	
-	
-private double damping= 0.03;
+/**
+ * basically no need change
+ * for plain cloth
+ */
+private double plainClothDamping= 0.03;
 public double getDamping() {
-	return damping;
+	return plainClothDamping;
 }
 
 public void setDamping(double damping) {
-	this.damping = damping;
+	this.plainClothDamping = damping;
 }
 
+/**
+ * basically no need change
+ * for plain cloth
+ */
+
+private double plainClothMass=.1;
 public double getMass() {
-	return mass;
+	return plainClothMass;
 }
-
 public void setMass(double mass) {
-	this.mass = mass;
+	this.plainClothMass = mass;
 }
 
+/*
+ *  to keep cloth/hair natural
+ *  
+ *  force move when vertex moved.
+ * 
+ *  ammo use syncMove and syncForceLinear value
+ */
+private boolean syncMove;//no fake physics;
 public boolean isSyncMove() {
 	return syncMove;
 }
@@ -250,7 +325,11 @@ public void setSyncMove(boolean syncMove) {
 	this.syncMove = syncMove;
 }
 
-private int channel;//for sphere
+/**
+ * TODO support bullet
+ * only same channel conflict.but ammo some time fail to ignore
+ */
+private int channel;
 public int getChannel() {
 	return channel;
 }
@@ -260,28 +339,34 @@ public void setChannel(int channel) {
 }
 
 
-private double mass=.1;
-private boolean syncMove;//no fake physics;
-
-private double syncForceLinear=0;
+/**
+ * only work when sync enabled and ammo
+ * 
+ * when sync enabled bone works boring move.
+ * this add extra move force
+ * 
+ * -10  - 100 works good
+ */
+private double ammoSyncForceLinear=0;
 public double getSyncForceLinear() {
-	return syncForceLinear;
+	return ammoSyncForceLinear;
 }
 
 public void setSyncForceLinear(double syncForceLinear) {
-	this.syncForceLinear = syncForceLinear;
+	this.ammoSyncForceLinear = syncForceLinear;
 }
 
+
+private double ammoSyncMoveLinear=0.5; //seems stable
 public double getSyncMoveLinear() {
-	return syncMoveLinear;
+	return ammoSyncMoveLinear;
 }
 
 public void setSyncMoveLinear(double syncMoveLinear) {
-	this.syncMoveLinear = syncMoveLinear;
+	this.ammoSyncMoveLinear = syncMoveLinear;
 }
 
 
-private double syncMoveLinear=0.5; //seems stable
 	
 //still format fixed
 public HairData clone(){
@@ -393,14 +478,14 @@ public void setHairPins(List<HairPin> hairPins) {
 	/*
 	 * 0.5 measn almost max,if more big conflict others
 	 */
-	private double particleRadiusRatio=0.5;//for ammo cloth
+	private double ammoParticleRadiusRatio=0.5;//for ammo cloth
 	
 	public double getParticleRadiusRatio() {
-		return particleRadiusRatio;
+		return ammoParticleRadiusRatio;
 	}
 
 	public void setParticleRadiusRatio(double particleRadius) {
-		this.particleRadiusRatio = particleRadius;
+		this.ammoParticleRadiusRatio = particleRadius;
 	}
 
 
@@ -437,22 +522,16 @@ public void setHairPins(List<HairPin> hairPins) {
 	 * 
 	 * actually value is restdistance * thickRatio
 	 */
-	private double thickRatio=0.1;//for ammo cloth thick
+	private double ammoBoneThickRatio=0.1;//for ammo cloth thick
 	public double getThickRatio() {
-		return thickRatio;
+		return ammoBoneThickRatio;
 	}
 
 	public void setThickRatio(double thick) {
-		this.thickRatio = thick;
+		this.ammoBoneThickRatio = thick;
 	}
 
-	public double getExtendOutsideRatio() {
-		return extendOutsideRatio;
-	}
-
-	public void setExtendOutsideRatio(double extendPosition) {
-		this.extendOutsideRatio = extendPosition;
-	}
+	
 
 
 	/**
@@ -464,6 +543,15 @@ public void setHairPins(List<HairPin> hairPins) {
 	 * use  restdistance * extendOutsideRatio
 	 */
 	private double extendOutsideRatio;
-	
+	/*
+	 * move outside depends on restdistance
+	 */
+	public double getExtendOutsideRatio() {
+		return extendOutsideRatio;
+	}
+
+	public void setExtendOutsideRatio(double extendPosition) {
+		this.extendOutsideRatio = extendPosition;
+	}
 	
 }

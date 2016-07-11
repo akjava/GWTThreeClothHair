@@ -453,9 +453,9 @@ public class HairCloth {
 		//this.startCutHorizontalConnection=hairData.getStartCutUIndexV();
 		
 		
-			//TODO support 0 sizeOfU
+			
 			this.w = (normalPin.size()-1)*hairData.getSizeOfU();
-			//sizeOfU=hairData.getSizeOfU();
+			
 			
 			this.h = hairData.getSizeOfV();
 			
