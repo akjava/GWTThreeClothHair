@@ -368,9 +368,9 @@ public void setSyncMoveLinear(double syncMoveLinear) {
 
 
 	
-//still format fixed
+//still format modifying
 public HairData clone(){
-	HairDataCsvConverter converter=new HairDataCsvConverter();
+	HairDataConverter converter=new HairDataConverter();
 	String line=converter.convert(this);
 	return converter.reverse().convert(line);
 }

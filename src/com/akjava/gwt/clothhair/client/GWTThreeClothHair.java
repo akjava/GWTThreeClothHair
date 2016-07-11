@@ -12,6 +12,8 @@ import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
 import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
 import com.akjava.gwt.clothhair.client.cloth.SphereDataControler;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
+import com.akjava.gwt.clothhair.client.hair.HairData;
+import com.akjava.gwt.clothhair.client.hair.HairDataConverter;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
 import com.akjava.gwt.clothhair.client.hair.HairPinPanel;
@@ -329,9 +331,6 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	@Override
 	public void onInitializedThree() {
-		
-		
-		
 		INSTANCE=this;//must be first
 		clock=THREE.Clock();
 		clothSimulator=new ClothSimulator(scene,null);

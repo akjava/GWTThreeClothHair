@@ -410,7 +410,7 @@ public class HairDataPanel extends VerticalPanel{
 		//
 		 String text=storageControler.getValue(GWTThreeClothHairStorageKeys.temp_hairset, null);
 		 if(text!=null && !text.isEmpty()){
-			 loadHairDataSync(text);
+			 loadHairDataSync(text,false);
 		 }
 		
 		 
@@ -434,7 +434,9 @@ public class HairDataPanel extends VerticalPanel{
 				}
 				//todo check validate
 				
-				loadHairDataSync(text);
+				boolean isCsv=file.getFileName().toLowerCase().endsWith(".csv");
+				
+				loadHairDataSync(text,isCsv);
 				 
 				
 			}
@@ -453,7 +455,7 @@ public class HairDataPanel extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				downloadArea.clear();
 				String text=toStoreText();
-				Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair.csv", "click to download",true);
+				Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair.json", "click to download",true);
 				downloadArea.add(a);
 			}
 		});
@@ -477,7 +479,7 @@ public class HairDataPanel extends VerticalPanel{
 						type="ammo_bone_hair";
 					}
 					String text=hairDataConverter.convert(cellObjects.getSelection().getHairData());
-					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair-"+type+".csv", "selection to download",true);
+					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair-"+type+".json", "selection to download",true);
 					downloadArea.add(a);
 				}
 			});
@@ -699,8 +701,14 @@ public class HairDataPanel extends VerticalPanel{
 	/*
 	 * must wait hair texture update
 	 */
-	private void loadHairDataSync(String text){
-		Iterable<HairData> hairDatas=hairDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+	private void loadHairDataSync(String text,boolean isCsv){
+		Iterable<HairData> hairDatas=null;
+		if(isCsv){
+			hairDatas=new HairDataCsvConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+		}else{
+		
+			hairDatas=hairDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+		}
 		loadHairDataSync(hairDatas);
 	}
 	private void loadHairDataSync(Iterable<HairData> hairDatas){
@@ -990,7 +998,8 @@ private void clearAllPoints(){
 		
 	}
 
-	private HairDataCsvConverter hairDataConverter=new HairDataCsvConverter();
+	//private HairDataCsvConverter csvHairDataConverter=new HairDataCsvConverter();
+	private HairDataConverter hairDataConverter=new HairDataConverter();
 	protected void removeHairData(HairMixedData data) {
 		checkNotNull(data,"removeHairData:data is null");
 		GWTThreeClothHair.INSTANCE.getScene().remove(data.getMesh());
