@@ -107,8 +107,26 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			this.hairDataPanel=hairDataPanel;
 			//hairPinEditor=SimpleEditor.of();
 			
-			uSize = new LabeledInputRangeWidget2("U-Size(W)", 1, 80, 1);
-			this.add(uSize);
+			VerticalPanel corePanel=new VerticalPanel();
+			this.add(corePanel);
+			
+			final VerticalPanel plainClothPanel=new VerticalPanel();
+			plainClothPanel.add(new Label("PlainCloth"));
+			this.add(plainClothPanel);
+			
+			final VerticalPanel ammoPanel=new VerticalPanel();
+			ammoPanel.add(new Label("Ammo"));
+			this.add(ammoPanel);
+			ammoPanel.setVisible(false);
+			
+			final VerticalPanel ammoBonePanel=new VerticalPanel();
+			ammoBonePanel.add(new Label("Ammo-Bone"));
+			this.add(ammoBonePanel);
+			ammoBonePanel.setVisible(false);
+			
+			uSize = new LabeledInputRangeWidget2("Slices(horizon)", 1, 80, 1);
+			uSize.setTitle("Face Slicing(spliting).\n");
+			corePanel.add(uSize);
 			uSize.addtRangeListener(new ValueChangeHandler<Number>() {
 				
 				@Override
@@ -116,9 +134,11 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					hairDataPanel.updateDistanceLabel();
 				}
 			});
+			uSize.setButtonVisible(true);
+			uSize.getLabel().setWidth("115px");
 
-			vSize = new LabeledInputRangeWidget2("V-Size(H)", 1, 80, 1);
-			this.add(vSize);
+			vSize = new LabeledInputRangeWidget2("Stacks(vertical)", 1, 80, 1);
+			corePanel.add(vSize);
 			vSize.addtRangeListener(new ValueChangeHandler<Number>() {
 				
 				@Override
@@ -126,50 +146,54 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					hairDataPanel.updateDistanceLabel();
 				}
 			});
-
+			vSize.setButtonVisible(true);
+			vSize.getLabel().setWidth("115px");
 			
 			scaleOfU = new LabeledInputRangeWidget2("Scale of U", 0.1, 16, 0.1);
-			this.add(scaleOfU);
+			corePanel.add(scaleOfU);
 			scaleOfU.addtRangeListener(new ValueChangeHandler<Number>() {
 				@Override
 				public void onValueChange(ValueChangeEvent<Number> event) {
 					hairDataPanel.updateDistanceLabel();
 				}
 			});
+			scaleOfU.setButtonVisible(true);
+			scaleOfU.getLabel().setWidth("115px");
 			
 			//cut-u
 			HorizontalPanel h1=new HorizontalPanel();
 			h1.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
-			this.add(h1);
-			h1.add(createLabel("cut-u"));
+			corePanel.add(h1);
 			cutCheck = new CheckBox();
-			cutCheck.setWidth("20px");
 			h1.add(cutCheck);
+			h1.add(createLabel("cut-u"));
+			
 			
 			cutIndex = new LabeledInputRangeWidget2("index", 0, 40, 1);
-			cutIndex.getLabel().setWidth("40px");
+			cutIndex.setButtonVisible(true);
+			cutIndex.getLabel().setWidth("35px");
 			h1.add(cutIndex);
 			
-			//cut-u
+			//narrow
 			HorizontalPanel h2=new HorizontalPanel();
 			h2.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
-			this.add(h2);
-			h2.add(createLabel("narrow"));
+			plainClothPanel.add(h2);
 			narrowCheck = new CheckBox();
-			narrowCheck.setTitle("only work on simple cloth");
-			narrowCheck.setWidth("20px");
 			h2.add(narrowCheck);
+			
+			h2.add(createLabel("narrow"));
+			
 			narrowIndex = new LabeledInputRangeWidget2("index", 0, 40, 1);
 			narrowIndex.getLabel().setWidth("40px");
 			h2.add(narrowIndex);
 			narrowScale = new LabeledInputRangeWidget2("Narrow Scale", 0.5, 1.5, 0.01);
-			this.add(narrowScale);
+			plainClothPanel.add(narrowScale);
 			
 			
-			this.add(createLabel("edge"));
+			//this.add(createLabel("edge"));
 			HorizontalPanel h3=new HorizontalPanel();
 			h3.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
-			this.add(h3);
+			//this.add(h3);
 			
 			/**
 			 * edgeMode is deprecated
@@ -192,7 +216,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			HorizontalPanel channelPanel=new HorizontalPanel();
 			channelPanel.setVerticalAlignment(ALIGN_MIDDLE);
 			channelPanel.add(createLabel("channel:"));
-			this.add(channelPanel);
+			corePanel.add(channelPanel);
 			channelBox = new ListBox();
 			for(int i=0;i<16;i++){
 				channelBox.addItem(String.valueOf(i));
@@ -215,47 +239,64 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					damping.setValue(0.03);	
 				}
 			});
-			channelPanel.add(resetGrvities);
+			plainClothPanel.add(resetGrvities);
 			
 			mass = new LabeledInputRangeWidget2("mass", 0.01, 1, 0.01);
-			this.add(mass);
+			plainClothPanel.add(mass);
 			damping = new LabeledInputRangeWidget2("damping", 0.001, 0.1, 0.001);
-			this.add(damping);
+			plainClothPanel.add(damping);
 			
 			
-			HorizontalPanel syncPanel=new HorizontalPanel();
-			syncPanel.setVerticalAlignment(ALIGN_MIDDLE);
-			syncPanel.add(new Label("sync:"));
-			this.add(syncPanel);
+			HorizontalPanel option1Panel0=new HorizontalPanel();
+			option1Panel0.setVerticalAlignment(ALIGN_MIDDLE);
 			syncCheck = new CheckBox();
-			syncPanel.add(syncCheck);
+			option1Panel0.add(syncCheck);
+			option1Panel0.add(new Label("sync:"));
+			corePanel.add(option1Panel0);
 			
-			syncPanel.add(new Label("connectHorizontal:"));
+			
+			option1Panel0.add(new Label("extend:"));
+			extendOutsideRatioEditor = new DoubleBox();
+			extendOutsideRatioEditor.setWidth("40px");
+			option1Panel0.add(extendOutsideRatioEditor);
 			
 			connectHorizontalCheck = new CheckBox();
-			syncPanel.add(connectHorizontalCheck);
+			option1Panel0.add(connectHorizontalCheck);
+			option1Panel0.add(new Label("connectHorizontal:"));
 			
-			syncPanel.add(new Label("useCustomNormal:"));
-			useCustomNormalEditor=new CheckBox();
-			syncPanel.add(useCustomNormalEditor);
+			
+			
+			
+			
 			
 			HorizontalPanel option1Panel=new HorizontalPanel();
 			option1Panel.setVerticalAlignment(ALIGN_MIDDLE);
 			option1Panel.setSpacing(2);
-			this.add(option1Panel);
-			option1Panel.add(new Label("extend:"));
-			extendOutsideRatioEditor = new DoubleBox();
-			extendOutsideRatioEditor.setWidth("40px");
-			option1Panel.add(extendOutsideRatioEditor);
+			corePanel.add(option1Panel);
+			
 			
 			
 			execAverageNormalEditor=new CheckBox("average normals");
 			option1Panel.add(execAverageNormalEditor);
 			
-			option1Panel.add(new Label("originRatio"));
+			
+			
+			
+			HorizontalPanel option1Panel2=new HorizontalPanel();
+			option1Panel2.setVerticalAlignment(ALIGN_MIDDLE);
+			option1Panel2.setSpacing(2);
+			corePanel.add(option1Panel2);
+			
+			useCustomNormalEditor=new CheckBox();
+			option1Panel2.add(useCustomNormalEditor);
+			option1Panel2.add(new Label("useCustomNormal:"));
+			
+			
+			
+			option1Panel2.add(new Label("originRatio"));
 			originalNormalRatioEditor=new DoubleBox();
 			originalNormalRatioEditor.setTitle("works when use custom normal.added custom to origin * ratio.1 measn half-half");
-			option1Panel.add(originalNormalRatioEditor);
+			option1Panel2.add(originalNormalRatioEditor);
 			originalNormalRatioEditor.setWidth("40px");
 			
 			hairTypeList = Lists.newArrayList(
@@ -266,9 +307,10 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					);
 			
 			
+			
 			HorizontalPanel typePanel=new HorizontalPanel();
 			typePanel.setVerticalAlignment(ALIGN_MIDDLE);
-			this.add(typePanel);
+			corePanel.add(typePanel);
 			typePanel.add(new Label("Type"));
 			hairTypeEditor = new ValueListBox<HairDataEditor.HairType>(new Renderer<HairType>() {
 
@@ -286,17 +328,38 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			hairTypeEditor.setValue(hairTypeList.get(0));
 			hairTypeEditor.setAcceptableValues(hairTypeList);
 			typePanel.add(hairTypeEditor);
+			hairTypeEditor.addValueChangeHandler(new ValueChangeHandler<HairDataEditor.HairType>() {
+
+				@Override
+				public void onValueChange(ValueChangeEvent<HairType> event) {
+					int type=event.getValue().value;
+					if(type==HairData.TYPE_SIMPLE_CLOTH){
+						plainClothPanel.setVisible(true);
+						ammoPanel.setVisible(false);
+						ammoBonePanel.setVisible(false);
+					}else if(type==HairData.TYPE_AMMO_CLOTH){
+						plainClothPanel.setVisible(false);
+						ammoPanel.setVisible(true);
+						ammoBonePanel.setVisible(false);
+					}else if(type==HairData.TYPE_AMMO_BONE_CLOTH){
+						plainClothPanel.setVisible(false);
+						ammoPanel.setVisible(true);
+						ammoBonePanel.setVisible(true);
+					}else if(type==HairData.TYPE_AMMO_BONE_HAIR){
+						plainClothPanel.setVisible(false);
+						ammoPanel.setVisible(true);
+						ammoBonePanel.setVisible(true);
+					}
+				}
+				
+			});
 			
 			
-			this.add(new Label("Ammo specific"));
 			
 			HorizontalPanel option1Pane2=new HorizontalPanel();
 			option1Pane2.setVerticalAlignment(ALIGN_MIDDLE);
-			this.add(option1Pane2);
-			option1Pane2.add(new Label("thick:"));
-			thickEditor = new DoubleBox();
-			thickEditor.setWidth("40px");
-			option1Pane2.add(thickEditor);
+			ammoPanel.add(option1Pane2);
+			
 			
 			option1Pane2.add(new Label("particleRadiusR:"));
 			particleRadiusEditor = new DoubleBox();
@@ -308,7 +371,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			
 			HorizontalPanel option1Pane3=new HorizontalPanel();
 			option1Pane3.setVerticalAlignment(ALIGN_MIDDLE);
-			this.add(option1Pane3);
+			ammoPanel.add(option1Pane3);
 			
 			option1Pane3.add(new Label("syncForceLinear:"));
 			syncForceLinearEditor = new DoubleBox();
@@ -319,6 +382,16 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			syncMoveLinearEditor = new DoubleBox();
 			syncMoveLinearEditor.setWidth("40px");
 			option1Pane3.add(syncMoveLinearEditor);
+			
+			
+			//specific ammo-bone
+			HorizontalPanel option1Pane4=new HorizontalPanel();
+			option1Pane4.setVerticalAlignment(ALIGN_MIDDLE);
+			ammoBonePanel.add(option1Pane4);
+			option1Pane4.add(new Label("thick:"));
+			thickEditor = new DoubleBox();
+			thickEditor.setWidth("40px");
+			option1Pane4.add(thickEditor);
 			
 		}
 		private Label createLabel(String name){
@@ -412,7 +485,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				originalNormalRatioEditor.setValue(value.getOriginalNormalRatio());
 				
 				if(value.getHairPhysicsType()>=0 && value.getHairPhysicsType()<hairTypeList.size()){
-				hairTypeEditor.setValue(hairTypeList.get(value.getHairPhysicsType()));
+				hairTypeEditor.setValue(hairTypeList.get(value.getHairPhysicsType()),true);//fire visible control
 				}else{
 					LogUtils.log("invalid hairtype skipped:"+value.getHairPhysicsType());
 				}

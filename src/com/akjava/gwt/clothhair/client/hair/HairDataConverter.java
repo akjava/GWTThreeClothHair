@@ -1,186 +1,332 @@
 package com.akjava.gwt.clothhair.client.hair;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataConverter;
+import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
-import com.akjava.lib.common.functions.StringToPrimitiveFunctions;
 import com.google.common.base.Converter;
-import com.google.common.base.Joiner;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Lists;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayNumber;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONBoolean;
+import com.google.gwt.json.client.JSONNumber;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.json.client.JSONValue;
 
 public class HairDataConverter extends Converter<HairData,String> {
-
-	private HairTextureDataConverter converter=new HairTextureDataConverter();
+	private HairTextureDataConverter textureDataConverter=new HairTextureDataConverter();
+	public static final String DATA_TYPE="HairData";
 	@Override
 	protected String doForward(HairData data) {
-		List<String> csv=Lists.newArrayList();
-		csv.add("1");//0 format version
-		
-		Joiner joiner=Joiner.on(":");
-		List<Integer> faceIndex=Lists.newArrayList();
-		List<Integer> vertexIndex=Lists.newArrayList();
-		List<Integer> targetIndex=Lists.newArrayList();
+		JSONObject object=new JSONObject();
+		JSONObjectWrapper wrapper=new JSONObjectWrapper(object);
+		//header
+		wrapper.setString("type", DATA_TYPE);
+		wrapper.setDouble("version", 1.0);
+		//pins
+		JsArrayNumber faceIndexes=JavaScriptUtils.createJSArrayNumber();
+		JsArrayNumber vertexIndexes=JavaScriptUtils.createJSArrayNumber();
+		JsArrayNumber targetIndexes=JavaScriptUtils.createJSArrayNumber();
 		for(int i=0;i<data.getHairPins().size();i++){
 			HairPin pin=data.getHairPins().get(i);
-			faceIndex.add(pin.getFaceIndex());
-			vertexIndex.add(pin.getVertexOfFaceIndex());
-			targetIndex.add(pin.getTargetClothIndex());
+			faceIndexes.push(pin.getFaceIndex());
+			vertexIndexes.push(pin.getVertexOfFaceIndex());
+			targetIndexes.push(pin.getTargetClothIndex());
 		}
-		csv.add(joiner.join(faceIndex));//1 face index
-		csv.add(joiner.join(vertexIndex));//2 vertex index
+		wrapper.setArrayNumber("faceIndexes", faceIndexes);
+		wrapper.setArrayNumber("vertexOfFaceIndexes", vertexIndexes);
+		wrapper.setArrayNumber("targetIndexes", targetIndexes);
+		//general
+		wrapper.setInt("sliceFace", data.getSizeOfU());
+		wrapper.setInt("stackFace", data.getSizeOfV());
+		wrapper.setDouble("faceWidthScale", data.getScaleOfU());
+		wrapper.setBoolean("cutHorizontal", data.isCutU());
+		wrapper.setInt("cutHorizontalStartIndex", data.getStartCutUIndexV());
+		wrapper.setInt("channel", data.getChannel());
+		wrapper.setBoolean("syncPosition", data.isSyncMove());
+		wrapper.setBoolean("connectHorizontal", data.isConnectHorizontal());
+		wrapper.setInt("physicsType", data.getHairPhysicsType());
 		
-		csv.add(data.getSizeOfU()+":"+data.getSizeOfV());//3 u x v
+		wrapper.setDouble("extendOutsideRatio", data.getExtendOutsideRatio());
+		wrapper.setBoolean("averagingNormal", data.isExecAverageNormal());
+		wrapper.setBoolean("useCustomNormal", data.isUseCustomNormal());
+		wrapper.setDouble("originalNormalRatio", data.getOriginalNormalRatio());
+		if(data.getHairTextureData()!=null){
+			wrapper.setString("hairTextureData", textureDataConverter.convert(data.getHairTextureData()));
+		}
+		//plain
+		JSONObject plainObject=new JSONObject();
+		JSONObjectWrapper plainObjectWrapper=new JSONObjectWrapper(plainObject);
+		wrapper.setObject("plain-cloth", plainObject);
+		plainObjectWrapper.setBoolean("narrow", data.isDoNarrow());
+		plainObjectWrapper.setDouble("narrowScale", data.getNarrowScale());
+		plainObjectWrapper.setInt("narrowStartIndex", data.getStartNarrowIndexV());
+		plainObjectWrapper.setDouble("damping", data.getDamping());
+		plainObjectWrapper.setDouble("mass", data.getMass());
+		//ammo
+		JSONObject ammoObject=new JSONObject();
+		JSONObjectWrapper ammoObjectWrapper=new JSONObjectWrapper(ammoObject);
+		wrapper.setObject("ammo", ammoObject);
+		ammoObjectWrapper.setDouble("particleRadiusRatio", data.getParticleRadiusRatio());
+		ammoObjectWrapper.setDouble("syncMoveLinear", data.getSyncMoveLinear());
+		ammoObjectWrapper.setDouble("syncForceLinear", data.getSyncForceLinear());
 		
-		csv.add(data.isCutU()+":"+data.getStartCutUIndexV());//4 cutU 
-		csv.add(data.isDoNarrow()+":"+data.getStartNarrowIndexV()+":"+data.getNarrowScale());//5 do narrow
 		
-		csv.add(data.getEdgeMode()+":"+data.getEdgeModeScale());//6 edge mode
+		//ammo-cloth
 		
+		//ammo-bone
+		JSONObject ammoBoneObject=new JSONObject();
+		JSONObjectWrapper ammoBoneObjectWrapper=new JSONObjectWrapper(ammoBoneObject);
+		wrapper.setObject("ammo-bone", ammoBoneObject);
+		ammoBoneObjectWrapper.setDouble("thick", data.getThickRatio());
 		
-		csv.add(String.valueOf(data.getScaleOfU()));//7
-		
-		csv.add(String.valueOf(data.getChannel()));//8
-		
-		csv.add(String.valueOf(data.isSyncMove()));//9
-		
-		csv.add(data.getMass()+":"+data.getDamping());//10
-		
-		csv.add(converter.convert(data.getHairTextureData()));//11
-		
-		csv.add(joiner.join(targetIndex));//12 targetIndex
-		
-		csv.add(String.valueOf(data.isConnectHorizontal()));//13
-		
-		csv.add(String.valueOf(data.getHairPhysicsType()));//14
-		csv.add(String.valueOf(data.getExtendOutsideRatio()));//15
-		csv.add(String.valueOf(data.getThickRatio()));//16
-		csv.add(String.valueOf(data.getParticleRadiusRatio()));//17
-		csv.add(String.valueOf(data.isExecAverageNormal()));//18
-		
-		csv.add(String.valueOf(data.getSyncForceLinear()));//19
-		csv.add(String.valueOf(data.getSyncMoveLinear()));//20
-		
-		csv.add(String.valueOf(data.isUseCustomNormal()));//21
-		
-		csv.add(String.valueOf(data.getOriginalNormalRatio()));//21
-		
-		return Joiner.on(",").join(csv);
+		return object.toString();
 	}
 
 	@Override
-	protected HairData doBackward(String line) {
-		String[] csv=line.split(",");
-		String version=csv[0];
-		
-		if(version.equals("1")){
-			return parseVersion1(csv);
+	protected HairData doBackward(String json) {
+		JSONValue value=JSONParser.parseStrict(json);
+		if(value==null){
+			LogUtils.log("HairDataConverter:parse json faild "+json);
+			return null;
 		}
-		LogUtils.log("invalid version:"+version);
-		//invalid
+		JSONObject object=value.isObject();
+		if(object==null){
+			LogUtils.log("HairDataConverter:not json object:"+json);
+			return null;
+		}
+		
+		if(object.get("type")==null){
+			LogUtils.log("HairDataConverter:has no type attribute:"+object.toString());
+			return null;
+		}
+		
+		JSONString typeString=object.get("type").isString();
+		if(typeString==null){
+			LogUtils.log("HairDataConverter:has a type attribute:"+object.toString());
+			return null;
+		}
+		
+		String type=typeString.stringValue();
+		if(!type.equals(DATA_TYPE)){
+			LogUtils.log("HairDataConverter:difference type:"+type);
+			return null;
+		}
+		
+		JSONObjectWrapper wrapper=new JSONObjectWrapper(object);
+		
+		double version=wrapper.getDouble("version",1.0);
+		if(version==1.0){
+			return parse1(wrapper);
+		}
+		
+		
 		return null;
 	}
-
-	private HairData parseVersion1(String[] csv) {
-		if(csv.length<8){
-			LogUtils.log("parseVersion1:invalid csv:"+Joiner.on(",").join(csv));
+	//parse version 1
+	private HairData parse1(JSONObjectWrapper object) {
+		HairData hairData=new HairData();
+		
+		//parse pins
+		JsArrayNumber faceIndexes=object.getArrayNumber("faceIndexes");
+		JsArrayNumber vertexIndexes=object.getArrayNumber("vertexOfFaceIndexes");
+		JsArrayNumber targetIndexes=object.getArrayNumber("targetIndexes");
+		if(faceIndexes==null || vertexIndexes==null || targetIndexes==null){
+			LogUtils.log("pins array is invalid");
+			return null;
 		}
-		HairData data=new HairData();
-		
-		//parse Hair Pin
-		List<Integer> faceIndex= FluentIterable.from(Arrays.asList(csv[1].split(":"))).transform(StringToPrimitiveFunctions.toInteger()).toList();
-		List<Integer> vertexIndex= FluentIterable.from(Arrays.asList(csv[2].split(":"))).transform(StringToPrimitiveFunctions.toInteger()).toList();
-		if(faceIndex.size()!=vertexIndex.size()){
-			LogUtils.log("parseVersion1:invalid faceIndexSize "+faceIndex.size()+","+vertexIndex.size());
+		if(faceIndexes.length()!=vertexIndexes.length() || vertexIndexes.length()!=targetIndexes.length()){
+			LogUtils.log("pins array length is invalid");
+			return null;
 		}
-		for(int i=0;i<faceIndex.size();i++){
-			HairPin pin=new HairPin(faceIndex.get(i), vertexIndex.get(i));
-			data.getHairPins().add(pin);
+		for(int i=0;i<faceIndexes.length();i++){
+			int faceIndex=(int)faceIndexes.get(i);
+			int vertexOfFaceIndex=(int)vertexIndexes.get(i);
+			int target=(int)targetIndexes.get(i);
+			HairPin pin=new HairPin(faceIndex, vertexOfFaceIndex,target);
+			hairData.getHairPins().add(pin);
+		}
+		//parse common
+		int sliceFace=object.getInt("sliceFace", hairData.getSizeOfU());
+		int stackFace=object.getInt("stackFace", hairData.getSizeOfV());
+		double faceWidthScale=object.getDouble("faceWidthScale", hairData.getScaleOfU());
+		//TODO add faceHeightScale
+		
+		hairData.setSizeOfU(sliceFace);
+		hairData.setSizeOfV(stackFace);
+		hairData.setScaleOfU(faceWidthScale);
+		
+		hairData.setCutU(object.getBoolean("cutHorizontal", hairData.isCutU()));
+		hairData.setStartCutUIndexV(object.getInt("cutHorizontalStartIndex", hairData.getStartCutUIndexV()));
+		//TODO add end
+		
+		hairData.setChannel(object.getInt("channel", hairData.getChannel()));//TODO support bit-channel
+		hairData.setSyncMove(object.getBoolean("syncPosition", hairData.isSyncMove()));
+		
+		hairData.setConnectHorizontal(object.getBoolean("connectHorizontal", hairData.isConnectHorizontal()));
+		hairData.setHairPhysicsType(object.getInt("physicsType", hairData.getHairPhysicsType()));
+		hairData.setExtendOutsideRatio(object.getDouble("extendOutsideRatio", hairData.getExtendOutsideRatio()));
+		
+		hairData.setExecAverageNormal(object.getBoolean("averagingNormal", hairData.isExecAverageNormal()));
+		hairData.setUseCustomNormal(object.getBoolean("useCustomNormal", hairData.isUseCustomNormal()));
+		//TODO add customNormal
+		hairData.setOriginalNormalRatio(object.getDouble("originalNormalRatio", hairData.getOriginalNormalRatio()));
+		
+		
+		String hairTextureData=object.getString("hairTextureData",null);
+		
+		if(hairTextureData!=null){
+			hairData.setHairTextureData(textureDataConverter.reverse().convert(hairTextureData));
+		}else{
+			//no need,had has default
 		}
 		
-		List<Integer> uvSize= FluentIterable.from(Arrays.asList(csv[3].split(":"))).transform(StringToPrimitiveFunctions.toInteger()).toList();
-		if(uvSize.size()<2){
-			LogUtils.log("parseVersion1:uvSize "+csv[3]);
-		}
-		data.setSizeOfU(uvSize.get(0));
-		data.setSizeOfV(uvSize.get(1));
-		
-		String[] cuts=csv[4].split(":");
-		data.setCutU(Boolean.valueOf(cuts[0]));
-		data.setStartCutUIndexV(Integer.valueOf(cuts[1]));
-		
-		String[] narrows=csv[5].split(":");
-		data.setDoNarrow(Boolean.valueOf(narrows[0]));
-		data.setStartNarrowIndexV(Integer.valueOf(narrows[1]));
-		data.setNarrowScale(Double.valueOf(narrows[2]));
-		
-		String[] edges=csv[6].split(":");
-		data.setEdgeMode(Integer.valueOf(edges[0]));
-		data.setEdgeModeScale(Double.valueOf(edges[1]));
-		
-		data.setScaleOfU(Double.valueOf(csv[7]));
-		
-		if(csv.length>8){
-			data.setChannel(Integer.valueOf(csv[8]));
+		//parse plain-cloth
+		JSONObjectWrapper plaintClothObject=object.getObject("plain-cloth");
+		if(plaintClothObject!=null){
+			hairData.setDoNarrow(plaintClothObject.getBoolean("narrow", hairData.isDoNarrow()));
+			hairData.setNarrowScale(plaintClothObject.getDouble("narrowScale", hairData.getNarrowScale()));
+			hairData.setStartNarrowIndexV(plaintClothObject.getInt("narrowStartIndex", hairData.getStartNarrowIndexV()));
+			
+			hairData.setDamping(plaintClothObject.getDouble("damping", hairData.getDamping()));
+			hairData.setMass(plaintClothObject.getDouble("mass", hairData.getMass()));
+			
+			//edge mode is deprecated
 		}
 		
-		if(csv.length>9){
-			data.setSyncMove(Boolean.valueOf(csv[9]));
-		}
-		
-		if(csv.length>10){
-			String[] mass_damping=csv[10].split(":");
-			data.setMass(Double.valueOf(mass_damping[0]));
-			data.setDamping(Double.valueOf(mass_damping[1]));
-		}
-		if(csv.length>11){
-			data.setHairTextureData(converter.reverse().convert(csv[11]));
-		}
-		if(csv.length>12){
-			List<Integer> targetIndex= FluentIterable.from(Arrays.asList(csv[12].split(":"))).transform(StringToPrimitiveFunctions.toInteger()).toList();
-			if(targetIndex.size()!=data.getHairPins().size()){
-				LogUtils.log("invalid target index size");
+		JSONObjectWrapper ammoObject=object.getObject("ammo");
+		if(ammoObject!=null){
+			hairData.setParticleRadiusRatio(ammoObject.getDouble("particleRadiusRatio", hairData.getParticleRadiusRatio()));
+			hairData.setSyncMoveLinear(ammoObject.getDouble("syncMoveLinear", hairData.getSyncMoveLinear()));
+			hairData.setSyncForceLinear(ammoObject.getDouble("syncForceLinear", hairData.getSyncForceLinear()));
+			
+			JSONObjectWrapper ammoClothObject=ammoObject.getObject("ammo-cloth");
+			if(ammoClothObject!=null){
+				//nothing so far
 			}
-			for(int i=0;i<data.getHairPins().size();i++){
-				data.getHairPins().get(i).setTargetClothIndex(targetIndex.get(i));
+			JSONObjectWrapper ammoBoneObject=ammoObject.getObject("ammo-bone");
+			if(ammoBoneObject!=null){
+				hairData.setThickRatio(ammoBoneObject.getDouble("thick", hairData.getThickRatio()));
 			}
 		}
 		
-		if(csv.length>13){
-			data.setConnectHorizontal(Boolean.valueOf(csv[13]));
-		}
-		
-		if(csv.length>14){
-			data.setHairPhysicsType(Integer.valueOf(csv[14]));
-		}
-		if(csv.length>15){
-			data.setExtendOutsideRatio(Double.valueOf(csv[15]));
-		}
-		if(csv.length>16){
-			data.setThickRatio(Double.valueOf(csv[16]));
-		}
-		if(csv.length>17){
-			data.setParticleRadiusRatio(Double.valueOf(csv[17]));
-		}
-		if(csv.length>18){
-			data.setExecAverageNormal(Boolean.valueOf(csv[18]));
-		}
-		if(csv.length>19){
-			data.setSyncForceLinear(Double.valueOf(csv[19]));
-		}
-		if(csv.length>20){
-			data.setSyncMoveLinear(Double.valueOf(csv[20]));
-		}
-		if(csv.length>21){
-			data.setUseCustomNormal(Boolean.valueOf(csv[21]));
-		}
-		if(csv.length>22){
-			data.setOriginalNormalRatio(Double.valueOf(csv[22]));
-		}
-		return data;
+		return hairData;
 	}
 
+	public static class JSONObjectWrapper{
+		private JSONObject jsonObject;
+
+		public JSONObjectWrapper(JSONObject object) {
+			super();
+			this.jsonObject = object;
+		}
+		
+		public void setArrayNumber(String key,JsArrayNumber value){
+			jsonObject.put(key, new JSONArray(value));
+		}
+		
+		public void setObject(String key,JSONObject value){
+			jsonObject.put(key, value);
+		}
+		
+		public void setInt(String key,int value){
+			jsonObject.put(key, new JSONNumber(value));
+		}
+		public void setDouble(String key,double value){
+			jsonObject.put(key, new JSONNumber(value));
+		}
+		public void setBoolean(String key,boolean value){
+			jsonObject.put(key, JSONBoolean.getInstance(value));
+		}
+		public void setString(String key,String value){
+			jsonObject.put(key, new JSONString(value));
+		}
+		
+		public JSONObjectWrapper getObject(String key){
+			if(!jsonObject.containsKey(key)){
+				return null;
+			}
+			JSONObject value=jsonObject.get(key).isObject();
+			if(value==null){
+				LogUtils.log("not object");
+				return null;
+			}
+			return new JSONObjectWrapper(value);
+		}
+		
+		public JsArray<JavaScriptObject> getArray(String key){
+			if(!jsonObject.containsKey(key)){
+				return null;
+			}
+			JSONArray value=jsonObject.get(key).isArray();
+			if(value==null){
+				LogUtils.log("not array");
+				return null;
+			}
+			return value.getJavaScriptObject().cast();
+		}
+		
+		public JsArrayNumber getArrayNumber(String key){
+			if(!jsonObject.containsKey(key)){
+				return null;
+			}
+			JSONArray value=jsonObject.get(key).isArray();
+			if(value==null){
+				LogUtils.log("not array");
+				return null;
+			}
+			
+			return value.getJavaScriptObject().cast();
+		}
+		
+		public double getDouble(String key,Double defaultValue){
+			if(!jsonObject.containsKey(key)){
+				return defaultValue;
+			}
+			JSONNumber value=jsonObject.get(key).isNumber();
+			if(value==null){
+				LogUtils.log("not number");
+				return defaultValue;
+			}
+			
+			return value.doubleValue();
+		}
+		public int getInt(String key,Integer defaultValue){
+			if(!jsonObject.containsKey(key)){
+				return defaultValue;
+			}
+			JSONNumber value=jsonObject.get(key).isNumber();
+			if(value==null){
+				LogUtils.log("not number");
+				return defaultValue;
+			}
+			
+			return (int)value.doubleValue();
+		}
+		public String getString(String key,String defaultValue){
+			if(!jsonObject.containsKey(key)){
+				return defaultValue;
+			}
+			JSONString value=jsonObject.get(key).isString();
+			if(value==null){
+				LogUtils.log("not string");
+				return defaultValue;
+			}
+			return value.stringValue();
+		}
+		public boolean getBoolean(String key,Boolean defaultValue){
+			if(!jsonObject.containsKey(key)){
+				return defaultValue;
+			}
+			JSONBoolean number=jsonObject.get(key).isBoolean();
+			if(number==null){
+				LogUtils.log("not boolean");
+				return defaultValue;
+			}
+			return number.booleanValue();
+		}
+	}
 }

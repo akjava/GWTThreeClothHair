@@ -107,6 +107,8 @@ public class HairDataPanel extends VerticalPanel{
 		this.hairPinPanel=hairPinPanel;
 		
 		HorizontalPanel h1=new HorizontalPanel();
+		h1.setSpacing(2);
+		h1.setVerticalAlignment(ALIGN_MIDDLE);
 		h1.add(new Label("Global Color"));
 		ColorBox colorBox = new ColorBox("global color", ColorUtils.toCssColor(GWTThreeClothHair.INSTANCE.getGlobalHairColor()));
 		h1.add(colorBox);
@@ -173,7 +175,7 @@ public class HairDataPanel extends VerticalPanel{
 		
 		
 		HorizontalPanel showHairPanel=new HorizontalPanel();
-		hairPanel.add(showHairPanel);
+		h1.add(showHairPanel);
 		showHair = new CheckBox("show hairs");
 		showHair.setValue(true);
 		showHairPanel.add(showHair);
@@ -988,7 +990,7 @@ private void clearAllPoints(){
 		
 	}
 
-	private HairDataConverter hairDataConverter=new HairDataConverter();
+	private HairDataCsvConverter hairDataConverter=new HairDataCsvConverter();
 	protected void removeHairData(HairMixedData data) {
 		checkNotNull(data,"removeHairData:data is null");
 		GWTThreeClothHair.INSTANCE.getScene().remove(data.getMesh());

@@ -104,24 +104,24 @@ public int countNormalPin(){
  * 
  * Interpolate linear.
  */
-private int sizeOfU=8;
+private int sliceFaceCount=8;//sizeOfU
 public int getSizeOfU() {
-	return sizeOfU;
+	return sliceFaceCount;
 }
 public void setSizeOfU(int sizeOfU) {
-	this.sizeOfU = sizeOfU;
+	this.sliceFaceCount = sizeOfU;
 }
 
 /*
  * vertical number of face
  * usually face's height is same as width.
  */
-private int sizeOfV=8;
+private int stackFaceCount=8;//sizeOfV
 public int getSizeOfV() {
-	return sizeOfV;
+	return stackFaceCount;
 }
 public void setSizeOfV(int sizeOfV) {
-	this.sizeOfV = sizeOfV;
+	this.stackFaceCount = sizeOfV;
 }
 
 /**
@@ -136,24 +136,24 @@ bugs,no effect on 2 pin circle-mode
 if particle ratio is small large sizeOfU make hole easily
  */
 
-private double scaleOfU=1.0;
+private double faceWidthScale=1.0;
 public double getScaleOfU() {
-	return scaleOfU;
+	return faceWidthScale;
 }
 public void setScaleOfU(double scaleOfU) {
-	this.scaleOfU = scaleOfU;
+	this.faceWidthScale = scaleOfU;
 }
 
 
 /**
  * cut horizontal constraints(joint)
  */
-private boolean cutU;
+private boolean cutHorizontalConnection;//cutU
 public boolean isCutU() {
-	return cutU;
+	return cutHorizontalConnection;
 }
 public void setCutU(boolean cutU) {
-	this.cutU = cutU;
+	this.cutHorizontalConnection = cutU;
 }
 
 /**
@@ -370,7 +370,7 @@ public void setSyncMoveLinear(double syncMoveLinear) {
 	
 //still format fixed
 public HairData clone(){
-	HairDataConverter converter=new HairDataConverter();
+	HairDataCsvConverter converter=new HairDataCsvConverter();
 	String line=converter.convert(this);
 	return converter.reverse().convert(line);
 }
@@ -389,20 +389,24 @@ public void setHairPins(List<HairPin> hairPins) {
 		 * main purpose of this technic is pin first row and last row.
 		 * but this really make 
 		 */
-		private int targetClothIndex=-1;
+		private int targetParticleIndex=-1;
 		
 		
 		public int getTargetClothIndex() {
-			return targetClothIndex;
+			return targetParticleIndex;
 		}
 		public void setTargetClothIndex(int targetClothIndex) {
-			this.targetClothIndex = targetClothIndex;
+			this.targetParticleIndex = targetClothIndex;
 		}
 		private int faceIndex;
 		public HairPin(int faceIndex, int vertexOfFaceIndex) {
+			this(faceIndex,vertexOfFaceIndex,-1);
+		}
+		public HairPin(int faceIndex, int vertexOfFaceIndex,int targetParticleIndex) {
 			super();
 			this.faceIndex = faceIndex;
 			this.vertexOfFaceIndex = vertexOfFaceIndex;
+			this.targetParticleIndex=targetParticleIndex;
 		}
 		public int getFaceIndex() {
 			return faceIndex;
@@ -450,7 +454,7 @@ public void setHairPins(List<HairPin> hairPins) {
 					.toString();
 		}
 		public boolean isCustomPin() {
-			return targetClothIndex!=-1;
+			return targetParticleIndex!=-1;
 		}
 	}
 	
