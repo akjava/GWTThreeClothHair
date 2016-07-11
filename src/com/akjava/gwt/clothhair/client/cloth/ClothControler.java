@@ -145,7 +145,7 @@ public class ClothControler {
 			Vector3 v1=data.getCalculator().getResult().get(0);
 			Vector3 v2=data.getCalculator().getResult().get(1);
 			//TODO move and fix
-			int cw=data.getCloth().w;
+			int cw=data.getCloth().getW();
 			int angleSplit=startAndEndSame?cw:cw+1;
 			
 			Vector2 center=THREE.Vector2(v1.getX(), v1.getZ());
@@ -167,7 +167,7 @@ public class ClothControler {
 			//TODO sync
 		}else //old one not reach code
 		if(data.getCalculator().getResult().size()<3){//2pins
-			int cw=data.getCloth().w;
+			int cw=data.getCloth().getW();
 			Vector3 v1=data.getCalculator().getResult().get(0);
 			Vector3 v2=data.getCalculator().getResult().get(1);
 			
@@ -226,7 +226,11 @@ public class ClothControler {
 			
 			int pinSize=generalPinVectors.size();
 			
-			int cw=data.getCloth().w/(pinSize-1);//TODO method
+			int cw=data.getCloth().getW()/(pinSize-1);//TODO change just size of U
+			
+			if(cw!=data.getCloth().getSizeOfU()){
+				LogUtils.log("invalid size of u:"+cw);
+			}
 			
 			Vector3 diff=THREE.Vector3();
 			for(int i=0;i<pinSize;i++){
@@ -331,13 +335,13 @@ public class ClothControler {
 			
 			
 			if(cloth.isConnectHorizontal()){
-			for(int x=0;x<=cloth.w;x++){
+			for(int x=0;x<=cloth.getW();x++){
 				for(int y=0;y<=cloth.h;y++){
 					
 					
 					
-					int pIndex=(cloth.w+1)*y+x;
-					int gIndex=(cloth.w+1+1)*y+x;//some remains
+					int pIndex=(cloth.getW()+1)*y+x;
+					int gIndex=(cloth.getW()+1+1)*y+x;//some remains
 					
 					if(!debugfirstTime){
 						Map<String,Integer> debugMap=Maps.newLinkedHashMap();
@@ -352,8 +356,8 @@ public class ClothControler {
 				}
 			}
 			for(int y=0;y<=cloth.h;y++){
-				int pIndex=(cloth.w+1)*y;
-				int gIndex=(cloth.w+1+1)*y+cloth.w+1;//extra
+				int pIndex=(cloth.getW()+1)*y;
+				int gIndex=(cloth.getW()+1+1)*y+cloth.getW()+1;//extra
 				clothGeometry.getVertices().get(gIndex).copy( p.get(pIndex).position);
 			}
 			}else{

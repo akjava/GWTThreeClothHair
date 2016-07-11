@@ -12,8 +12,21 @@ import com.google.common.collect.Lists;
  *
  */
 public class HairData {
-	
+
+/*
+ * show this hair or not ,not serialized for viewing 	
+ */
 private boolean visible;
+
+/*
+ * connect to first and last
+ * 
+ *  actual geometry is difference.
+ *  
+ *  PLAIN_CLOTH,AMMO_CLOTH has a space between connection.
+ *  
+ *  
+ */
 private boolean connectHorizontal;
 
 

@@ -615,7 +615,7 @@ public class ClothSimulator  {
 			//}
 			
 		}else 
-		if(hairData.getHairPins().size()<3){//TODO merge 3pin
+		if(hairData.getHairPins().size()<3){//old less pin,now not reached
 		Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
 		Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
 		
@@ -641,7 +641,7 @@ public class ClothSimulator  {
 			List<Vector3> noTargetedPinNormals=FluentIterable.from(hairData.getHairPins()).filter(HairPinPredicates.NoTargetOnly()).transform(new HairPinToNormal(characterMesh,true)).toList();
 			//List<Vector3> pinNormals=FluentIterable.from(hairData.getHairPins()).transform(new HairPinToNormal(characterMesh)).toList();
 			
-			
+			//merging custom normal
 			//TODO add vector3,now only -1y
 			if(hairData.isUseCustomNormal()){
 			
@@ -653,7 +653,7 @@ public class ClothSimulator  {
 			}
 			}
 			
-			
+			// averaing normal 
 			//TODO make function
 			if(hairData.isExecAverageNormal()){
 			List<Vector3> averageNormals=Lists.newArrayList();
@@ -695,7 +695,7 @@ public class ClothSimulator  {
 			
 			
 			
-			//3 pin
+			//separate custom and notarget
 			int cw=hairData.getSizeOfU();
 			
 			List<HairPin> noTargetPins=Lists.newArrayList();
@@ -732,6 +732,7 @@ public class ClothSimulator  {
 				normalSize++;
 				normals.add(noTargetedPinNormals.get(i));
 				
+				//interporating
 				if(i!=noTargetPins.size()-1){
 					//has next;
 					Vector3 v2=hairPinToVertex(characterMesh,noTargetPins.get(i+1),true);

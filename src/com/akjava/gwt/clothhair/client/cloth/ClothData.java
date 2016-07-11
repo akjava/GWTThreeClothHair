@@ -49,7 +49,7 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 	cloth.wind=false;
 	cloth.setPinAll();
 	
-	int slices=cloth.w;
+	int slices=cloth.getW();
 	if(cloth.isConnectHorizontal()){
 		slices++;
 	}

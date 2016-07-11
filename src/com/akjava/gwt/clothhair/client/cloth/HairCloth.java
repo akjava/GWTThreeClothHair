@@ -304,11 +304,14 @@ public class HairCloth {
 	/**
 	 * (normalPin.size()-1)*hairData.getSizeOfU()
 	 */
-	int w;
+	private int w;
 	public int getW() {
 		return w;
 	}
 
+	public int getSizeOfU(){
+		return hairData.getSizeOfU();
+	}
 
 	/**
 	 * right now same of sizeOfV
