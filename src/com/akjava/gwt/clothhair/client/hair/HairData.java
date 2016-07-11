@@ -284,7 +284,7 @@ private double edgeModeScale=1.5;
 
 
 /**
- * basically no need change
+ * if you feel hair too bouncing,decrese it
  * for plain cloth
  */
 private double plainClothDamping= 0.03;
@@ -297,7 +297,7 @@ public void setDamping(double damping) {
 }
 
 /**
- * basically no need change
+ * heavy effected by wind,
  * for plain cloth
  */
 

@@ -574,7 +574,7 @@ public class ClothSimulator  {
 			ThreeLog.log("point",point);
 			for(int i=0;i<=cw;i++){
 				Vector2 rotated=point.clone().rotateAround(center, Math.toRadians(perAngle*i));
-				ThreeLog.log("angle:"+(perAngle*i),rotated);
+				//ThreeLog.log("angle:"+(perAngle*i),rotated);
 				
 				corePositions.add(THREE.Vector3(rotated.getX(), v1.getY(), rotated.getY()));
 				
@@ -608,7 +608,7 @@ public class ClothSimulator  {
 						newPosition.add(corePositions.get(x));
 					}
 					
-					ThreeLog.log("j="+j+",x="+x+",y="+y,newPosition);
+					//ThreeLog.log("j="+j+",x="+x+",y="+y,newPosition);
 					
 					data.getCloth().particles.get(j).setAllPosition(newPosition);
 				}
