@@ -1304,6 +1304,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			initMorph();
 		}
 			
+	public double getAmmoWorldScale(){
+		double scale=ValuesUtils.toDouble(GWTThreeClothHair.INSTANCE.getStorageControler().getValue(GWTThreeClothHairStorageKeys.KEY_AMMO_WORLD_SCALE,String.valueOf(0.1)), 0.1);
+		return scale;
+	}
 		
 	public void skinningbyHand(SkinnedMesh mesh){
 		mesh.getGeometry().setDynamic(true);

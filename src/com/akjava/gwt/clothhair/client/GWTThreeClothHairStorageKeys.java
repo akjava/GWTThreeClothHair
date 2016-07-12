@@ -12,4 +12,6 @@ public static final String THREEJS_CLEAR_COLOR="threejs_clear_color";
 public static final String KEY_GROUND_COLOR="ground_color";
 
 public static final String KEY_LIGHTS="threejs_lights";
+
+public static final String KEY_AMMO_WORLD_SCALE="ammo_world_scale";
 }

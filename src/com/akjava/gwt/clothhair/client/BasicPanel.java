@@ -201,54 +201,8 @@ public class BasicPanel extends VerticalPanel{
 		});
 		//basicPanel.add(test);
 		VerticalPanel ammoPanel=new VerticalPanel();
-		tab.add(ammoPanel,"Ammo");
-		HorizontalPanel ha=new HorizontalPanel();
-		ha.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
-		CheckBox ammoStopCheck=new CheckBox("stop");
+		tab.add(new AmmoPanel(),"Ammo");
 		
-		ammoStopCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				GWTThreeClothHair.INSTANCE.getAmmoControler().setStopped(event.getValue());
-			}
-			
-		});
-		ha.add(ammoStopCheck);
-		Button ammostep=new Button("step",new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				GWTThreeClothHair.INSTANCE.getAmmoControler().getAmmoControler().update();
-			}
-		});
-		ha.add(ammostep);
-		ammoPanel.add(ha);
-		
-		//TODO fix effect new-add cloth
-		CheckBox ammoBoneCheck=new CheckBox("bone");
-		
-		ammoBoneCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().updateVisibleBone(event.getValue());
-			}
-			
-		});
-		ha.add(ammoBoneCheck);
-		
-		
-		CheckBox particleBoneCheck=new CheckBox("particle");
-		
-		particleBoneCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-			@Override
-			public void onValueChange(ValueChangeEvent<Boolean> event) {
-				GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().updateVisibleParticle(event.getValue());
-			}
-			
-		});
-		ha.add(particleBoneCheck);
 		
 	
 		

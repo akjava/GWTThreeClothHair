@@ -427,6 +427,10 @@ public class HairCloth {
 		checkNotNull(mesh,"HairCloth:mesh is null");
 		this.hairData=hairData.clone();
 		
+		ammoMultipleScalar=GWTThreeClothHair.INSTANCE.getAmmoWorldScale();
+		LogUtils.log("ammoMultipleScalar:"+ammoMultipleScalar);
+		
+		
 		
 		List<HairPin> normalPin=Lists.newArrayList();//trying cutom pin
 		List<HairPin> customPin=Lists.newArrayList();
@@ -871,7 +875,7 @@ public class HairCloth {
 	
 	//very important,if use sync ,value should 1 so far 
 	//TODO make global setting
-	double ammoMultipleScalar=.1;
+	private double ammoMultipleScalar;
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
 	 
 	 
