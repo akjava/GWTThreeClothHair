@@ -193,7 +193,7 @@ public class SphereDataPanel extends VerticalPanel{
 			});
 			buttons.add(copyBt);
 			
-			Button copyHBt=new Button("copy H",new ClickHandler() {
+			Button copyHBt=new Button("Copy H",new ClickHandler() {
 				
 				@Override
 				public void onClick(ClickEvent event) {
@@ -210,7 +210,7 @@ public class SphereDataPanel extends VerticalPanel{
 			});
 			buttons.add(copyHBt);
 			
-			Button removeBt=new Button("remove",new ClickHandler() {
+			Button removeBt=new Button("Remove",new ClickHandler() {
 				
 				@Override
 				public void onClick(ClickEvent event) {
@@ -221,7 +221,7 @@ public class SphereDataPanel extends VerticalPanel{
 			});
 			buttons.add(removeBt);
 			
-			Button removeAll=new Button("remove All",new ClickHandler() {
+			Button removeAll=new Button("Remove All",new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
 					boolean confirm=Window.confirm("remove all?");

@@ -303,7 +303,7 @@ public class HairDataPanel extends VerticalPanel{
 		hairPanel.add(editPanel);
 		
 		
-		Button edit=new Button("remove & edit",new ClickHandler() {
+		Button edit=new Button("Remove & Edit",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				HairMixedData data=cellObjects.getSelection();
@@ -351,7 +351,7 @@ public class HairDataPanel extends VerticalPanel{
 		});
 		editPanel.add(copy);
 		
-		Button remove=new Button("remove",new ClickHandler() {
+		Button remove=new Button("Remove",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				HairMixedData data=cellObjects.getSelection();
@@ -362,7 +362,7 @@ public class HairDataPanel extends VerticalPanel{
 		});
 		editPanel.add(remove);
 		
-		Button removeAll=new Button("remove ll",new ClickHandler() {
+		Button removeAll=new Button("Remove all",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				boolean confirm=Window.confirm("remove all?");
@@ -377,6 +377,7 @@ public class HairDataPanel extends VerticalPanel{
 		Button reload=new Button("Reload",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				GWTThreeClothHair.INSTANCE.resetAnimation();//without reset usually bad
 				List<HairData> oldData=Lists.newArrayList();
 				for(HairMixedData data:ImmutableList.copyOf(cellObjects.getDatas())){
 					oldData.add(data.getHairData());

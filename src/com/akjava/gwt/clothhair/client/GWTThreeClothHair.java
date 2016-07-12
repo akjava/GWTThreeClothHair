@@ -1264,6 +1264,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		}
 		
 		public void resetAnimation(){
+			
+			characterMovePanel.resetAnimationWidget();
+			
 			if(mixer==null){
 				return;
 			}

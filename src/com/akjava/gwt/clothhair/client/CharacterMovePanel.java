@@ -330,7 +330,7 @@ public class CharacterMovePanel extends VerticalPanel{
 		
 		
 		
-		final LabeledInputRangeWidget2 xAnimation=new LabeledInputRangeWidget2("x", -180, 180, 1);
+		xAnimation = new LabeledInputRangeWidget2("x", -180, 180, 1);
 		xAnimation.getLabel().setWidth("20px");
 		xAnimation.getRange().setWidth("240px");
 		this.add(xAnimation);
@@ -341,7 +341,7 @@ public class CharacterMovePanel extends VerticalPanel{
 				startAnimation();
 			}
 		});
-		final LabeledInputRangeWidget2 yAnimation=new LabeledInputRangeWidget2("y", -180, 180, 1);
+		yAnimation = new LabeledInputRangeWidget2("y", -180, 180, 1);
 		yAnimation.getLabel().setWidth("20px");
 		yAnimation.getRange().setWidth("240px");
 		this.add(yAnimation);
@@ -352,7 +352,7 @@ public class CharacterMovePanel extends VerticalPanel{
 				startAnimation();
 			}
 		});
-		final LabeledInputRangeWidget2 zAnimation=new LabeledInputRangeWidget2("z", -180, 180, 1);
+		zAnimation = new LabeledInputRangeWidget2("z", -180, 180, 1);
 		zAnimation.getLabel().setWidth("20px");
 		zAnimation.getRange().setWidth("240px");
 		this.add(zAnimation);
@@ -392,14 +392,9 @@ public class CharacterMovePanel extends VerticalPanel{
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				resetAnimation();
-				xAnimation.setValue(0);
-				yAnimation.setValue(0);
-				zAnimation.setValue(0);
-				animationX=0;
-				animationY=0;
-				animationZ=0;
-				
+				GWTThreeClothHair.INSTANCE.stopAnimation();
+				GWTThreeClothHair.INSTANCE.resetAnimation();
+				//resetAnimationWidget();
 				/*
 				 * i faild how to update by hand.
 				 
@@ -422,18 +417,31 @@ public class CharacterMovePanel extends VerticalPanel{
 		this.add(new FacialAnimationPanel(this));
 		
 	}
+	/**
+	 * called from GWTThreeClothHair
+	 */
+	public void resetAnimationWidget(){
+		
+		//GWTThreeClothHair.INSTANCE.resetAnimation();
+		xAnimation.setValue(0);
+		yAnimation.setValue(0);
+		zAnimation.setValue(0);
+		animationX=0;
+		animationY=0;
+		animationZ=0;
+	}
 	
 	private int lastBoneIndex;
 	private int boneIndex;
-	private void resetAnimation(){
-		GWTThreeClothHair.INSTANCE.stopAnimation();
-		GWTThreeClothHair.INSTANCE.resetAnimation();
-	}
+	
 	double animationX;
 	double animationY;
 	double animationZ;
 	private ValueListBox<BoneData> boneIndexBox;
 	private CheckBox bothCheck;
+	private LabeledInputRangeWidget2 xAnimation;
+	private LabeledInputRangeWidget2 yAnimation;
+	private LabeledInputRangeWidget2 zAnimation;
 	
 	private void testAnimation(String name){
 		THREE.XHRLoader().load(name, new XHRLoadHandler() {
