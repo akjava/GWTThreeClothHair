@@ -7,13 +7,13 @@ import javax.annotation.Nullable;
 
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
 import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler;
+import com.akjava.gwt.clothhair.client.ammo.BodyDataConverter;
+import com.akjava.gwt.clothhair.client.ammo.ConstraintDataConverter;
 import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
 import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
 import com.akjava.gwt.clothhair.client.cloth.SphereDataControler;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
-import com.akjava.gwt.clothhair.client.hair.HairData;
-import com.akjava.gwt.clothhair.client.hair.HairDataConverter;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
 import com.akjava.gwt.clothhair.client.hair.HairPinPanel;
@@ -71,6 +71,8 @@ import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.three.client.js.textures.Texture;
+import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
+import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
 import com.akjava.lib.common.utils.CSVUtils;
 import com.akjava.lib.common.utils.ValuesUtils;
 import com.google.common.base.Stopwatch;
@@ -1307,6 +1309,22 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	public double getAmmoWorldScale(){
 		double scale=ValuesUtils.toDouble(GWTThreeClothHair.INSTANCE.getStorageControler().getValue(GWTThreeClothHairStorageKeys.KEY_AMMO_WORLD_SCALE,String.valueOf(0.1)), 0.1);
 		return scale;
+	}
+	public AmmoBodyPropertyData getAmmoParticleBodyData(){
+		String text=storageControler.getValue(GWTThreeClothHairStorageKeys.KEY_AMMO_PARTICLE_BODY, null);
+		if(text==null){
+			return new AmmoBodyPropertyData();
+		}else{
+			return new BodyDataConverter().reverse().convert(text);
+		}
+	}
+	public AmmoConstraintPropertyData getAmmoParticleConstraintData(){
+		String text=storageControler.getValue(GWTThreeClothHairStorageKeys.KEY_AMMO_PARTICLE_CONSTRAINT, null);
+		if(text==null){
+			return new AmmoConstraintPropertyData();
+		}else{
+			return new ConstraintDataConverter().reverse().convert(text);
+		}
 	}
 		
 	public void skinningbyHand(SkinnedMesh mesh){

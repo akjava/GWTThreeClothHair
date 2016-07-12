@@ -9,11 +9,11 @@ import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
+import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
+import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
 import com.akjava.gwt.threeammo.client.AmmoControler;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
-import com.akjava.gwt.threeammo.client.BodyProperties;
 import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
-import com.akjava.gwt.threeammo.client.SphereBodyAndMesh;
 import com.akjava.gwt.threeammo.client.core.Ammo;
 import com.akjava.gwt.threeammo.client.core.constraints.btGeneric6DofSpringConstraint;
 import com.google.common.collect.Maps;
@@ -175,35 +175,35 @@ public class AmmoHairControler {
 	}
 	
 	
-	private DistanceConstraintProperties constraintProperties=new DistanceConstraintProperties(0);
+	private AmmoConstraintPropertyData constraintProperties=new AmmoConstraintPropertyData();
 	
-	public DistanceConstraintProperties getConstraintProperties() {
+	public AmmoConstraintPropertyData getParticleConstraintData() {
 		return constraintProperties;
 	}
 
 
-	public void setConstraintProperties(DistanceConstraintProperties constraintProperties) {
+	public void setParticleConstraintData(AmmoConstraintPropertyData constraintProperties) {
 		this.constraintProperties = constraintProperties;
 	}
 
-	private BodyProperties clothProperties=new BodyProperties();
-	public BodyProperties getParticleProperties() {
+	private AmmoBodyPropertyData clothProperties=new AmmoBodyPropertyData();
+	public AmmoBodyPropertyData getParticleBodyData() {
 		return clothProperties;
 	}
 
 
-	public void setClothProperties(BodyProperties clothMaterial) {
+	public void setParticleBodyData(AmmoBodyPropertyData clothMaterial) {
 		this.clothProperties = clothMaterial;
 	}
 
-	private BodyProperties spherehProperties=new BodyProperties();
+	private AmmoBodyPropertyData spherehProperties=new AmmoBodyPropertyData();
 	
-	public BodyProperties getSpherehProperties() {
+	public AmmoBodyPropertyData getSpherehProperties() {
 		return spherehProperties;
 	}
 
 
-	public void setSpherehProperties(BodyProperties spherehMaterial) {
+	public void setSpherehProperties(AmmoBodyPropertyData spherehMaterial) {
 		this.spherehProperties = spherehMaterial;
 	}
 

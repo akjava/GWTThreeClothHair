@@ -6,6 +6,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.List;
 import java.util.Map;
 
+import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair.SphereCalculatorAndMesh;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
@@ -44,6 +45,7 @@ import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.three.client.js.textures.Texture;
+import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.akjava.lib.common.utils.CSVUtils;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
@@ -98,15 +100,21 @@ public class ClothSimulator  {
 		 * setting 1
 		 */
 		//this is easy recover
-		ammoHairControler.getSpherehProperties().setFriction(0);
-		ammoHairControler.getSpherehProperties().setRestitution(0.5);
+		//TODO make
+		ammoHairControler.getSpherehProperties().setFriction(1);
+		ammoHairControler.getSpherehProperties().setRestitution(1);
 		
-		ammoHairControler.getParticleProperties().setFriction(0);
-		ammoHairControler.getParticleProperties().setRestitution(0.5);
-		ammoHairControler.getParticleProperties().setDamping(.001,.001);
-		ammoHairControler.getConstraintProperties().setEnableSpringsAll(true);
-		ammoHairControler.getConstraintProperties().setStiffnessAll(10);//1000 is too strong?
-		ammoHairControler.getConstraintProperties().setDampingAll(0);
+		//init setting
+		AmmoBodyPropertyData particleBodyData=GWTThreeClothHair.INSTANCE.getAmmoParticleBodyData();
+		
+		
+		ammoHairControler.getParticleBodyData().setFriction(particleBodyData.getFriction());
+		ammoHairControler.getParticleBodyData().setRestitution(particleBodyData.getRestitution());
+		ammoHairControler.getParticleBodyData().setDamping(particleBodyData.getDamping().getX(),particleBodyData.getDamping().getY());
+		
+		ammoHairControler.getParticleConstraintData().setEnableSpringsAll(true);
+		ammoHairControler.getParticleConstraintData().setStiffnessAll(10);//1000 is too strong?
+		ammoHairControler.getParticleConstraintData().setDampingAll(0);
 		
 		
 		/* I'm not sure how effect
@@ -128,8 +136,8 @@ public class ClothSimulator  {
 		//ammoHairControler.getConstraintProperties().setDisableCollisionsBetweenLinkedBodies(false);
 		
 		double mpi=Math.PI/2;
-		ammoHairControler.getConstraintProperties().setAngularLowerLimit(THREE.Vector3(-mpi, -mpi, -mpi));
-		ammoHairControler.getConstraintProperties().setAngularUpperLimit(THREE.Vector3(mpi, mpi, mpi));
+		ammoHairControler.getParticleConstraintData().setAngularLowerLimit(THREE.Vector3(-mpi, -mpi, -mpi));
+		ammoHairControler.getParticleConstraintData().setAngularUpperLimit(THREE.Vector3(mpi, mpi, mpi));
 		
 		
 		double v=0.1;

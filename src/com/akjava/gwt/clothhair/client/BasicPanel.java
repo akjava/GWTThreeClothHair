@@ -279,6 +279,6 @@ public class BasicPanel extends VerticalPanel{
 		
 		lightPanel.add(new LightDataPanel(GWTThreeClothHairStorageKeys.KEY_LIGHTS,GWTThreeClothHair.INSTANCE.getStorageControler()));
 		
-		tab.selectTab(0);
+		tab.selectTab(1);//for debug
 	}
 }

@@ -14,4 +14,6 @@ public static final String KEY_GROUND_COLOR="ground_color";
 public static final String KEY_LIGHTS="threejs_lights";
 
 public static final String KEY_AMMO_WORLD_SCALE="ammo_world_scale";
+public static final String KEY_AMMO_PARTICLE_BODY="ammo_particle_body";
+public static final String KEY_AMMO_PARTICLE_CONSTRAINT="ammo_particle_constraint";
 }

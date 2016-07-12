@@ -28,12 +28,12 @@ import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
+import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
 import com.akjava.gwt.threeammo.client.AmmoControler;
 import com.akjava.gwt.threeammo.client.AmmoUtils;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.akjava.gwt.threeammo.client.BoxBodyAndMesh;
 import com.akjava.gwt.threeammo.client.ConstraintAndLine;
-import com.akjava.gwt.threeammo.client.DistanceConstraintProperties;
 import com.akjava.gwt.threeammo.client.bones.PlainBoneCreator;
 import com.akjava.gwt.threeammo.client.core.Ammo;
 import com.akjava.gwt.threeammo.client.core.btRigidBody;
@@ -1092,7 +1092,7 @@ public class HairCloth {
 				Vector3 pos2=bm2.getMesh().getPosition();//.multiplyScalar(ammoMultipleScalar);
 				
 				
-				DistanceConstraintProperties distanceConstraintProperties=simulator.getAmmoHairControler().getConstraintProperties();
+				AmmoConstraintPropertyData distanceConstraintProperties=simulator.getAmmoHairControler().getParticleConstraintData();
 				
 				if(useB){//trying tight maybe narrow is good for this
 					distanceConstraintProperties.setFrameInARelativePosRatio(0.5);
@@ -1125,7 +1125,7 @@ public class HairCloth {
 				ConstraintAndLine constraintAndMesh=simulator.getAmmoHairControler().getAmmoControler().createGeneric6DofSpringConstraint(bm1, bm2, transform1, transform2, distanceConstraintProperties.isDisableCollisionsBetweenLinkedBodies());
 				constraintAndMesh.setVisibleLine(false);
 				
-				simulator.getAmmoHairControler().getAmmoControler().updateConstraint(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint(), distanceConstraintProperties);
+				simulator.getAmmoHairControler().getAmmoControler().updateConstraint(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint(), distanceConstraintProperties,restDistance);
 				
 				ammoConstraints.push(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint());
 			}
@@ -1301,7 +1301,7 @@ public class HairCloth {
 		BoxBodyAndMesh body=BodyAndMesh.createBox(THREE.Vector3(s*2,s*2,s*2), mass, p,material);
 		
 		
-		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getParticleProperties());
+		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getParticleBodyData());
 		body.getBody().setActivationState(Ammo.DISABLE_DEACTIVATION);
 		
 		

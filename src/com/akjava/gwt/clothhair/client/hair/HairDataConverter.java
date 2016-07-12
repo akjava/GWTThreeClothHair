@@ -7,6 +7,7 @@ import com.akjava.gwt.lib.client.LogUtils;
 import com.google.common.base.Converter;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayBoolean;
 import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONBoolean;
@@ -230,9 +231,27 @@ public class HairDataConverter extends Converter<HairData,String> {
 			this.jsonObject = object;
 		}
 		
+		public void setArrayBoolean(String key,JsArrayBoolean value){
+			jsonObject.put(key, new JSONArray(value));
+		}
+		public JsArrayBoolean getArrayBoolean(String key){
+			if(!jsonObject.containsKey(key)){
+				return null;
+			}
+			JSONArray value=jsonObject.get(key).isArray();
+			if(value==null){
+				LogUtils.log("not array");
+				return null;
+			}
+			
+			return value.getJavaScriptObject().cast();
+		}
+		
 		public void setArrayNumber(String key,JsArrayNumber value){
 			jsonObject.put(key, new JSONArray(value));
 		}
+		
+		
 		
 		public void setObject(String key,JSONObject value){
 			jsonObject.put(key, value);

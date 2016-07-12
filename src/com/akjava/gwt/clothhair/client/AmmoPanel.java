@@ -1,14 +1,21 @@
 package com.akjava.gwt.clothhair.client;
 
+import com.akjava.gwt.clothhair.client.ammo.BodyDataConverter;
+import com.akjava.gwt.clothhair.client.ammo.BodyDataEditor;
+import com.akjava.gwt.clothhair.client.ammo.ConstraintDataConverter;
+import com.akjava.gwt.clothhair.client.ammo.ConstraintDataEditor;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
+import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
+import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -82,5 +89,63 @@ public AmmoPanel(){
 		}
 	});
 	this.add(new Label("Must reload if modified"));
+	
+	this.add(new HTML("<h4>Particle Body</h4>"));
+	final BodyDataEditor particleBodyEditor=new BodyDataEditor();
+	this.add(particleBodyEditor);
+	
+	particleBodyEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoParticleBodyData());
+	
+	HorizontalPanel p1=new HorizontalPanel();
+	p1.setSpacing(2);
+	this.add(p1);
+	Button particleSave=new Button("Save",new ClickHandler() {
+		@Override
+		public void onClick(ClickEvent event) {
+			particleBodyEditor.flush();
+			AmmoBodyPropertyData data=particleBodyEditor.getValue();
+			String dataText=new BodyDataConverter().convert(data);
+			try {
+				GWTThreeClothHair.INSTANCE.getStorageControler().setValue(GWTThreeClothHairStorageKeys.KEY_AMMO_PARTICLE_BODY,dataText);
+			} catch (StorageException e) {
+				LogUtils.logAndAlert("maybe quote error:"+e.getMessage());
+			}
+			
+			GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().setParticleBodyData(data);
+			
+		}
+	});
+	p1.add(particleSave);
+	p1.add(new Label("need readd apply changes"));
+	//set value
+	
+
+	this.add(new HTML("<h4>Particle Constraint</h4>"));
+	final ConstraintDataEditor particleConstraintEditor=new ConstraintDataEditor();
+	this.add(particleConstraintEditor);
+	
+	particleConstraintEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoParticleConstraintData());
+	
+	HorizontalPanel p2=new HorizontalPanel();
+	p2.setSpacing(2);
+	this.add(p2);
+	Button particleConstraintSave=new Button("Save",new ClickHandler() {
+		@Override
+		public void onClick(ClickEvent event) {
+			particleConstraintEditor.flush();
+			AmmoConstraintPropertyData data=particleConstraintEditor.getValue();
+			String dataText=new ConstraintDataConverter().convert(data);
+			try {
+				GWTThreeClothHair.INSTANCE.getStorageControler().setValue(GWTThreeClothHairStorageKeys.KEY_AMMO_PARTICLE_CONSTRAINT,dataText);
+			} catch (StorageException e) {
+				LogUtils.logAndAlert("maybe quote error:"+e.getMessage());
+			}
+			
+			GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().setParticleConstraintData(data);
+			
+		}
+	});
+	p2.add(particleConstraintSave);
+	p2.add(new Label("need readd apply changes"));
 }
 }
