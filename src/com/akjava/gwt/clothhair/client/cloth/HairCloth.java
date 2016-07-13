@@ -418,6 +418,10 @@ public class HairCloth {
 	
 	//private double ammoThick;
 	
+	public boolean isCircleStyle(){
+		return hairData.getHairPins().size()==2;
+	}
+	
 	//private int hairPhysicsType;
 	private HairData hairData;
 	public HairCloth(HairData hairData,Mesh mesh){
@@ -470,7 +474,12 @@ public class HairCloth {
 			this.initGravities(hairData.getMass(),hairData.getDamping());
 
 			clothFunction=plane(width,height);
-			restDistance=width/(w);
+			
+			if(!isCircleStyle()){
+				restDistance=width/(w);
+			}else{
+				restDistance=width;
+			}
 			
 			//this.channel=hairData.getChannel();
 			//this.syncMove=hairData.isSyncMove();
