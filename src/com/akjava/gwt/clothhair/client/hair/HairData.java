@@ -544,9 +544,21 @@ public void setHairPins(List<HairPin> hairPins) {
 		this.ammoBoneThickRatio = thick;
 	}
 
+	/**
+	 * used for hair
+	 * 0 means same as 2
+	 */
+	private double ammoBoneThickRatio2=0;
 	
 
 
+	public double getAmmoBoneThickRatio2() {
+		return ammoBoneThickRatio2;
+	}
+
+	public void setAmmoBoneThickRatio2(double ammoBoneThickRatio2) {
+		this.ammoBoneThickRatio2 = ammoBoneThickRatio2;
+	}
 	/**
 	 * how position extend outside.
 	 * 

@@ -83,7 +83,7 @@ public class HairDataConverter extends Converter<HairData,String> {
 		JSONObjectWrapper ammoBoneObjectWrapper=new JSONObjectWrapper(ammoBoneObject);
 		ammoObjectWrapper.setObject("ammo-bone", ammoBoneObject);
 		ammoBoneObjectWrapper.setDouble("thick", data.getThickRatio());
-		
+		ammoBoneObjectWrapper.setDouble("thick2", data.getAmmoBoneThickRatio2());
 		return object.toString();
 	}
 
@@ -216,6 +216,7 @@ public class HairDataConverter extends Converter<HairData,String> {
 			JSONObjectWrapper ammoBoneObject=ammoObject.getObject("ammo-bone");
 			if(ammoBoneObject!=null){
 				hairData.setThickRatio(ammoBoneObject.getDouble("thick", hairData.getThickRatio()));
+				hairData.setAmmoBoneThickRatio2(ammoBoneObject.getDouble("thick2", hairData.getAmmoBoneThickRatio2()));
 			}else{
 				LogUtils.log("no ammoBoneObject on hairData");
 			}

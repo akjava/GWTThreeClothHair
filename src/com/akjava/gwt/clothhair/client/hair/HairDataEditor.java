@@ -92,6 +92,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private CheckBox useCustomNormalEditor;
 		private DoubleBox originalNormalRatioEditor;
 		private CheckBox startCenterCircleCheck;
+		private LabeledInputRangeWidget2 thickEditor2;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -386,14 +387,16 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			ammoPanel.add(startCenterCircleCheck);
 			
 			//specific ammo-bone
-			HorizontalPanel option1Pane4=new HorizontalPanel();
-			option1Pane4.setVerticalAlignment(ALIGN_MIDDLE);
-			ammoBonePanel.add(option1Pane4);
 			
 			thickEditor = new LabeledInputRangeWidget2("Thick:",0,10,0.01);
 			thickEditor.getLabel().setWidth("115px");
 			thickEditor.setButtonVisible(true);
-			option1Pane4.add(thickEditor);
+			ammoBonePanel.add(thickEditor);
+			
+			thickEditor2 = new LabeledInputRangeWidget2("Thick2:",0,10,0.01);
+			thickEditor2.getLabel().setWidth("115px");
+			thickEditor2.setButtonVisible(true);
+			ammoBonePanel.add(thickEditor2);
 			
 		}
 		private Label createLabel(String name){
@@ -439,6 +442,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				//no need getHairTextureData update,because these value are updated dynamic
 				
 				value.setAmmoStartCenterCircle(startCenterCircleCheck.getValue());
+				value.setAmmoBoneThickRatio2(thickEditor2.getValue());
 			}
 
 			@Override
@@ -505,7 +509,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				}
 				
 				startCenterCircleCheck.setValue(value.isAmmoStartCenterCircle());
-				
+				thickEditor2.setValue(value.getAmmoBoneThickRatio2());
 				//hairPinPanel.setHairPins(value.getHairPins());
 			}
 	}

@@ -84,6 +84,11 @@ public class HairDataCsvConverter extends Converter<HairData,String> {
 		return null;
 	}
 
+	/**
+	 * @deprecated this old format keep compatible
+	 * @param csv
+	 * @return
+	 */
 	private HairData parseVersion1(String[] csv) {
 		if(csv.length<8){
 			LogUtils.log("parseVersion1:invalid csv:"+Joiner.on(",").join(csv));

@@ -1191,7 +1191,9 @@ public class HairCloth {
 				
 				//I'm not sure why circle effect vertical thick
 				//shape would rotate differenctly on path
-				Geometry clothBox=HairGeometryCreator.merge(new HairGeometryCreator().horizontalThick(hairData.getThickRatio()).verticalThick(hairData.getThickRatio()).createGeometry(positions, w));
+				double thick2=hairData.getAmmoBoneThickRatio2()==0?hairData.getThickRatio():hairData.getAmmoBoneThickRatio2();
+				LogUtils.log("thick:"+hairData.getThickRatio()+","+thick2);
+				Geometry clothBox=HairGeometryCreator.merge(new HairGeometryCreator().horizontalThick(hairData.getThickRatio()).verticalThick(thick2).createGeometry(positions, w));
 				
 				clothBox.setBones(new PlainBoneCreator().createBone(positions, w));
 				
