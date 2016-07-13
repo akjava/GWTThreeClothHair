@@ -32,6 +32,8 @@ public class EnableSpringsEditor extends VerticalPanel{
 		angularZ.setEnabled(value);
 	}
 	public EnableSpringsEditor(){
+		HorizontalPanel buttons=new HorizontalPanel();
+		this.add(buttons);
 		HorizontalPanel linearChecks=new HorizontalPanel();
 		linearChecks.setVerticalAlignment(ALIGN_MIDDLE);
 		linearChecks.setSpacing(4);
@@ -50,7 +52,7 @@ public class EnableSpringsEditor extends VerticalPanel{
 				angularZ.setValue(!v);
 			}
 		});
-		linearChecks.add(all);
+		buttons.add(all);
 		
 Button linear=new Button("Linear",new ClickHandler() {
 			
@@ -63,7 +65,7 @@ Button linear=new Button("Linear",new ClickHandler() {
 			
 			}
 		});
-		linearChecks.add(linear);
+buttons.add(linear);
 		
 		
 Button angular=new Button("Angular",new ClickHandler() {
@@ -77,7 +79,7 @@ Button angular=new Button("Angular",new ClickHandler() {
 				angularZ.setValue(!v);
 			}
 		});
-		linearChecks.add(angular);
+buttons.add(angular);
 		
 		Label label0=new Label("Linear:");
 		linearChecks.add(label0);

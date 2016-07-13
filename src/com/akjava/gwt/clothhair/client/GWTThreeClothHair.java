@@ -333,11 +333,13 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	@Override
 	public void onInitializedThree() {
+		//popup.setWidth("529px");//max get from moveToAroundRightTop
+		
 		INSTANCE=this;//must be first
 		clock=THREE.Clock();
 		clothSimulator=new ClothSimulator(scene,null);
 		
-		LogUtils.log("clear-color:"+getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR, 0));
+		//LogUtils.log("clear-color:"+getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR, 0));
 		
 		renderer.setClearColor(getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR, 0));
 		
@@ -1312,6 +1314,14 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	public AmmoBodyPropertyData getAmmoParticleBodyData(){
 		String text=storageControler.getValue(GWTThreeClothHairStorageKeys.KEY_AMMO_PARTICLE_BODY, null);
+		if(text==null){
+			return new AmmoBodyPropertyData();
+		}else{
+			return new BodyDataConverter().reverse().convert(text);
+		}
+	}
+	public AmmoBodyPropertyData getAmmoCollisionBodyData(){
+		String text=storageControler.getValue(GWTThreeClothHairStorageKeys.KEY_AMMO_COLLISION_BODY, null);
 		if(text==null){
 			return new AmmoBodyPropertyData();
 		}else{

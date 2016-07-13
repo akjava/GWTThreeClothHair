@@ -1,5 +1,6 @@
 package com.akjava.gwt.clothhair.client.deprecated;
 
+import com.akjava.gwt.lib.client.LogUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
@@ -14,7 +15,7 @@ public abstract class ThreeAppEntryPointWithControler extends SimpleThreeAppEntr
 	protected VerticalPanel controlerRootPanel;
 	protected PopupPanel popup;
 	
-	protected void updateGUI(){
+	public void updateGUI(){
 		if(popup==null){
 			return;
 		}
@@ -40,7 +41,7 @@ public abstract class ThreeAppEntryPointWithControler extends SimpleThreeAppEntr
 		
 		
 		
-		//LogUtils.log(clientWidth+","+scrollTopPos+","+dw);
+		//LogUtils.log("moveToAroundRightTop:"+clientWidth+","+scrollTopPos+","+dw);
 		
 		
 		dialog.setPopupPosition(clientWidth-dw, scrollTopPos+0);

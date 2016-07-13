@@ -37,7 +37,7 @@ public class DampingsEditor extends VerticalPanel{
 	public DampingsEditor(){
 		HorizontalPanel panel0=new HorizontalPanel();
 		panel0.setVerticalAlignment(ALIGN_MIDDLE);
-		panel0.setSpacing(4);
+		panel0.setSpacing(0);
 		this.add(panel0);
 		
 		panel0.add(new Label("set"));

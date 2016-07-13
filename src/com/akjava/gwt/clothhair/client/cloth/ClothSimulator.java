@@ -46,6 +46,7 @@ import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
+import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
 import com.akjava.lib.common.utils.CSVUtils;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
@@ -100,21 +101,26 @@ public class ClothSimulator  {
 		 * setting 1
 		 */
 		//this is easy recover
-		//TODO make
-		ammoHairControler.getSpherehProperties().setFriction(1);
-		ammoHairControler.getSpherehProperties().setRestitution(1);
+		AmmoBodyPropertyData collisionBodyData=GWTThreeClothHair.INSTANCE.getAmmoCollisionBodyData();
+		ammoHairControler.setCollisionProperties(collisionBodyData);
+		
+		//ammoHairControler.getCollisionProperties().setFriction(1);
+		//ammoHairControler.getCollisionProperties().setRestitution(1);
 		
 		//init setting
 		AmmoBodyPropertyData particleBodyData=GWTThreeClothHair.INSTANCE.getAmmoParticleBodyData();
+		ammoHairControler.setParticleBodyData(particleBodyData);
 		
+		//ammoHairControler.getParticleBodyData().setFriction(particleBodyData.getFriction());
+		//ammoHairControler.getParticleBodyData().setRestitution(particleBodyData.getRestitution());
+		//ammoHairControler.getParticleBodyData().setDamping(particleBodyData.getDamping().getX(),particleBodyData.getDamping().getY());
 		
-		ammoHairControler.getParticleBodyData().setFriction(particleBodyData.getFriction());
-		ammoHairControler.getParticleBodyData().setRestitution(particleBodyData.getRestitution());
-		ammoHairControler.getParticleBodyData().setDamping(particleBodyData.getDamping().getX(),particleBodyData.getDamping().getY());
+		AmmoConstraintPropertyData constraintCata=GWTThreeClothHair.INSTANCE.getAmmoParticleConstraintData();
+		ammoHairControler.setParticleConstraintData(constraintCata);
 		
-		ammoHairControler.getParticleConstraintData().setEnableSpringsAll(true);
-		ammoHairControler.getParticleConstraintData().setStiffnessAll(10);//1000 is too strong?
-		ammoHairControler.getParticleConstraintData().setDampingAll(0);
+		//ammoHairControler.getParticleConstraintData().setEnableSpringsAll(true);
+		//ammoHairControler.getParticleConstraintData().setStiffnessAll(10);//1000 is too strong?
+		//ammoHairControler.getParticleConstraintData().setDampingAll(0);
 		
 		
 		/* I'm not sure how effect

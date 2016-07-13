@@ -1283,7 +1283,7 @@ public class HairCloth {
 		}else{
 		body=BodyAndMesh.createSphere(size, 0, position.getX(),position.getY(),position.getZ(),material);	
 		}
-		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getSpherehProperties());
+		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getCollisionProperties());
 		body.getBody().setActivationState(Ammo.DISABLE_DEACTIVATION);
 		
 		return body;

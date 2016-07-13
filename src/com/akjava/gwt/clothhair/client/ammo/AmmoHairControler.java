@@ -195,15 +195,16 @@ public class AmmoHairControler {
 	public void setParticleBodyData(AmmoBodyPropertyData clothMaterial) {
 		this.clothProperties = clothMaterial;
 	}
+	
 
 	private AmmoBodyPropertyData spherehProperties=new AmmoBodyPropertyData();
 	
-	public AmmoBodyPropertyData getSpherehProperties() {
+	public AmmoBodyPropertyData getCollisionProperties() {
 		return spherehProperties;
 	}
 
 
-	public void setSpherehProperties(AmmoBodyPropertyData spherehMaterial) {
+	public void setCollisionProperties(AmmoBodyPropertyData spherehMaterial) {
 		this.spherehProperties = spherehMaterial;
 	}
 
