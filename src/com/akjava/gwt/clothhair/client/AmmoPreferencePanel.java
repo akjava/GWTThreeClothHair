@@ -23,8 +23,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class AmmoPanel extends VerticalPanel{
-public AmmoPanel(){
+public class AmmoPreferencePanel extends VerticalPanel{
+public AmmoPreferencePanel(){
 	HorizontalPanel ha=new HorizontalPanel();
 	this.add(ha);
 	ha.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
@@ -75,6 +75,7 @@ public AmmoPanel(){
 	ha.add(particleBoneCheck);
 	
 	LabeledInputRangeWidget2 worldScale=new LabeledInputRangeWidget2("WorldScale", 0.001, 1, 0.001);
+	worldScale.getLabel().setWidth("90px");
 	this.add(worldScale);
 	worldScale.setButtonVisible(true);
 	
@@ -91,7 +92,7 @@ public AmmoPanel(){
 			}
 		}
 	});
-	this.add(new Label("Must reload if modified"));
+	this.add(new Label("Must reload page to work correctly"));
 	
 	TabPanel tab=new TabPanel();
 	tab.setWidth("100%");
@@ -107,6 +108,7 @@ public AmmoPanel(){
 	particleBodyEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoParticleBodyData());
 	
 	HorizontalPanel p1=new HorizontalPanel();
+	p1.setVerticalAlignment(ALIGN_MIDDLE);
 	p1.setSpacing(2);
 	particleBodyPanel.add(p1);
 	Button particleSave=new Button("Save",new ClickHandler() {
@@ -126,7 +128,7 @@ public AmmoPanel(){
 		}
 	});
 	p1.add(particleSave);
-	p1.add(new Label("need readd apply changes"));
+	p1.add(new Label("need reload hair to apply changes"));
 	//set value
 	
 	VerticalPanel particleConstraintPanel=new VerticalPanel();
@@ -138,6 +140,7 @@ public AmmoPanel(){
 	particleConstraintEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoParticleConstraintData());
 	
 	HorizontalPanel p2=new HorizontalPanel();
+	p2.setVerticalAlignment(ALIGN_MIDDLE);
 	p2.setSpacing(2);
 	particleConstraintPanel.add(p2);
 	Button particleConstraintSave=new Button("Save",new ClickHandler() {
@@ -157,7 +160,7 @@ public AmmoPanel(){
 		}
 	});
 	p2.add(particleConstraintSave);
-	p2.add(new Label("need readd apply changes"));
+	p2.add(new Label("need reload hair to apply changes"));
 	
 	VerticalPanel particleCollisionPanel=new VerticalPanel();
 	tab.add(particleCollisionPanel,"Collision Body");
@@ -170,6 +173,7 @@ public AmmoPanel(){
 	collisionBodyEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoCollisionBodyData());
 	
 	HorizontalPanel p4=new HorizontalPanel();
+	p4.setVerticalAlignment(ALIGN_MIDDLE);
 	p4.setSpacing(2);
 	particleCollisionPanel.add(p4);
 	Button collsionSave=new Button("Save",new ClickHandler() {
@@ -189,7 +193,7 @@ public AmmoPanel(){
 		}
 	});
 	p4.add(collsionSave);
-	p4.add(new Label("need readd apply changes"));
+	p4.add(new Label("need reload hair to apply changes"));
 	
 	
 	

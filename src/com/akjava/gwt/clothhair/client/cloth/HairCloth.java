@@ -108,14 +108,12 @@ public class HairCloth {
 	 * TODO add format
 	 * on circle mode(when point has only two point,start first or second)
 	 */
-	private boolean startCircleCenter=true;
+	
 	
 	public boolean isStartCircleCenter() {
-		return startCircleCenter;
+		return hairData.isAmmoStartCenterCircle();
 	}
-	public void setStartCircleCenter(boolean startCircleCenter) {
-		this.startCircleCenter = startCircleCenter;
-	}
+	
 
 	//i'm not sure any advantage when true,maybe no need,there were bug of circling
 	private boolean startAndEndSameCircle=false;

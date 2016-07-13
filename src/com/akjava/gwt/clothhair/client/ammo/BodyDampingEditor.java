@@ -2,6 +2,7 @@ package com.akjava.gwt.clothhair.client.ammo;
 
 import javax.annotation.Nullable;
 
+import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.three.client.js.math.Vector2;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -14,8 +15,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class BodyDampingEditor extends VerticalPanel{
 	
 	private Vector2 value;
-	private DoubleBox linearBox;
-	private DoubleBox angulerBox;
+	private LabeledInputRangeWidget2 linearBox;
+	private LabeledInputRangeWidget2 angulerBox;
 	
 	public void setEnabled(boolean value){
 		linearBox.setEnabled(value);
@@ -158,73 +159,27 @@ public class BodyDampingEditor extends VerticalPanel{
 		HorizontalPanel linearPanel=new HorizontalPanel();
 		linearPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 		add(linearPanel);
-		Label label5=new Label("linear:");
-		label5.setWidth("60px");
-		linearPanel.add(label5);
-		linearBox = new DoubleBox();
+		
+		linearBox = new LabeledInputRangeWidget2("Linear:",0,1,0.01);
+		linearBox.getLabel().setWidth("90px");
+		linearBox.setButtonVisible(true);
 		linearBox.setWidth("60px");
 		linearPanel.add(linearBox);
 		
-		Button linear0=new Button("0",new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				linearBox.setValue(0.0);
-			}
-		});
-		linearPanel.add(linear0);
-		
-		Button linear5=new Button("0.5",new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				linearBox.setValue(0.5);
-			}
-		});
-		linearPanel.add(linear5);
-		
-		Button linear1=new Button("1",new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				linearBox.setValue(1.0);
-			}
-		});
-		linearPanel.add(linear1);
 		
 		
 		HorizontalPanel angulerPanel=new HorizontalPanel();
 		angulerPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 		add(angulerPanel);
 		
-		Label label6=new Label("anguler:");
-		label6.setWidth("60px");
-		angulerPanel.add(label6);
-		angulerBox = new DoubleBox();
-		angulerBox.setWidth("60px");
+		
+		angulerBox = new LabeledInputRangeWidget2("Angular:",0,1,0.01);
+		angulerBox.getLabel().setWidth("90px");
+		angulerBox.setButtonVisible(true);
 		angulerPanel.add(angulerBox);
 		
 		
-		Button anguler0=new Button("0",new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				angulerBox.setValue(0.0);
-			}
-		});
-		angulerPanel.add(anguler0);
-		
-		Button anguler5=new Button("0.5",new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				angulerBox.setValue(0.5);
-			}
-		});
-		angulerPanel.add(anguler5);
-		
-		Button anguler1=new Button("1",new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				angulerBox.setValue(1.0);
-			}
-		});
-		angulerPanel.add(anguler1);
+	
 		
 	}
 	

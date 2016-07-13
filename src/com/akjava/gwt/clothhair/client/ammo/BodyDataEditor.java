@@ -2,6 +2,7 @@ package com.akjava.gwt.clothhair.client.ammo;
 
 import javax.annotation.Nullable;
 
+import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
 import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.editor.client.Editor;
@@ -14,8 +15,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class BodyDataEditor extends VerticalPanel implements Editor<AmmoBodyPropertyData>,ValueAwareEditor<AmmoBodyPropertyData>{
 		private AmmoBodyPropertyData value;
-		private DoubleBox frictionEditor;
-		private DoubleBox restitutionEditor;
+		private LabeledInputRangeWidget2 frictionEditor;
+		private LabeledInputRangeWidget2 restitutionEditor;
 		private BodyDampingEditor dampingEditor;
 		private VerticalPanel dampingPanel;
 
@@ -34,26 +35,20 @@ public class BodyDataEditor extends VerticalPanel implements Editor<AmmoBodyProp
 						HorizontalPanel frictionPanel=new HorizontalPanel();
 						frictionPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 						add(frictionPanel);
-						Label frictionLabel=new Label("Friction");
-						frictionLabel.getElement().getStyle().setFontSize(fontSize, Unit.PX);
-						frictionLabel.setWidth(labelWidth);
-						frictionPanel.add(frictionLabel);
-						frictionEditor=new DoubleBox();
-						frictionEditor.setWidth("100px");
+						
+						frictionEditor=new LabeledInputRangeWidget2("Friction",0,10,0.1);
 						frictionPanel.add(frictionEditor);
-
+						frictionEditor.setButtonVisible(true);
+						frictionEditor.getLabel().setWidth("90px");
 
 						HorizontalPanel restitutionPanel=new HorizontalPanel();
 						restitutionPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 						add(restitutionPanel);
-						Label restitutionLabel=new Label("Restitution");
-						restitutionLabel.getElement().getStyle().setFontSize(fontSize, Unit.PX);
-						restitutionLabel.setWidth(labelWidth);
-						restitutionPanel.add(restitutionLabel);
-						restitutionEditor=new DoubleBox();
-						restitutionEditor.setWidth("100px");
+						
+						restitutionEditor=new LabeledInputRangeWidget2("Restitution",0,10,0.1);
 						restitutionPanel.add(restitutionEditor);
-
+						restitutionEditor.setButtonVisible(true);
+						restitutionEditor.getLabel().setWidth("90px");
 
 						
 						dampingPanel = new VerticalPanel();

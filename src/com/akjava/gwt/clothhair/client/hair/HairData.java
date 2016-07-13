@@ -13,6 +13,15 @@ import com.google.common.collect.Lists;
  */
 public class HairData {
 
+private boolean ammoStartCenterCircle;
+	
+public boolean isAmmoStartCenterCircle() {
+	return ammoStartCenterCircle;
+}
+
+public void setAmmoStartCenterCircle(boolean ammoStartCenterCircle) {
+	this.ammoStartCenterCircle = ammoStartCenterCircle;
+}
 /*
  * show this hair or not ,not serialized for viewing 
  * not storing	

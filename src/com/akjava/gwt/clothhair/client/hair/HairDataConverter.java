@@ -74,7 +74,7 @@ public class HairDataConverter extends Converter<HairData,String> {
 		ammoObjectWrapper.setDouble("particleRadiusRatio", data.getParticleRadiusRatio());
 		ammoObjectWrapper.setDouble("syncMoveLinear", data.getSyncMoveLinear());
 		ammoObjectWrapper.setDouble("syncForceLinear", data.getSyncForceLinear());
-		
+		ammoObjectWrapper.setBoolean("startCenterCircle", data.isAmmoStartCenterCircle());
 		
 		//ammo-cloth
 		
@@ -205,6 +205,9 @@ public class HairDataConverter extends Converter<HairData,String> {
 			hairData.setParticleRadiusRatio(ammoObject.getDouble("particleRadiusRatio", hairData.getParticleRadiusRatio()));
 			hairData.setSyncMoveLinear(ammoObject.getDouble("syncMoveLinear", hairData.getSyncMoveLinear()));
 			hairData.setSyncForceLinear(ammoObject.getDouble("syncForceLinear", hairData.getSyncForceLinear()));
+			
+			hairData.setAmmoStartCenterCircle(ammoObject.getBoolean("startCenterCircle", hairData.isAmmoStartCenterCircle()));
+			
 			
 			JSONObjectWrapper ammoClothObject=ammoObject.getObject("ammo-cloth");
 			if(ammoClothObject!=null){

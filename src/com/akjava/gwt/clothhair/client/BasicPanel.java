@@ -201,7 +201,7 @@ public class BasicPanel extends VerticalPanel{
 		});
 		//basicPanel.add(test);
 		VerticalPanel ammoPanel=new VerticalPanel();
-		tab.add(new AmmoPanel(),"Ammo");
+		tab.add(new AmmoPreferencePanel(),"Ammo");
 		
 		
 	

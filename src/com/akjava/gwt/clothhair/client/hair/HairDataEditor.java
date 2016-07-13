@@ -3,7 +3,6 @@ package com.akjava.gwt.clothhair.client.hair;
 import java.io.IOException;
 import java.util.List;
 
-import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
@@ -11,7 +10,6 @@ import com.google.common.collect.Lists;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorDelegate;
 import com.google.gwt.editor.client.ValueAwareEditor;
-import com.google.gwt.editor.client.adapters.SimpleEditor;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -82,9 +80,9 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private HairDataPanel hairDataPanel;
 		private LabeledInputRangeWidget2 mass;
 		private LabeledInputRangeWidget2 damping;
-		private DoubleBox thickEditor;
+		private LabeledInputRangeWidget2 thickEditor;
 		private DoubleBox extendOutsideRatioEditor;
-		private DoubleBox particleRadiusEditor;
+		private LabeledInputRangeWidget2 particleRadiusEditor;
 		private ValueListBox<HairType> hairTypeEditor;
 		private List<HairType> hairTypeList;
 		
@@ -93,6 +91,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		
 		private CheckBox useCustomNormalEditor;
 		private DoubleBox originalNormalRatioEditor;
+		private CheckBox startCenterCircleCheck;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -361,12 +360,12 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			ammoPanel.add(option1Pane2);
 			
 			
-			option1Pane2.add(new Label("particleRadiusR:"));
-			particleRadiusEditor = new DoubleBox();
+			//option1Pane2.add(new Label("particleRadiusR:"));
+			particleRadiusEditor = new LabeledInputRangeWidget2("particleRadiusR",0,100,0.1);
 			particleRadiusEditor.setTitle("ratio 0.5 is max.can visible on particle setting");
-			particleRadiusEditor.setWidth("40px");
+			particleRadiusEditor.setButtonVisible(true);
 			option1Pane2.add(particleRadiusEditor);
-			
+			particleRadiusEditor.getLabel().setWidth("115px");
 			
 			
 			HorizontalPanel option1Pane3=new HorizontalPanel();
@@ -383,14 +382,17 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			syncMoveLinearEditor.setWidth("40px");
 			option1Pane3.add(syncMoveLinearEditor);
 			
+			startCenterCircleCheck = new CheckBox("start center circle");
+			ammoPanel.add(startCenterCircleCheck);
 			
 			//specific ammo-bone
 			HorizontalPanel option1Pane4=new HorizontalPanel();
 			option1Pane4.setVerticalAlignment(ALIGN_MIDDLE);
 			ammoBonePanel.add(option1Pane4);
-			option1Pane4.add(new Label("thick:"));
-			thickEditor = new DoubleBox();
-			thickEditor.setWidth("40px");
+			
+			thickEditor = new LabeledInputRangeWidget2("Thick:",0,10,0.01);
+			thickEditor.getLabel().setWidth("115px");
+			thickEditor.setButtonVisible(true);
 			option1Pane4.add(thickEditor);
 			
 		}
@@ -435,6 +437,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setUseCustomNormal(useCustomNormalEditor.getValue());
 				value.setOriginalNormalRatio(originalNormalRatioEditor.getValue());
 				//no need getHairTextureData update,because these value are updated dynamic
+				
+				value.setAmmoStartCenterCircle(startCenterCircleCheck.getValue());
 			}
 
 			@Override
@@ -499,6 +503,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				if(hairPinPanel==null){
 					LogUtils.log("no hairPinPanel");
 				}
+				
+				startCenterCircleCheck.setValue(value.isAmmoStartCenterCircle());
 				
 				//hairPinPanel.setHairPins(value.getHairPins());
 			}
