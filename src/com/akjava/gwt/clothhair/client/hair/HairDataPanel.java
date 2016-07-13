@@ -427,7 +427,7 @@ public class HairDataPanel extends VerticalPanel{
 			
 			@Override
 			public void uploaded(File file, String text) {
-				
+				GWTThreeClothHair.INSTANCE.resetAnimation();//without reset usually bad
 				
 				
 				if(uploadModeBox.getSelectedIndex()==0){
@@ -442,7 +442,7 @@ public class HairDataPanel extends VerticalPanel{
 				
 			}
 		}, true, "UTF-8");
-		 upload.setAccept(".csv");
+		 upload.setAccept(Lists.newArrayList(".csv",".json"));
 		 uploadPanel.add(upload);
 		 
 		 //downloads
@@ -505,7 +505,7 @@ public class HairDataPanel extends VerticalPanel{
 		HorizontalPanel testPanel=new HorizontalPanel();
 		testPanel.setVerticalAlignment(ALIGN_MIDDLE);
 		main.add(testPanel);
-		testPanel.add(new Label("Ammo-Bone"));
+		testPanel.add(new Label("Ammo-Bone-Geometry"));
 		 Button test=new Button("export-json",new ClickHandler() {
 				
 				@Override
