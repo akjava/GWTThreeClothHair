@@ -331,6 +331,9 @@ public class ClothSimulator  {
 		return null;
 	}
 	
+	/*
+	 * replace bone name and position
+	 */
 	public void updateHorizontalMirror(SphereData data){
 		data.setX(data.getX()*-1);
 		//boneName
@@ -350,6 +353,8 @@ public class ClothSimulator  {
 			}
 			//LogUtils.log(mirrowName+","+index);
 		}
+		
+		//TODO support rotation
 	}
 
 	//direct load from text
@@ -422,7 +427,7 @@ public class ClothSimulator  {
 	private SphereCalculatorAndMesh initSphereCalculatorAndMesh(SphereData data,int color){
 		MeshPhongMaterial ballMaterial = THREE.MeshPhongMaterial( GWTParamUtils.MeshPhongMaterial().color(color).side(THREE.DoubleSide).wireframe(true));
 		//TODO support box here
-		Mesh sphere = createFromSphereData(data,ballMaterial);//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
+		Mesh sphere = createFromSphereData(data,ballMaterial);
 		scene.add( sphere );
 		
 		

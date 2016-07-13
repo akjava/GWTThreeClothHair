@@ -48,21 +48,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		this.defaultValue=defaultValue;
 		this.panel=panel;
 		
-		HorizontalPanel typePanel=new HorizontalPanel();
-		this.add(typePanel);
-		typePanel.setVerticalAlignment(ALIGN_MIDDLE);
-		typePanel.add(new Label("Type:"));
 		
-		typeEditor = new ListBox();
-		typeEditor.addItem("Sphere");
-		typeEditor.addItem("Box");
-		typePanel.add(typeEditor);
-		typeEditor.addChangeHandler(new ChangeHandler() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				flush();
-			}
-		});
 		
 		TabPanel tab=new TabPanel();
 		this.add(tab);
@@ -191,16 +177,36 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		this.add(bonePanel);
 		
 		
-		HorizontalPanel channelPanel=new HorizontalPanel();
-		channelPanel.setVerticalAlignment(ALIGN_MIDDLE);
-		channelPanel.add(new Label("Channel for hair"));
-		this.add(channelPanel);
+		HorizontalPanel panel1=new HorizontalPanel();
+		panel1.setVerticalAlignment(ALIGN_MIDDLE);
+		
+		HorizontalPanel typePanel=new HorizontalPanel();
+		panel1.add(typePanel);
+		typePanel.setVerticalAlignment(ALIGN_MIDDLE);
+		typePanel.add(new Label("Type:"));
+		
+		typeEditor = new ListBox();
+		typeEditor.addItem("Sphere");
+		typeEditor.addItem("Box");
+		typePanel.add(typeEditor);
+		typeEditor.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				flush();
+			}
+		});
+		
+		
+		
+		
+		panel1.add(new Label("Channel for hair"));
+		this.add(panel1);
 		
 		channelBox = new ListBox();
 		for(int i=0;i<16;i++){
 			channelBox.addItem(String.valueOf(i));
 		}
-		channelPanel.add(channelBox);
+		panel1.add(channelBox);
 		channelBox.setSelectedIndex(0);
 		channelBox.addChangeHandler(new ChangeHandler() {
 			
@@ -212,7 +218,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		});
 		
 		copyHorizontalCheck = new CheckBox("copy horizontal");
-		channelPanel.add(copyHorizontalCheck);
+		panel1.add(copyHorizontalCheck);
 		copyHorizontalCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
 			@Override

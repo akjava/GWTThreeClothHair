@@ -52,6 +52,8 @@ public SphereData copyTo(SphereData data){
 	data.setChannel(channel);
 	data.setCopyHorizontal(copyHorizontal);
 	
+	data.setType(type);
+	data.getRotate().copy(rotate);
 	return data;
 }
 
