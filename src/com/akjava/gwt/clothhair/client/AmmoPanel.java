@@ -164,6 +164,7 @@ public AmmoPanel(){
 	
 	
 	final BodyDataEditor collisionBodyEditor=new BodyDataEditor();
+	collisionBodyEditor.getDampingPanel().setVisible(false);//no need static collisions
 	particleCollisionPanel.add(collisionBodyEditor);
 	
 	collisionBodyEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoCollisionBodyData());

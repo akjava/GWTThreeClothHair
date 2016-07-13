@@ -17,6 +17,11 @@ public class BodyDataEditor extends VerticalPanel implements Editor<AmmoBodyProp
 		private DoubleBox frictionEditor;
 		private DoubleBox restitutionEditor;
 		private BodyDampingEditor dampingEditor;
+		private VerticalPanel dampingPanel;
+
+		public VerticalPanel getDampingPanel() {
+			return dampingPanel;
+		}
 
 		public AmmoBodyPropertyData getValue() {
 			return value;
@@ -50,15 +55,16 @@ public class BodyDataEditor extends VerticalPanel implements Editor<AmmoBodyProp
 						restitutionPanel.add(restitutionEditor);
 
 
-						HorizontalPanel dampingPanel=new HorizontalPanel();
-						dampingPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+						
+						dampingPanel = new VerticalPanel();
+						//dampingPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 						add(dampingPanel);
 						Label dampingLabel=new Label("Damping");
 						dampingLabel.getElement().getStyle().setFontSize(fontSize, Unit.PX);
 						dampingLabel.setWidth(labelWidth);
 						dampingPanel.add(dampingLabel);
 						dampingEditor=new BodyDampingEditor();
-						add(dampingEditor);
+						dampingPanel.add(dampingEditor);
 
 
 		}
