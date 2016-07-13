@@ -495,139 +495,151 @@ public class HairDataPanel extends VerticalPanel{
 		 hairPanel.add(uploadPanel);
 		 hairPanel.add(downloadPanels);
 		 
-		 HorizontalPanel testPanel=new HorizontalPanel();
-		 this.add(testPanel);
+		
+		hairPanel.add(createGeometryImportExportPanel());
+	}
+	
+	public Panel createGeometryImportExportPanel(){
+		VerticalPanel main=new VerticalPanel();
+		
+		HorizontalPanel testPanel=new HorizontalPanel();
+		testPanel.setVerticalAlignment(ALIGN_MIDDLE);
+		main.add(testPanel);
+		testPanel.add(new Label("Ammo-Bone"));
 		 Button test=new Button("export-json",new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				if(cellObjects.getSelection()==null){
-					return;
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					if(cellObjects.getSelection()==null){
+						return;
+					}
+					SkinnedMesh character=GWTThreeClothHair.INSTANCE.getCharacterMesh();
+					
+					Geometry geometry=convertSelectionToGeometry(cellObjects.getSelection());
+					
+					MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x00ff00).skinning(true));
+					
+					
+					
+					JSONObject object=geometry.gwtJSONWithBone();
+					downloadArea.clear();
+					
+					Anchor a=HTML5Download.get().generateTextDownloadLink(object.toString(), "geometry.json", "geometry to download",true);
+					downloadArea.add(a);
+					
+					String text=object.toString();
+					//this is XXXX 4.4 FORMAT
+					JavaScriptObject js=JSONParser.parseStrict(text).isObject().get("data").isObject().getJavaScriptObject();
+					LogUtils.log("json-parsed");
+					
+					Geometry loadedGeometry=THREE.JSONLoader().parse(js).getGeometry();
+					
+					LogUtils.log("loaded:");
+					
+					
+					SkinnedMesh newMesh=THREE.SkinnedMesh(loadedGeometry, material);
+					newMesh.setScale(character.getScale().getX(), character.getScale().getY(), character.getScale().getZ());
+					newMesh.setSkeleton(character.getSkeleton());//can share the bone
+					
+					GWTThreeClothHair.INSTANCE.getScene().add(newMesh);
 				}
-				SkinnedMesh character=GWTThreeClothHair.INSTANCE.getCharacterMesh();
-				
-				Geometry geometry=convertSelectionToGeometry(cellObjects.getSelection());
-				
-				MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x00ff00).skinning(true));
-				
-				
-				
-				JSONObject object=geometry.gwtJSONWithBone();
-				downloadArea.clear();
-				
-				Anchor a=HTML5Download.get().generateTextDownloadLink(object.toString(), "geometry.json", "geometry to download",true);
-				downloadArea.add(a);
-				
-				String text=object.toString();
-				//this is XXXX 4.4 FORMAT
-				JavaScriptObject js=JSONParser.parseStrict(text).isObject().get("data").isObject().getJavaScriptObject();
-				LogUtils.log("json-parsed");
-				
-				Geometry loadedGeometry=THREE.JSONLoader().parse(js).getGeometry();
-				
-				LogUtils.log("loaded:");
-				
-				
-				SkinnedMesh newMesh=THREE.SkinnedMesh(loadedGeometry, material);
-				newMesh.setScale(character.getScale().getX(), character.getScale().getY(), character.getScale().getZ());
-				newMesh.setSkeleton(character.getSkeleton());//can share the bone
-				
-				GWTThreeClothHair.INSTANCE.getScene().add(newMesh);
-			}
-		});
-		 testPanel.add(test);
-		 
-		 Button test2=new Button("export-obj",new ClickHandler() {
-				
-			@Override
-			public void onClick(ClickEvent event) {
-				if(cellObjects.getSelection()==null){
-					return;
-				}
-				
-				Geometry geometry=convertSelectionToGeometry(cellObjects.getSelection());
-				LogUtils.log(geometry);
-				int m=geometry.mergeVertices();
-				LogUtils.log("merged "+m);
-				
-				//validate face
-				for(int i=0;i<geometry.getFaces().length();i++){
-					Face3 face=geometry.getFaces().get(i);
-					for(int j=0;j<3;j++){
-						int index=face.gwtGet(j);
-						if(index<0 || index>=geometry.getVertices().length()){
-							LogUtils.log("invalid face at:"+i+","+j+" index="+index);
+			});
+			 testPanel.add(test);
+			 
+			 Button test2=new Button("export-obj",new ClickHandler() {
+					
+				@Override
+				public void onClick(ClickEvent event) {
+					if(cellObjects.getSelection()==null){
+						return;
+					}
+					
+					Geometry geometry=convertSelectionToGeometry(cellObjects.getSelection());
+					LogUtils.log(geometry);
+					int m=geometry.mergeVertices();
+					LogUtils.log("merged "+m);
+					
+					//validate face
+					for(int i=0;i<geometry.getFaces().length();i++){
+						Face3 face=geometry.getFaces().get(i);
+						for(int j=0;j<3;j++){
+							int index=face.gwtGet(j);
+							if(index<0 || index>=geometry.getVertices().length()){
+								LogUtils.log("invalid face at:"+i+","+j+" index="+index);
+							}
 						}
 					}
-				}
-				
-				MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x00ff00));
-				
-				
-				Mesh testMesh=THREE.Mesh(geometry);
-				
-				String text=THREEExp.OBJExporter().parse(testMesh);
-				List<String> lines=CSVUtils.splitLinesWithGuava(text);
-				int vt=0;
-				int f=0;
-				int vn=0;
-				int v=0;
-				for(String line:lines){
-					if(line.startsWith("vt")){
-						vt++;
-					}else if(line.startsWith("vn")){
-						vn++;
-					}else if(line.startsWith("f")){
-						f++;
-					}else if(line.startsWith("v")){
-						v++;
+					
+					MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x00ff00));
+					
+					
+					Mesh testMesh=THREE.Mesh(geometry);
+					
+					String text=THREEExp.OBJExporter().parse(testMesh);
+					List<String> lines=CSVUtils.splitLinesWithGuava(text);
+					int vt=0;
+					int f=0;
+					int vn=0;
+					int v=0;
+					for(String line:lines){
+						if(line.startsWith("vt")){
+							vt++;
+						}else if(line.startsWith("vn")){
+							vn++;
+						}else if(line.startsWith("f")){
+							f++;
+						}else if(line.startsWith("v")){
+							v++;
+						}
 					}
+					Map<String,Integer> map=Maps.newHashMap();
+					map.put("vt", vt);
+					map.put("f", f);
+					map.put("vn", vn);
+					map.put("v", v);
+					//vt vn v must be same ,i confirmed r74 objexporter faild.
+					LogUtils.log(Joiner.on(",").withKeyValueSeparator("=").join(map));
+					
+					
+					
+					downloadArea.clear();
+					
+					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "geometry.obj", "obj to download",true);
+					downloadArea.add(a);
+					
 				}
-				Map<String,Integer> map=Maps.newHashMap();
-				map.put("vt", vt);
-				map.put("f", f);
-				map.put("vn", vn);
-				map.put("v", v);
-				//vt vn v must be same ,i confirmed r74 objexporter faild.
-				LogUtils.log(Joiner.on(",").withKeyValueSeparator("=").join(map));
+			});
+			 testPanel.add(test2);
+			 
+			 FileUploadForm testUpload=FileUtils.createSingleTextFileUploadForm(new DataURLListener() {
 				
-				
-				
-				downloadArea.clear();
-				
-				Anchor a=HTML5Download.get().generateTextDownloadLink(text, "geometry.obj", "obj to download",true);
-				downloadArea.add(a);
-				
-			}
-		});
-		 testPanel.add(test2);
-		 
-		 FileUploadForm testUpload=FileUtils.createSingleTextFileUploadForm(new DataURLListener() {
-			
-			@Override
-			public void uploaded(File file, String text) {
-				JavaScriptObject js=JSONParser.parseLenient(text).isObject().get("data").isObject().getJavaScriptObject();
-				LogUtils.log("json-parsed");
-				
-				Geometry loadedGeometry=THREE.JSONLoader().parse(js).getGeometry();
-				
-				LogUtils.log("loaded:");
-				MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial()
-						.color(GWTThreeClothHair.INSTANCE.getGlobalHairColor())
-						.skinning(true)
-						.side(THREE.DoubleSide)
-						);
-				SkinnedMesh character=GWTThreeClothHair.INSTANCE.getCharacterMesh();
-				
-				SkinnedMesh newMesh=THREE.SkinnedMesh(loadedGeometry, material);
-				newMesh.setScale(character.getScale().getX(), character.getScale().getY(), character.getScale().getZ());
-				newMesh.setSkeleton(character.getSkeleton());//can share the bone
-				
-				GWTThreeClothHair.INSTANCE.getScene().add(newMesh);
-			}
-		}, true);
-		 testPanel.add(testUpload);
+				@Override
+				public void uploaded(File file, String text) {
+					JavaScriptObject js=JSONParser.parseLenient(text).isObject().get("data").isObject().getJavaScriptObject();
+					LogUtils.log("json-parsed");
+					
+					Geometry loadedGeometry=THREE.JSONLoader().parse(js).getGeometry();
+					
+					LogUtils.log("loaded:");
+					MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial()
+							.color(GWTThreeClothHair.INSTANCE.getGlobalHairColor())
+							.skinning(true)
+							.side(THREE.DoubleSide)
+							);
+					SkinnedMesh character=GWTThreeClothHair.INSTANCE.getCharacterMesh();
+					
+					SkinnedMesh newMesh=THREE.SkinnedMesh(loadedGeometry, material);
+					newMesh.setScale(character.getScale().getX(), character.getScale().getY(), character.getScale().getZ());
+					newMesh.setSkeleton(character.getSkeleton());//can share the bone
+					
+					GWTThreeClothHair.INSTANCE.getScene().add(newMesh);
+				}
+			}, true);
+			 main.add(testUpload);
+			 
+			 return main;
 	}
+	
 	
 	protected Geometry convertSelectionToGeometry(HairMixedData selection) {
 		ParticleBodyDatas data=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().getAmmoData(selection.getClothData().getCloth());
