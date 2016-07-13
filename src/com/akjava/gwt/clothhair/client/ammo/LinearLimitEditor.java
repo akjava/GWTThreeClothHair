@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DoubleBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class LinearLimitEditor extends VerticalPanel{
@@ -19,6 +20,7 @@ public class LinearLimitEditor extends VerticalPanel{
 	private DoubleBox xBox;
 	private DoubleBox yBox;
 	private DoubleBox zBox;
+	private ListBox targetListBox;
 	
 	public void setEnabled(boolean value){
 
@@ -26,11 +28,33 @@ public class LinearLimitEditor extends VerticalPanel{
 		yBox.setEnabled(value);
 		zBox.setEnabled(value);
 	}
+	
+	public void setValueByTarget(double value){
+		int selection=targetListBox.getSelectedIndex();
+		if(selection==0){
+			setValueAll(value);
+		}else if(selection==1){
+			xBox.setValue(value);
+		}else if(selection==2){
+			yBox.setValue(value);
+		}else if(selection==3){
+			zBox.setValue(value);
+		}
+	}
+	
 	public LinearLimitEditor(){
 		HorizontalPanel panel0=new HorizontalPanel();
 		panel0.setVerticalAlignment(ALIGN_MIDDLE);
 		panel0.setSpacing(4);
 		this.add(panel0);
+		
+		targetListBox = new ListBox();
+		panel0.add(targetListBox);
+		targetListBox.addItem("All");
+		targetListBox.addItem("X");
+		targetListBox.addItem("Y");
+		targetListBox.addItem("Z");
+		targetListBox.setSelectedIndex(0);
 		
 		
 		Button mpi1=new Button("-2",new ClickHandler() {
@@ -38,7 +62,7 @@ public class LinearLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=-2;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(mpi1);
@@ -48,7 +72,7 @@ public class LinearLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=-1;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(mpi2);
@@ -58,7 +82,7 @@ public class LinearLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=-0.5;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(mpi4);
@@ -68,10 +92,20 @@ public class LinearLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=-0.25;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(mpi5);
+		
+		Button mhalf2a=new Button("-0.1",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				double v=-0.1;
+				
+				setValueByTarget(v);
+			}
+		});
+		panel0.add(mhalf2a);
 		
 		
 		Button zero=new Button("0",new ClickHandler() {
@@ -79,10 +113,20 @@ public class LinearLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=0;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(zero);
+		
+		Button half2a=new Button("0.1",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				double v=0.1;
+				
+				setValueByTarget(v);
+			}
+		});
+		panel0.add(half2a);
 		
 
 		Button half2=new Button("0.25",new ClickHandler() {
@@ -90,7 +134,7 @@ public class LinearLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=0.25;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(half2);
@@ -101,7 +145,7 @@ public class LinearLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=0.5;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(half);
@@ -111,7 +155,7 @@ public class LinearLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=1;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(max);
@@ -121,32 +165,12 @@ public class LinearLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=2;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(pi);
 		
-		final DoubleBox customBox=new DoubleBox();
-		customBox.setWidth("60px");
-		panel0.add(customBox);
-		customBox.addValueChangeHandler(new ValueChangeHandler<Double>() {
-			
-			@Override
-			public void onValueChange(ValueChangeEvent<Double> event) {
-				double v=event.getValue();
-				
-				setValueAll(v);
-			}
-		});
 		
-		Button update=new Button("Update",new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				setValueAll(customBox.getValue());
-			}
-		});
-		panel0.add(update);
 		
 		
 		HorizontalPanel panel1=new HorizontalPanel();
@@ -181,6 +205,30 @@ public class LinearLimitEditor extends VerticalPanel{
 		zBox = new DoubleBox();
 		zBox.setWidth("60px");
 		panel1.add(zBox);
+		
+		panel1.add(new Label("Set All"));
+		
+		final DoubleBox customBox=new DoubleBox();
+		customBox.setWidth("60px");
+		panel1.add(customBox);
+		customBox.addValueChangeHandler(new ValueChangeHandler<Double>() {
+			
+			@Override
+			public void onValueChange(ValueChangeEvent<Double> event) {
+				double v=event.getValue();
+				
+				setValueAll(v);
+			}
+		});
+		
+		Button update=new Button("Update",new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				setValueAll(customBox.getValue());
+			}
+		});
+		panel1.add(update);
 	}
 	
 	private void setValueAll(double v){

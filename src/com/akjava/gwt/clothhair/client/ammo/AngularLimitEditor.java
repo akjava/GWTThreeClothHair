@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DoubleBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class AngularLimitEditor extends VerticalPanel{
@@ -19,6 +20,7 @@ public class AngularLimitEditor extends VerticalPanel{
 	private DoubleBox xBox;
 	private DoubleBox yBox;
 	private DoubleBox zBox;
+	private ListBox targetListBox;
 	
 	public void setEnabled(boolean value){
 
@@ -26,19 +28,40 @@ public class AngularLimitEditor extends VerticalPanel{
 		yBox.setEnabled(value);
 		zBox.setEnabled(value);
 	}
+	
+	public void setValueByTarget(double value){
+		int selection=targetListBox.getSelectedIndex();
+		if(selection==0){
+			setValueAll(value);
+		}else if(selection==1){
+			xBox.setValue(value);
+		}else if(selection==2){
+			yBox.setValue(value);
+		}else if(selection==3){
+			zBox.setValue(value);
+		}
+	}
+	
 	public AngularLimitEditor(){
 		HorizontalPanel panel0=new HorizontalPanel();
 		panel0.setVerticalAlignment(ALIGN_MIDDLE);
 		panel0.setSpacing(4);
 		this.add(panel0);
 		
+		targetListBox = new ListBox();
+		panel0.add(targetListBox);
+		targetListBox.addItem("All");
+		targetListBox.addItem("X");
+		targetListBox.addItem("Y");
+		targetListBox.addItem("Z");
+		targetListBox.setSelectedIndex(0);
 		
 		Button mpi1=new Button("-PI",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				double v=-Math.PI;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(mpi1);
@@ -48,7 +71,7 @@ public class AngularLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=-Math.PI/2;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(mpi2);
@@ -58,7 +81,7 @@ public class AngularLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=-Math.PI/4;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(mpi4);
@@ -68,7 +91,7 @@ public class AngularLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=-Math.PI/8;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(mpi8);
@@ -78,7 +101,7 @@ public class AngularLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=0;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(zero);
@@ -88,7 +111,7 @@ public class AngularLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=Math.PI/8;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(pi8);
@@ -98,7 +121,7 @@ public class AngularLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=Math.PI/4;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(half);
@@ -108,7 +131,7 @@ public class AngularLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=Math.PI/2;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(max);
@@ -118,32 +141,12 @@ public class AngularLimitEditor extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				double v=Math.PI;
 				
-				setValueAll(v);
+				setValueByTarget(v);
 			}
 		});
 		panel0.add(pi);
 		
-		final DoubleBox customBox=new DoubleBox();
-		customBox.setWidth("60px");
-		panel0.add(customBox);
-		customBox.addValueChangeHandler(new ValueChangeHandler<Double>() {
-			
-			@Override
-			public void onValueChange(ValueChangeEvent<Double> event) {
-				double v=event.getValue();
-				
-				setValueAll(v);
-			}
-		});
 		
-Button update=new Button("Update",new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				setValueAll(customBox.getValue());
-			}
-		});
-		//panel0.add(update);
 		
 		
 		HorizontalPanel panel1=new HorizontalPanel();
@@ -178,6 +181,29 @@ Button update=new Button("Update",new ClickHandler() {
 		zBox = new DoubleBox();
 		zBox.setWidth("60px");
 		panel1.add(zBox);
+		
+		panel1.add(new Label("Set All"));
+		final DoubleBox customBox=new DoubleBox();
+		customBox.setWidth("60px");
+		panel1.add(customBox);
+		customBox.addValueChangeHandler(new ValueChangeHandler<Double>() {
+			
+			@Override
+			public void onValueChange(ValueChangeEvent<Double> event) {
+				double v=event.getValue();
+				
+				setValueAll(v);
+			}
+		});
+		
+		Button update=new Button("Update",new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				setValueAll(customBox.getValue());
+			}
+		});
+		panel1.add(update);//no space
 	}
 	
 	private void setValueAll(double v){
