@@ -1021,7 +1021,6 @@ private void clearAllPoints(){
 		//remove physics data
 		
 		GWTThreeClothHair.INSTANCE.getAmmoControler()
-		//GWTThreeClothHair.INSTANCE.getCannonControler()
 		.removeParticleData(data.getClothData().getCloth());
 		
 		

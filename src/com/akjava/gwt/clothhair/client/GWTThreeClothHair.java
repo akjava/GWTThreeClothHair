@@ -669,7 +669,6 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	//List<SkinningVertexCalculator> skinningVertexCalculators=Lists.newArrayList();
 	
-//private CannonControler cannonControler;
 
 	
 

@@ -513,7 +513,7 @@ public void setHairPins(List<HairPin> hairPins) {
 	 * TYPE_SIMPLE_CLOTH is three.js cloth(ultra first smooth,but not suite cloth)
 	 * 
 	 * 
-	 * maybe Cannon drop soon because Ammo do everything It's possibility.
+	
 	 * 
 	 */
 	private int hairType;//TODO support hair type

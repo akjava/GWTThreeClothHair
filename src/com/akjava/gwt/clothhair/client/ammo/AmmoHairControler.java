@@ -87,7 +87,7 @@ public class AmmoHairControler {
 			ammoControler.getWorld().addConstraint(data.getConstraints().get(i),disableCollisionsBetweenLinkedBodies);
 		}
 		*/
-		//LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
+		
 	}
 	
 	public void setSphereData(int channel,SphereBodyData data){
@@ -106,7 +106,7 @@ public class AmmoHairControler {
 		
 		LogUtils.log("set-sphere:channel="+channel+",sphere-count="+data.getAmmoSpheres().size());
 		
-		//LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
+		
 	}
 	
 	public void addSphereBodyData(BodyAndMesh bm){
@@ -151,7 +151,7 @@ public class AmmoHairControler {
 		particleMap.remove(hairCloth);
 		
 		LogUtils.log("removeParticleData:bm="+data.getAmmoParticles().size()+",const="+data.getConstraints().length());
-		//LogUtils.log(GWTThreeClothHair.INSTANCE.getCannonControler().getInfo());
+		
 	}
 	public ParticleBodyDatas getAmmoData(HairCloth hairCloth){
 		return particleMap.get(hairCloth);
@@ -167,13 +167,13 @@ public class AmmoHairControler {
 		/*
 		 * BodyAndMesh is js object
 		 */
-		List<BodyAndMesh> cannonSpheres;
-		public SphereBodyData(List<BodyAndMesh> cannonSpheres) {
+		List<BodyAndMesh> ammoSpheres;
+		public SphereBodyData(List<BodyAndMesh> ammoSpheres) {
 			super();
-			this.cannonSpheres = cannonSpheres;
+			this.ammoSpheres = ammoSpheres;
 		}
 		public List<BodyAndMesh> getAmmoSpheres() {
-			return cannonSpheres;
+			return ammoSpheres;
 		}
 	}
 	
@@ -227,15 +227,15 @@ public class AmmoHairControler {
 		public void setSkinnedMesh(SkinnedMesh skinnedMesh) {
 			this.skinnedMesh = skinnedMesh;
 		}
-		public ParticleBodyDatas(List<BodyAndMesh> cannonParticles,JsArray<btGeneric6DofSpringConstraint> constraints) {
+		public ParticleBodyDatas(List<BodyAndMesh> ammoParticles,JsArray<btGeneric6DofSpringConstraint> constraints) {
 			super();
-			this.cannonParticles = cannonParticles;
+			this.ammoParticles = ammoParticles;
 			this.constraints=constraints;
 		}
 		public List<BodyAndMesh> getAmmoParticles() {
-			return cannonParticles;
+			return ammoParticles;
 		}
-		List<BodyAndMesh> cannonParticles;
+		List<BodyAndMesh> ammoParticles;
 		JsArray<btGeneric6DofSpringConstraint> constraints;
 		public JsArray<btGeneric6DofSpringConstraint> getConstraints() {
 			return constraints;
