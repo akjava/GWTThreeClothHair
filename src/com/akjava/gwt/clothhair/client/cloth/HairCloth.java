@@ -809,6 +809,11 @@ public class HairCloth {
 	//before simulate
 	
 	public void beforeSimulate(ClothSimulator simulator,Geometry clothGeometry,List<Mesh> spheres){
+		if(skipSync){
+			skipSync=false;
+			return;
+		}
+		
 		if(!isSyncMove()){
 			return;
 		}
@@ -885,6 +890,12 @@ public class HairCloth {
 	 
 	 
 	private boolean visibleDummy;
+	
+	
+	/*
+	 * just create particle not good at sync
+	 */
+	private boolean skipSync;
 	private void simulateAmmo(ClothSimulator simulator,double time, Geometry clothGeometry, List<Mesh> spheres) {
 
 		int channel=hairData.getChannel();
@@ -1282,6 +1293,7 @@ public class HairCloth {
 		
 		helper.setVisible(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone());//TODO get visible from setting
 		//updateParticles(simulator);//for sync need update here
+		skipSync=true;
 	}
 
 	public native final boolean isSame(int c,double value1,double value2)/*-{
