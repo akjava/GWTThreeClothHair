@@ -21,6 +21,7 @@ public class HairGeometryCreator {
 	private double horizontalThick=0.5;
 	private double verticalThick=0.5;
 	
+	private boolean mergeFirstEdge=true;
 	private boolean mergeLastEdge=true;
 	public HairGeometryCreator horizontalThick(double v){
 		horizontalThick=v;
@@ -35,7 +36,7 @@ public class HairGeometryCreator {
 		checkArgument(positions.size()>slices,"need at least slices");
 		JsArray<Geometry> geometries=JavaScriptUtils.createJSArray();
 		
-		LogUtils.log("HairGeometryCreator:createGeometry() vthick="+verticalThick+",hthick="+horizontalThick);
+		//LogUtils.log("HairGeometryCreator:createGeometry() vthick="+verticalThick+",hthick="+horizontalThick);
 		
 		
 		int horizontalVertexCount=slices+1;
@@ -56,6 +57,13 @@ public class HairGeometryCreator {
 		Shape shape=THREE.Shape(pts);
 		int lastVertexSize=shape.getPoints(12).length();//default curve
 		
+		Vector3 centerPos=THREE.Vector3();
+		if(mergeFirstEdge){
+		for(int i=0;i<horizontalVertexCount;i++){
+			centerPos.add(positions.get(i));
+		}
+		centerPos.divideScalar(horizontalVertexCount);
+		}
 		
 		for(int i=0;i<horizontalVertexCount;i++){
 			JsArray<Vector3> poses=JavaScriptUtils.createJSArray();
@@ -89,6 +97,21 @@ public class HairGeometryCreator {
 			}
 			}
 			
+			if(mergeFirstEdge){
+				/*
+				 * TODO make face?
+				 */
+				/*
+				Vector3 pos=THREE.Vector3();
+				
+				
+				for(int j=0;j<lastVertexSize;j++){
+					int at=geometry.getVertices().length()-1-j;
+					geometry.getVertices().get(at).copy(pos);
+				}
+				*/
+				
+				}
 			
 			geometries.push(geometry);
 		}

@@ -620,6 +620,12 @@ public class ClothSimulator  {
 					
 					Vector3 delta=corePositions.get(x).clone().sub(v1).setY(0);
 					Vector3 newPosition=delta.multiplyScalar(y);
+					
+					double angle=x*perAngle;
+					if(angle>=0 && angle<180){//Test angle
+						newPosition.multiplyScalar(0.5);
+					}
+					
 					if(startCenter){
 						newPosition.add(v1);
 						//no need

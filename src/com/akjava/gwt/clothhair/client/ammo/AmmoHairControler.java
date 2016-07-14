@@ -164,6 +164,9 @@ public class AmmoHairControler {
 	
 
 	public static class SphereBodyData{
+		/*
+		 * BodyAndMesh is js object
+		 */
 		List<BodyAndMesh> cannonSpheres;
 		public SphereBodyData(List<BodyAndMesh> cannonSpheres) {
 			super();

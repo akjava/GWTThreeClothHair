@@ -362,7 +362,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			
 			
 			//option1Pane2.add(new Label("particleRadiusR:"));
-			particleRadiusEditor = new LabeledInputRangeWidget2("particleRadiusR",0,100,0.1);
+			particleRadiusEditor = new LabeledInputRangeWidget2("particleRadiusR",0,10,0.01);
 			particleRadiusEditor.setTitle("ratio 0.5 is max.can visible on particle setting");
 			particleRadiusEditor.setButtonVisible(true);
 			option1Pane2.add(particleRadiusEditor);
