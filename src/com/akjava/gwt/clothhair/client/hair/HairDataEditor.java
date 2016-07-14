@@ -93,6 +93,10 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private DoubleBox originalNormalRatioEditor;
 		private CheckBox startCenterCircleCheck;
 		private LabeledInputRangeWidget2 thickEditor2;
+		private CheckBox ammoCircleUseFirstPointYEditor;
+		private DoubleBox circleRangeMin;
+		private DoubleBox circleRangeMax;
+		private DoubleBox circleInRangeRatio;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -383,8 +387,37 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			syncMoveLinearEditor.setWidth("40px");
 			option1Pane3.add(syncMoveLinearEditor);
 			
+			
+			HorizontalPanel ammoPanel1=new HorizontalPanel();
+			ammoPanel1.setVerticalAlignment(ALIGN_MIDDLE);
+			ammoPanel.add(ammoPanel1);
+			
 			startCenterCircleCheck = new CheckBox("start center circle");
-			ammoPanel.add(startCenterCircleCheck);
+			ammoPanel1.add(startCenterCircleCheck);
+			
+			
+			ammoCircleUseFirstPointYEditor = new CheckBox("ammoCircleUseFirstPointY");
+			ammoPanel1.add(ammoCircleUseFirstPointYEditor);
+			
+			HorizontalPanel ammoPanel2=new HorizontalPanel();
+			ammoPanel2.setVerticalAlignment(ALIGN_MIDDLE);
+			ammoPanel.add(ammoPanel2);
+			
+			ammoPanel2.add(new Label("min-circle"));
+			
+			circleRangeMin = new DoubleBox();
+			circleRangeMin.setWidth("40px");
+			ammoPanel2.add(circleRangeMin);
+			
+			ammoPanel2.add(new Label("max-circle"));
+			circleRangeMax = new DoubleBox();
+			circleRangeMax.setWidth("40px");
+			ammoPanel2.add(circleRangeMax);
+			
+			ammoPanel2.add(new Label("in-ratio"));
+			circleInRangeRatio = new DoubleBox();
+			circleInRangeRatio.setWidth("40px");
+			ammoPanel2.add(circleInRangeRatio);
 			
 			//specific ammo-bone
 			
@@ -397,6 +430,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			thickEditor2.getLabel().setWidth("115px");
 			thickEditor2.setButtonVisible(true);
 			ammoBonePanel.add(thickEditor2);
+			
+			
 			
 		}
 		private Label createLabel(String name){
@@ -443,6 +478,10 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				
 				value.setAmmoStartCenterCircle(startCenterCircleCheck.getValue());
 				value.setAmmoBoneThickRatio2(thickEditor2.getValue());
+				value.setAmmoCircleUseFirstPointY(ammoCircleUseFirstPointYEditor.getValue());
+				value.setAmmoCircleRangeMin(circleRangeMin.getValue());
+				value.setAmmoCircleRangeMax(circleRangeMax.getValue());
+				value.setAmmoCircleInRangeRatio(circleInRangeRatio.getValue());
 			}
 
 			@Override
@@ -510,6 +549,10 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				
 				startCenterCircleCheck.setValue(value.isAmmoStartCenterCircle());
 				thickEditor2.setValue(value.getAmmoBoneThickRatio2());
-				//hairPinPanel.setHairPins(value.getHairPins());
+				ammoCircleUseFirstPointYEditor.setValue(value.isAmmoCircleUseFirstPointY());
+				circleRangeMin.setValue(value.getAmmoCircleRangeMin());
+				circleRangeMax.setValue(value.getAmmoCircleRangeMax());
+				circleInRangeRatio.setValue(value.getAmmoCircleInRangeRatio());
+				
 			}
 	}

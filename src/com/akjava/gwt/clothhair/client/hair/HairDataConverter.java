@@ -21,7 +21,7 @@ public class HairDataConverter extends Converter<HairData,String> {
 	private HairTextureDataConverter textureDataConverter=new HairTextureDataConverter();
 	public static final String DATA_TYPE="HairData";
 	@Override
-	protected String doForward(HairData data) {
+	protected String doForward(HairData hairData) {
 		JSONObject object=new JSONObject();
 		JSONObjectWrapper wrapper=new JSONObjectWrapper(object);
 		//header
@@ -31,8 +31,8 @@ public class HairDataConverter extends Converter<HairData,String> {
 		JsArrayNumber faceIndexes=JavaScriptUtils.createJSArrayNumber();
 		JsArrayNumber vertexIndexes=JavaScriptUtils.createJSArrayNumber();
 		JsArrayNumber targetIndexes=JavaScriptUtils.createJSArrayNumber();
-		for(int i=0;i<data.getHairPins().size();i++){
-			HairPin pin=data.getHairPins().get(i);
+		for(int i=0;i<hairData.getHairPins().size();i++){
+			HairPin pin=hairData.getHairPins().get(i);
 			faceIndexes.push(pin.getFaceIndex());
 			vertexIndexes.push(pin.getVertexOfFaceIndex());
 			targetIndexes.push(pin.getTargetClothIndex());
@@ -41,40 +41,45 @@ public class HairDataConverter extends Converter<HairData,String> {
 		wrapper.setArrayNumber("vertexOfFaceIndexes", vertexIndexes);
 		wrapper.setArrayNumber("targetIndexes", targetIndexes);
 		//general
-		wrapper.setInt("sliceFace", data.getSizeOfU());
-		wrapper.setInt("stackFace", data.getSizeOfV());
-		wrapper.setDouble("faceWidthScale", data.getScaleOfU());
-		wrapper.setBoolean("cutHorizontal", data.isCutU());
-		wrapper.setInt("cutHorizontalStartIndex", data.getStartCutUIndexV());
-		wrapper.setInt("channel", data.getChannel());
-		wrapper.setBoolean("syncPosition", data.isSyncMove());
-		wrapper.setBoolean("connectHorizontal", data.isConnectHorizontal());
-		wrapper.setInt("physicsType", data.getHairPhysicsType());
+		wrapper.setInt("sliceFace", hairData.getSizeOfU());
+		wrapper.setInt("stackFace", hairData.getSizeOfV());
+		wrapper.setDouble("faceWidthScale", hairData.getScaleOfU());
+		wrapper.setBoolean("cutHorizontal", hairData.isCutU());
+		wrapper.setInt("cutHorizontalStartIndex", hairData.getStartCutUIndexV());
+		wrapper.setInt("channel", hairData.getChannel());
+		wrapper.setBoolean("syncPosition", hairData.isSyncMove());
+		wrapper.setBoolean("connectHorizontal", hairData.isConnectHorizontal());
+		wrapper.setInt("physicsType", hairData.getHairPhysicsType());
 		
-		wrapper.setDouble("extendOutsideRatio", data.getExtendOutsideRatio());
-		wrapper.setBoolean("averagingNormal", data.isExecAverageNormal());
-		wrapper.setBoolean("useCustomNormal", data.isUseCustomNormal());
-		wrapper.setDouble("originalNormalRatio", data.getOriginalNormalRatio());
-		if(data.getHairTextureData()!=null){
-			wrapper.setString("hairTextureData", textureDataConverter.convert(data.getHairTextureData()));
+		wrapper.setDouble("extendOutsideRatio", hairData.getExtendOutsideRatio());
+		wrapper.setBoolean("averagingNormal", hairData.isExecAverageNormal());
+		wrapper.setBoolean("useCustomNormal", hairData.isUseCustomNormal());
+		wrapper.setDouble("originalNormalRatio", hairData.getOriginalNormalRatio());
+		if(hairData.getHairTextureData()!=null){
+			wrapper.setString("hairTextureData", textureDataConverter.convert(hairData.getHairTextureData()));
 		}
 		//plain
 		JSONObject plainObject=new JSONObject();
 		JSONObjectWrapper plainObjectWrapper=new JSONObjectWrapper(plainObject);
 		wrapper.setObject("plain-cloth", plainObject);
-		plainObjectWrapper.setBoolean("narrow", data.isDoNarrow());
-		plainObjectWrapper.setDouble("narrowScale", data.getNarrowScale());
-		plainObjectWrapper.setInt("narrowStartIndex", data.getStartNarrowIndexV());
-		plainObjectWrapper.setDouble("damping", data.getDamping());
-		plainObjectWrapper.setDouble("mass", data.getMass());
+		plainObjectWrapper.setBoolean("narrow", hairData.isDoNarrow());
+		plainObjectWrapper.setDouble("narrowScale", hairData.getNarrowScale());
+		plainObjectWrapper.setInt("narrowStartIndex", hairData.getStartNarrowIndexV());
+		plainObjectWrapper.setDouble("damping", hairData.getDamping());
+		plainObjectWrapper.setDouble("mass", hairData.getMass());
 		//ammo
 		JSONObject ammoObject=new JSONObject();
 		JSONObjectWrapper ammoObjectWrapper=new JSONObjectWrapper(ammoObject);
 		wrapper.setObject("ammo", ammoObject);
-		ammoObjectWrapper.setDouble("particleRadiusRatio", data.getParticleRadiusRatio());
-		ammoObjectWrapper.setDouble("syncMoveLinear", data.getSyncMoveLinear());
-		ammoObjectWrapper.setDouble("syncForceLinear", data.getSyncForceLinear());
-		ammoObjectWrapper.setBoolean("startCenterCircle", data.isAmmoStartCenterCircle());
+		ammoObjectWrapper.setDouble("particleRadiusRatio", hairData.getParticleRadiusRatio());
+		ammoObjectWrapper.setDouble("syncMoveLinear", hairData.getSyncMoveLinear());
+		ammoObjectWrapper.setDouble("syncForceLinear", hairData.getSyncForceLinear());
+		ammoObjectWrapper.setBoolean("startCenterCircle", hairData.isAmmoStartCenterCircle());
+		
+		ammoObjectWrapper.setBoolean("circleUseFirstPointY", hairData.isAmmoCircleUseFirstPointY());
+		ammoObjectWrapper.setDouble("circleRangeMin", hairData.getAmmoCircleRangeMin());
+		ammoObjectWrapper.setDouble("circleRangeMax", hairData.getAmmoCircleRangeMax());
+		ammoObjectWrapper.setDouble("circleInRangeRatio", hairData.getAmmoCircleInRangeRatio());
 		
 		//ammo-cloth
 		
@@ -82,8 +87,8 @@ public class HairDataConverter extends Converter<HairData,String> {
 		JSONObject ammoBoneObject=new JSONObject();
 		JSONObjectWrapper ammoBoneObjectWrapper=new JSONObjectWrapper(ammoBoneObject);
 		ammoObjectWrapper.setObject("ammo-bone", ammoBoneObject);
-		ammoBoneObjectWrapper.setDouble("thick", data.getThickRatio());
-		ammoBoneObjectWrapper.setDouble("thick2", data.getAmmoBoneThickRatio2());
+		ammoBoneObjectWrapper.setDouble("thick", hairData.getThickRatio());
+		ammoBoneObjectWrapper.setDouble("thick2", hairData.getAmmoBoneThickRatio2());
 		return object.toString();
 	}
 
@@ -200,20 +205,23 @@ public class HairDataConverter extends Converter<HairData,String> {
 			LogUtils.log("no plaintClothObject on hairData");
 		}
 		
-		JSONObjectWrapper ammoObject=object.getObject("ammo");
-		if(ammoObject!=null){
-			hairData.setParticleRadiusRatio(ammoObject.getDouble("particleRadiusRatio", hairData.getParticleRadiusRatio()));
-			hairData.setSyncMoveLinear(ammoObject.getDouble("syncMoveLinear", hairData.getSyncMoveLinear()));
-			hairData.setSyncForceLinear(ammoObject.getDouble("syncForceLinear", hairData.getSyncForceLinear()));
+		JSONObjectWrapper ammoObjectWrapper=object.getObject("ammo");
+		if(ammoObjectWrapper!=null){
+			hairData.setParticleRadiusRatio(ammoObjectWrapper.getDouble("particleRadiusRatio", hairData.getParticleRadiusRatio()));
+			hairData.setSyncMoveLinear(ammoObjectWrapper.getDouble("syncMoveLinear", hairData.getSyncMoveLinear()));
+			hairData.setSyncForceLinear(ammoObjectWrapper.getDouble("syncForceLinear", hairData.getSyncForceLinear()));
 			
-			hairData.setAmmoStartCenterCircle(ammoObject.getBoolean("startCenterCircle", hairData.isAmmoStartCenterCircle()));
+			hairData.setAmmoStartCenterCircle(ammoObjectWrapper.getBoolean("startCenterCircle", hairData.isAmmoStartCenterCircle()));
+			hairData.setAmmoCircleUseFirstPointY(ammoObjectWrapper.getBoolean("circleUseFirstPointY", hairData.isAmmoCircleUseFirstPointY()));
+			hairData.setAmmoCircleRangeMin(ammoObjectWrapper.getDouble("circleRangeMin", hairData.getAmmoCircleRangeMin()));
+			hairData.setAmmoCircleRangeMax(ammoObjectWrapper.getDouble("circleRangeMax", hairData.getAmmoCircleRangeMax()));
+			hairData.setAmmoCircleInRangeRatio(ammoObjectWrapper.getDouble("circleInRangeRatio", hairData.getAmmoCircleInRangeRatio()));
 			
-			
-			JSONObjectWrapper ammoClothObject=ammoObject.getObject("ammo-cloth");
+			JSONObjectWrapper ammoClothObject=ammoObjectWrapper.getObject("ammo-cloth");
 			if(ammoClothObject!=null){
 				//nothing so far
 			}
-			JSONObjectWrapper ammoBoneObject=ammoObject.getObject("ammo-bone");
+			JSONObjectWrapper ammoBoneObject=ammoObjectWrapper.getObject("ammo-bone");
 			if(ammoBoneObject!=null){
 				hairData.setThickRatio(ammoBoneObject.getDouble("thick", hairData.getThickRatio()));
 				hairData.setAmmoBoneThickRatio2(ammoBoneObject.getDouble("thick2", hairData.getAmmoBoneThickRatio2()));

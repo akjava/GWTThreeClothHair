@@ -577,6 +577,8 @@ public class ClothSimulator  {
 		boolean startCenter=data.getCloth().isStartCircleCenter();//start circle from center or not
 		boolean startAndEndSame=data.getCloth().isStartAndEndSameCircle();
 		
+		boolean useFirstPointY=data.getCloth().isUseFirstPointY();
+		//TODO make function,WARNING do same things in ClothControlers:syncPinPositions()
 		if(hairData.getHairPins().size()==2){
 			Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
 			Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
@@ -595,7 +597,12 @@ public class ClothSimulator  {
 				Vector2 rotated=point.clone().rotateAround(center, Math.toRadians(perAngle*i));
 				//ThreeLog.log("angle:"+(perAngle*i),rotated);
 				
-				corePositions.add(THREE.Vector3(rotated.getX(), v1.getY(), rotated.getY()));
+				//TODO switch v1 or v2
+				if(useFirstPointY){
+					corePositions.add(THREE.Vector3(rotated.getX(), v1.getY(), rotated.getY()));
+				}else{
+					corePositions.add(THREE.Vector3(rotated.getX(), v2.getY(), rotated.getY()));
+				}
 				
 			}
 			
@@ -621,10 +628,12 @@ public class ClothSimulator  {
 					Vector3 delta=corePositions.get(x).clone().sub(v1).setY(0);
 					Vector3 newPosition=delta.multiplyScalar(y);
 					
+					
 					double angle=x*perAngle;
-					if(angle>=0 && angle<180){//Test angle
-						newPosition.multiplyScalar(0.5);
+					if(data.getCloth().isAmmoInCircleInRange(angle)){
+						newPosition.multiplyScalar(data.getCloth().getAmmoCircleInRangeRatio());
 					}
+					
 					
 					if(startCenter){
 						newPosition.add(v1);

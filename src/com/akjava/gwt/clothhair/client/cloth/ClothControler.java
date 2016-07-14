@@ -140,6 +140,8 @@ public class ClothControler {
 		boolean startCenter=data.getCloth().isStartCircleCenter();
 		boolean startAndEndSame=data.getCloth().isStartAndEndSameCircle();
 		
+		boolean useFirstPointY=data.getCloth().isUseFirstPointY();
+		
 		if(data.getCalculator().getResult().size()==2){
 			//TODO merge method
 			Vector3 v1=data.getCalculator().getResult().get(0);
@@ -154,7 +156,14 @@ public class ClothControler {
 			double perAngle=360.0/(angleSplit);
 			for(int i=0;i<=cw;i++){
 				Vector2 rotated=point.clone().rotateAround(center, Math.toRadians(perAngle*i));
-				corePositions.add(THREE.Vector3(rotated.getX(), v1.getY(), rotated.getY()));
+				
+				if(useFirstPointY){
+					corePositions.add(THREE.Vector3(rotated.getX(), v1.getY(), rotated.getY()));
+				}else{
+					corePositions.add(THREE.Vector3(rotated.getX(), v2.getY(), rotated.getY()));
+				}
+				
+				
 			}
 			
 			for(int i=0;i<=cw;i++){

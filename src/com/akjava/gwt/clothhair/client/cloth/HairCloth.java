@@ -1343,7 +1343,19 @@ public class HairCloth {
 		
 		return body;
 	}
-	
+
+	public boolean isUseFirstPointY() {
+		return hairData.isAmmoCircleUseFirstPointY();
+	}
+	public boolean isAmmoInCircleInRange(double angle){
+		if(!hairData.isUseAmmoCircleInRange()){
+			return false;
+		}
+		return hairData.isAmmoInCircleInRange(angle);
+	}
+	public double getAmmoCircleInRangeRatio(){
+		return hairData.getAmmoCircleInRangeRatio();
+	}
 
 	
 

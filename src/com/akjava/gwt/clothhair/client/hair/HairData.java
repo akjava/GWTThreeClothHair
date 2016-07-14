@@ -579,4 +579,51 @@ public void setHairPins(List<HairPin> hairPins) {
 		this.extendOutsideRatio = extendPosition;
 	}
 	
+	private double ammoCircleInRangeRatio=0.5;
+	public double getAmmoCircleInRangeRatio() {
+		return ammoCircleInRangeRatio;
+	}
+
+	public boolean isAmmoInCircleInRange(double angle){
+		if(angle>ammoCircleRangeMin && angle<ammoCircleRangeMax){
+			return true;
+		}
+	
+		if(angle>ammoCircleRangeMin+360 && angle<ammoCircleRangeMax+360){
+			return true;
+		}
+		return false;
+	}
+	public boolean isUseAmmoCircleInRange(){
+		return ammoCircleRangeMin!=ammoCircleRangeMax;
+	}
+	public void setAmmoCircleInRangeRatio(double ammoCircleInRangeRatio) {
+		this.ammoCircleInRangeRatio = ammoCircleInRangeRatio;
+	}
+	private double ammoCircleRangeMin;
+	public double getAmmoCircleRangeMin() {
+		return ammoCircleRangeMin;
+	}
+
+	public void setAmmoCircleRangeMin(double ammoCircleRangeMin) {
+		this.ammoCircleRangeMin = ammoCircleRangeMin;
+	}
+
+	public double getAmmoCircleRangeMax() {
+		return ammoCircleRangeMax;
+	}
+
+	public void setAmmoCircleRangeMax(double ammoCircleRangeMax) {
+		this.ammoCircleRangeMax = ammoCircleRangeMax;
+	}
+	private double ammoCircleRangeMax;
+	private boolean ammoCircleUseFirstPointY;
+
+	public boolean isAmmoCircleUseFirstPointY() {
+		return ammoCircleUseFirstPointY;
+	}
+
+	public void setAmmoCircleUseFirstPointY(boolean useFirstPointY) {
+		this.ammoCircleUseFirstPointY = useFirstPointY;
+	}
 }
