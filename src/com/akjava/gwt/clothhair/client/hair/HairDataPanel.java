@@ -70,8 +70,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Timer;
@@ -479,7 +483,9 @@ public class HairDataPanel extends VerticalPanel{
 					}else if(cellObjects.getSelection().getHairData().getHairPhysicsType()==HairData.TYPE_AMMO_BONE_HAIR){
 						type="ammo_bone_hair";
 					}
-					String text=hairDataConverter.convert(cellObjects.getSelection().getHairData());
+					JSONObject selection=hairDataConverter.convert(cellObjects.getSelection().getHairData());
+					
+					String text=toJsonText(Lists.newArrayList(selection));
 					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair-"+type+".json", "selection to download",true);
 					downloadArea.add(a);
 				}
@@ -497,6 +503,21 @@ public class HairDataPanel extends VerticalPanel{
 		 
 		
 		hairPanel.add(createGeometryImportExportPanel());
+	}
+	
+	public String toJsonText(List<JSONObject> list){
+		JSONObject root=new JSONObject();
+		root.put("type", new JSONString(HairData.DATA_TYPE));
+		root.put("version", new JSONNumber(1.0));
+		
+		JSONArray array=new JSONArray();
+		for(int i=0;i<list.size();i++){
+			array.set(i, list.get(i));
+		}
+		
+		root.put("datas", array);
+		
+		return root.toString();
 	}
 	
 	public Panel createGeometryImportExportPanel(){
@@ -714,13 +735,61 @@ public class HairDataPanel extends VerticalPanel{
 	/*
 	 * must wait hair texture update
 	 */
-	private void loadHairDataSync(String text,boolean isCsv){
+	private void loadHairDataSync(String json,boolean isCsv){
 		Iterable<HairData> hairDatas=null;
 		if(isCsv){
-			hairDatas=new HairDataCsvConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+			hairDatas=new HairDataCsvConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(json));
 		}else{
-		
-			hairDatas=hairDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+			JSONValue value=JSONParser.parseStrict(json);
+			if(value==null){
+				LogUtils.log("HairDataConverter:parse json faild "+json);
+				return ;
+			}
+			JSONObject object=value.isObject();
+			if(object==null){
+				LogUtils.log("HairDataConverter:not json object:"+json);
+				return ;
+			}
+			
+			if(object.get("type")==null){
+				LogUtils.log("HairDataConverter:has no type attribute:"+object.toString());
+				return ;
+			}
+			
+			JSONString typeString=object.get("type").isString();
+			if(typeString==null){
+				LogUtils.log("HairDataConverter:has a type attribute:"+object.toString());
+				return ;
+			}
+			
+			String type=typeString.stringValue();
+			if(!type.equals(HairData.DATA_TYPE)){
+				LogUtils.log("HairDataConverter:difference type:"+type);
+				return;
+			}
+			
+			JSONValue datasValue=object.get("datas");
+			if(datasValue==null){
+				LogUtils.log("HairDataConverter:no datas:");
+				return;
+			}
+			JSONArray array=datasValue.isArray();
+			if(array==null){
+				LogUtils.log("HairDataConverter:no jsonarray:");
+				return;
+			}
+			List<JSONObject> jsonObjects=Lists.newArrayList();
+			for(int i=0;i<array.size();i++){
+				JSONValue arrayValue=array.get(i);
+				JSONObject arrayObject=arrayValue.isObject();
+				if(arrayObject==null){
+					LogUtils.log("HairDataConverter:contain invalid data:"+i+","+arrayValue);
+					return;
+				}
+				jsonObjects.add(arrayObject);
+			}
+			
+			hairDatas=hairDataConverter.reverse().convertAll(jsonObjects);
 		}
 		loadHairDataSync(hairDatas);
 	}
@@ -1267,14 +1336,15 @@ public void updateHairDataLine(){
 	}
 	
 	private String toStoreText(){
-		String text=
-				Joiner.on("\r\n").join(hairDataConverter.convertAll(FluentIterable.from(cellObjects.getDatas()).transform(new Function<HairMixedData, HairData>() {
+		List<JSONObject> objects=
+				Lists.newArrayList(hairDataConverter.convertAll(FluentIterable.from(cellObjects.getDatas()).transform(new Function<HairMixedData, HairData>() {
 					@Override
 					public HairData apply(HairMixedData input) {
 						return input.getHairData();
 					}
 				})));
-		return text;
+		
+		return toJsonText(objects);
 	}
 
 	private StorageControler storageControler=new StorageControler();

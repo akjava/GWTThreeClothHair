@@ -17,16 +17,16 @@ import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 
-public class HairDataConverter extends Converter<HairData,String> {
+public class HairDataConverter extends Converter<HairData,JSONObject> {
 	private HairTextureDataConverter textureDataConverter=new HairTextureDataConverter();
-	public static final String DATA_TYPE="HairData";
+	
 	@Override
-	protected String doForward(HairData hairData) {
+	protected JSONObject doForward(HairData hairData) {
 		JSONObject object=new JSONObject();
 		JSONObjectWrapper wrapper=new JSONObjectWrapper(object);
 		//header
-		wrapper.setString("type", DATA_TYPE);
-		wrapper.setDouble("version", 1.0);
+		//wrapper.setString("type", DATA_TYPE);
+		//wrapper.setDouble("version", 1.0);
 		//pins
 		JsArrayNumber faceIndexes=JavaScriptUtils.createJSArrayNumber();
 		JsArrayNumber vertexIndexes=JavaScriptUtils.createJSArrayNumber();
@@ -89,48 +89,15 @@ public class HairDataConverter extends Converter<HairData,String> {
 		ammoObjectWrapper.setObject("ammo-bone", ammoBoneObject);
 		ammoBoneObjectWrapper.setDouble("thick", hairData.getThickRatio());
 		ammoBoneObjectWrapper.setDouble("thick2", hairData.getAmmoBoneThickRatio2());
-		return object.toString();
+		return object;
 	}
 
 	@Override
-	protected HairData doBackward(String json) {
-		JSONValue value=JSONParser.parseStrict(json);
-		if(value==null){
-			LogUtils.log("HairDataConverter:parse json faild "+json);
-			return null;
-		}
-		JSONObject object=value.isObject();
-		if(object==null){
-			LogUtils.log("HairDataConverter:not json object:"+json);
-			return null;
-		}
-		
-		if(object.get("type")==null){
-			LogUtils.log("HairDataConverter:has no type attribute:"+object.toString());
-			return null;
-		}
-		
-		JSONString typeString=object.get("type").isString();
-		if(typeString==null){
-			LogUtils.log("HairDataConverter:has a type attribute:"+object.toString());
-			return null;
-		}
-		
-		String type=typeString.stringValue();
-		if(!type.equals(DATA_TYPE)){
-			LogUtils.log("HairDataConverter:difference type:"+type);
-			return null;
-		}
+	protected HairData doBackward(JSONObject object) {
 		
 		JSONObjectWrapper wrapper=new JSONObjectWrapper(object);
-		
-		double version=wrapper.getDouble("version",1.0);
-		if(version==1.0){
-			return parse1(wrapper);
-		}
-		
-		
-		return null;
+		return parse1(wrapper);
+	
 	}
 	//parse version 1
 	private HairData parse1(JSONObjectWrapper object) {

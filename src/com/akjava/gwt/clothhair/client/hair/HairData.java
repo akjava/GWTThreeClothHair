@@ -5,6 +5,7 @@ import java.util.List;
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
+import com.google.gwt.json.client.JSONObject;
 
 /**
  * serializable data
@@ -12,7 +13,7 @@ import com.google.common.collect.Lists;
  *
  */
 public class HairData {
-
+	public static final String DATA_TYPE="HairData";
 private boolean ammoStartCenterCircle;
 	
 public boolean isAmmoStartCenterCircle() {
@@ -380,7 +381,7 @@ public void setSyncMoveLinear(double syncMoveLinear) {
 //still format modifying
 public HairData clone(){
 	HairDataConverter converter=new HairDataConverter();
-	String line=converter.convert(this);
+	JSONObject line=converter.convert(this);
 	return converter.reverse().convert(line);
 }
 
