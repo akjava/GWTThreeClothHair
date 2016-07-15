@@ -18,7 +18,7 @@ import com.akjava.gwt.clothhair.client.hair.HairDataPanel;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
 import com.akjava.gwt.clothhair.client.hair.HairPinPanel;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
-import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
+import com.akjava.gwt.clothhair.client.sphere.SphereDataCsvConverter;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataPanel;
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
@@ -1082,13 +1082,16 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 		String lines=storageControler.getValue(GWTThreeClothHairStorageKeys.KEY_SPHERES, null);
 		if(lines!=null){
-			Iterable<SphereData> datas=new SphereDataConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(lines));
+			sphereDataPanel.loadSphereDatas(lines,false);
+			/*
+			Iterable<SphereData> datas=new SphereDataCsvConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(lines));
 			for(SphereData data:datas){
 				sphereDataPanel.addSpereData(data);
 			}
+			*/
 		}else{
-			//if empty
-			sphereDataPanel.addSpereData(firstOne.clone());
+			//if empty really need?
+			//sphereDataPanel.addSpereData(firstOne.clone());
 		}
 		panel.add(sphereDataPanel);
 		

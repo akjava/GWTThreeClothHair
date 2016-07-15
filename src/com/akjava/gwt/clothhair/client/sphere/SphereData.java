@@ -5,6 +5,7 @@ import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
 
 public class SphereData {
+public static final String DATA_TYPE="SphereData";
 public static final int TYPE_SPHERE=0;
 public static final int TYPE_BOX=1;
 	
@@ -46,21 +47,24 @@ public SphereData clone(){
 
 public SphereData copyTo(SphereData data){
 	data.set(this.getX(),this.getY(),this.getZ());
-	data.setSize(this.getSize());
+	data.setWidth(this.getWidth());
+	data.setHeight(this.getHeight());
+	data.setDepth(this.getDepth());
+	
 	data.setEnabled(enabled);
 	data.setBoneIndex(boneIndex);
 	data.setChannel(channel);
 	data.setCopyHorizontal(copyHorizontal);
 	
 	data.setType(type);
-	data.getRotate().copy(rotate);
+	data.getRotation().copy(rotation);
 	return data;
 }
 
 public SphereData(double x, double y, double z, double size,boolean enabled,int boneIndex) {
 	super();
 	position.set(x, y, z);
-	this.size = size;
+	this.width = size;
 	this.enabled=enabled;
 	this.boneIndex=boneIndex;
 }
@@ -99,23 +103,41 @@ public double getZ() {
 public void setZ(double z) {
 	position.setZ(z);
 }
-public double getSize() {
-	return size;
+public double getWidth() {
+	return width;
 }
-public void setSize(double size) {
-	this.size = size;
+public void setWidth(double size) {
+	this.width = size;
 }
 
-private double size;
+private double width;
+private double height;
+public double getHeight() {
+	return height;
+}
 
-private Quaternion rotate=THREE.Quaternion();
+public void setHeight(double height) {
+	this.height = height;
+}
+
+public double getDepth() {
+	return depth;
+}
+
+public void setDepth(double depth) {
+	this.depth = depth;
+}
+
+private double depth;
+
+private Quaternion rotation=THREE.Quaternion();
 private int type; //sphere or box
-public Quaternion getRotate() {
-	return rotate;
+public Quaternion getRotation() {
+	return rotation;
 }
 
-public void setRotate(Quaternion rotate) {
-	this.rotate = rotate;
+public void setRotattion(Quaternion rotate) {
+	this.rotation = rotate;
 }
 
 public int getType() {

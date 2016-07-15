@@ -16,8 +16,8 @@ import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.akjava.lib.common.utils.CSVUtils;
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -41,7 +41,7 @@ public class SphereDataPanel extends VerticalPanel{
 	 
 	SphereDataControler controler;
 	SphereData defaultValue;
-	private SphereDataConverter sphereDataConverter=new SphereDataConverter();
+	private SphereDataCsvConverter sphereDataConverter=new SphereDataCsvConverter();
 	
 	public static final int FILTER_ALL=0;
 	public static final int FILTER_CHANNEL=1;
@@ -143,7 +143,7 @@ public class SphereDataPanel extends VerticalPanel{
 					TextColumn<SphereData> sizeColumn=new TextColumn<SphereData>() {
 						@Override
 						public String getValue(SphereData object) {
-							return String.valueOf(object.getSize());
+							return String.valueOf(object.getWidth());
 						}
 					};
 					table.addColumn(sizeColumn,"size");
@@ -185,7 +185,7 @@ public class SphereDataPanel extends VerticalPanel{
 					if(selection==null){
 						return;
 					}
-					SphereData newData=new SphereDataConverter().copy(selection);
+					SphereData newData=new SphereDataCsvConverter().copy(selection);
 					addSpereData(newData);
 					cellObjects.setSelected(newData, true);
 					
@@ -201,7 +201,7 @@ public class SphereDataPanel extends VerticalPanel{
 					if(selection==null){
 						return;
 					}
-					SphereData newData=new SphereDataConverter().copy(selection);
+					SphereData newData=new SphereDataCsvConverter().copy(selection);
 					newData.setX(newData.getX()*-1);
 					addSpereData(newData);
 					cellObjects.setSelected(newData, true);
@@ -249,18 +249,12 @@ public class SphereDataPanel extends VerticalPanel{
 					if(uploadModeBox.getSelectedIndex()==0){
 						clearAllSphereData();
 					}
-					//todo check validate
 					
-					 Iterable<SphereData> newDatas=sphereDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
-					 for(SphereData newData:newDatas){
-						 addSpereData(newData);
-						 cellObjects.setSelected(newData, true);//maybe last selected
-					 }
-					 
+					loadSphereDatas(text,file.getFileName().toLowerCase().endsWith(".csv"));
 					
 				}
 			}, true, "UTF-8");
-			 upload.setAccept(".csv");
+			 upload.setAccept(Lists.newArrayList(".csv",".json"));
 			 uploadPanel.add(upload);
 			 
 			 //downloads
@@ -274,7 +268,7 @@ public class SphereDataPanel extends VerticalPanel{
 				public void onClick(ClickEvent event) {
 					download.clear();
 					String text=toStoreText();
-					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "spheres.csv", "click to download",true);
+					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "spheres.json", "click to download",true);
 					download.add(a);
 				}
 			});
@@ -284,6 +278,34 @@ public class SphereDataPanel extends VerticalPanel{
 			 this.add(uploadPanel);
 			 this.add(downloadPanels);
 			
+	 }
+	 
+	 public void loadSphereDatas(String text,boolean isCsv){
+		//todo check validate
+			Iterable<SphereData> newDatas=null;
+			if(isCsv){
+				newDatas=sphereDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+				 for(SphereData newData:newDatas){
+					// LogUtils.log("newData:"+newData.getWidth());
+					//newData.setWidth(newData.getWidth()*2);//csv data is radius
+				//	 LogUtils.log("newData-m:"+newData.getWidth());
+					 //strangely if set here,clear value when read-newData
+				 }
+			}else{
+				newDatas=new SphereDataListConverter().reverse().convert(text);
+				
+			}
+			
+			// Iterable<SphereData> newDatas=sphereDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+			
+			 for(SphereData newData:newDatas){
+				// LogUtils.log("newData-a:"+newData.getWidth());
+				 if(isCsv){
+					 newData.setWidth(newData.getWidth()*2);//csv data is radius
+				 }
+				 addSpereData(newData);
+				 cellObjects.setSelected(newData, true);//maybe last selected
+			 }
 	 }
 	 
 	 public void updateSphereVisible() {
@@ -320,7 +342,7 @@ public class SphereDataPanel extends VerticalPanel{
 			}
 	}
 
-	private SphereDataConverter converter=new SphereDataConverter();
+	private SphereDataCsvConverter converter=new SphereDataCsvConverter();
 	 private StorageControler storageControler=new StorageControler();
 	private SphereDataEditor sphereDataEditor;
 	 public void onFlushed(){
@@ -338,7 +360,10 @@ public class SphereDataPanel extends VerticalPanel{
 	 }
 	 
 	 public String toStoreText(){
-		return Joiner.on("\r\n").join(converter.convertAll(cellObjects.getDatas()));
+		 
+		 return new SphereDataListConverter().convert(cellObjects.getDatas());
+		 
+		//return Joiner.on("\r\n").join(converter.convertAll(cellObjects.getDatas()));
 	 }
 	 
 	 public void addSpereData(SphereData data){

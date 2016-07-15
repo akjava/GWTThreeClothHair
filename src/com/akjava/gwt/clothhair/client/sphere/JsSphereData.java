@@ -26,10 +26,17 @@ public final  native void setRotate(Quaternion  param)/*-{
 this.rotate=param;
 }-*/;
 
+/**
+ * @deprecated
+ * @return
+ */
 public final  native double getRadius()/*-{
 return this.radius;
 }-*/;
-
+/**
+ * @deprecated
+ * @return
+ */
 public final  native void setRadius(double param)/*-{
 this.radius=param;
 }-*/;
@@ -40,5 +47,29 @@ return this.boneIndex;
 
 public final  native void setBoneIndex(int  param)/*-{
 this.boneIndex=param;
+}-*/;
+
+public final  native double getWidth()/*-{
+return this.width;
+}-*/;
+
+public final  native void setWidth(double param)/*-{
+this.width=param;
+}-*/;
+
+public final  native double getHeight()/*-{
+return this.height;
+}-*/;
+
+public final  native void setHeight(double param)/*-{
+this.height=param;
+}-*/;
+
+public final  native double getDepth()/*-{
+return this.depth;
+}-*/;
+
+public final  native void setDepth(double param)/*-{
+this.depth=param;
 }-*/;
 }

@@ -112,13 +112,13 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 				xRange.setValue(defaultValue.getX(),false);
 				yRange.setValue( defaultValue.getY(),false);
 				zRange.setValue(defaultValue.getZ(),false);
-				scaleRange.setValue(defaultValue.getSize(),true);//call flush here
+				scaleRange.setValue(defaultValue.getWidth(),true);//call flush here
 			}
 		});
 		
 		h1.add(reset);
 		
-		scaleRange = new LabeledInputRangeWidget2("scale", .001, 0.4, .001);
+		scaleRange = new LabeledInputRangeWidget2("width", .001, 0.4, .001);
 		scaleRange.getLabel().setWidth("40px");
 		scaleRange.getRange().setWidth("220px");
 		
@@ -247,7 +247,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			value.setX(xRange.getValue());
 			value.setY(yRange.getValue());
 			value.setZ(zRange.getValue());
-			value.setSize(scaleRange.getValue());
+			value.setWidth(scaleRange.getValue());
 			
 			value.setBoneIndex(boneIndexBox.getValue().getIndex());
 			
@@ -258,7 +258,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			value.setType(typeEditor.getSelectedIndex());
 			
 			
-			value.getRotate().setFromEuler(rotateEditor.getValue());
+			value.getRotation().setFromEuler(rotateEditor.getValue());
 			
 			//sync here?
 			panel.onFlushed();
@@ -357,10 +357,10 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			xRange.setValue(value.getX());
 			yRange.setValue(value.getY());
 			zRange.setValue(value.getZ());
-			scaleRange.setValue(value.getSize());
+			scaleRange.setValue(value.getWidth());
 			
 			typeEditor.setSelectedIndex(value.getType());
-			rotateEditor.setValue(THREE.Euler().setFromQuaternion(value.getRotate()));
+			rotateEditor.setValue(THREE.Euler().setFromQuaternion(value.getRotation()));
 			
 			
 			BoneData data=null;

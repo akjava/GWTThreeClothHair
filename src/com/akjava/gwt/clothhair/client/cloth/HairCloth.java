@@ -935,7 +935,7 @@ public class HairCloth {
 				 * 
 				 */
 				
-				BodyAndMesh body=createAmmoSphereBody(simulator,sphereMesh.getPosition().clone().multiplyScalar(ammoMultipleScalar),sphereMesh.getScale().getX()*ammoMultipleScalar,(JsSphereData)sphereMesh.getUserData().cast());
+				BodyAndMesh body=createAmmoSphereBody(simulator,sphereMesh.getPosition().clone().multiplyScalar(ammoMultipleScalar),sphereMesh.getScale().getX()*2*ammoMultipleScalar,(JsSphereData)sphereMesh.getUserData().cast());
 				body.setAmmoMultipleScalar(ammoMultipleScalar);
 				ammoSpheres.add(body);	
 			}
@@ -966,10 +966,10 @@ public class HairCloth {
 						}
 					}else{//box
 						
-						double radius=bodyAndMesh.castToBox().getBoxSize().getX()/2/ammoMultipleScalar/characterScale;
+						double width=bodyAndMesh.castToBox().getBoxSize().getX()/ammoMultipleScalar/characterScale;
 						//TODO support boxSize
-						if(!isSame(4, radius, jsData.getRadius())){
-							LogUtils.log("box-radius:"+jsData.getRadius()+","+radius);
+						if(!isSame(4, width, jsData.getWidth())){
+							LogUtils.log("box-radius:"+jsData.getWidth()+","+width);
 							needReCreate=true;
 						}
 						
@@ -1313,10 +1313,10 @@ public class HairCloth {
 		//
 		BodyAndMesh body=null;
 		if(sphereData.getType()==SphereData.TYPE_BOX){
-		body=BodyAndMesh.createBox(THREE.Vector3().setScalar(size*2), 0, position.getX(),position.getY(),position.getZ(),material);
+		body=BodyAndMesh.createBox(THREE.Vector3().setScalar(size), 0, position.getX(),position.getY(),position.getZ(),material);
 		//rotate later
 		}else{
-		body=BodyAndMesh.createSphere(size, 0, position.getX(),position.getY(),position.getZ(),material);	
+		body=BodyAndMesh.createSphere(size/2, 0, position.getX(),position.getY(),position.getZ(),material);	
 		}
 		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getCollisionProperties());
 		body.getBody().setActivationState(Ammo.DISABLE_DEACTIVATION);

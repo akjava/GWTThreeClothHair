@@ -1,6 +1,6 @@
 package com.akjava.gwt.clothhair.client.ammo;
 
-import com.akjava.gwt.clothhair.client.hair.HairDataConverter.JSONObjectWrapper;
+import com.akjava.gwt.clothhair.client.JSONObjectWrapper;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;

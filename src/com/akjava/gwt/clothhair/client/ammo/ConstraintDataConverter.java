@@ -2,7 +2,7 @@ package com.akjava.gwt.clothhair.client.ammo;
 
 import javax.annotation.Nullable;
 
-import com.akjava.gwt.clothhair.client.hair.HairDataConverter.JSONObjectWrapper;
+import com.akjava.gwt.clothhair.client.JSONObjectWrapper;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.THREE;

@@ -19,7 +19,7 @@ import com.akjava.gwt.clothhair.client.hair.HairPinDataFunctions.HairPinToNormal
 import com.akjava.gwt.clothhair.client.hair.HairPinPredicates;
 import com.akjava.gwt.clothhair.client.sphere.JsSphereData;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
-import com.akjava.gwt.clothhair.client.sphere.SphereDataConverter;
+import com.akjava.gwt.clothhair.client.sphere.SphereDataCsvConverter;
 import com.akjava.gwt.clothhair.client.texture.HairPatternDataUtils;
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.akjava.gwt.lib.client.CanvasUtils;
@@ -365,7 +365,7 @@ public class ClothSimulator  {
 
 	//direct load from text
 	public void loadSphereDatas(String text){
-		Iterable<SphereData> newDatas=new SphereDataConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
+		Iterable<SphereData> newDatas=new SphereDataCsvConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
 		 for(SphereData newData:newDatas){
 			 addSphereData(newData);
 		 }
@@ -403,8 +403,11 @@ public class ClothSimulator  {
 	private JsSphereData sphereDataToJsData(SphereData data){
 		JsSphereData jsData=JsSphereData.create();
 		jsData.setType(data.getType());
-		jsData.setRotate(data.getRotate().clone());
-		jsData.setRadius(data.getSize());
+		jsData.setRotate(data.getRotation().clone());
+		jsData.setRadius(data.getWidth()/2);//deprecated
+		jsData.setWidth(data.getWidth());
+		jsData.setHeight(data.getHeight());
+		jsData.setDepth(data.getDepth());
 		jsData.setBoneIndex(data.getBoneIndex());
 		return jsData;
 	}
@@ -419,7 +422,7 @@ public class ClothSimulator  {
 			//geometry.applyMatrix(THREE.Matrix4().makeRotationFromQuaternion(data.getRotate()));
 			collisionMesh = THREE.Mesh( geometry, material );	
 			}
-		collisionMesh.getScale().setScalar(data.getSize());
+		collisionMesh.getScale().setScalar(data.getWidth()/2);
 		collisionMesh.setUserData(sphereDataToJsData(data));
 		return collisionMesh;
 	}
@@ -449,7 +452,7 @@ public class ClothSimulator  {
 		for(SphereData data:sphereMeshMap.keySet()){
 			SphereCalculatorAndMesh sphereCalculatorAndMesh=sphereMeshMap.get(data);
 			sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(0).getVertex().copy(data.getPosition());
-			sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(1).getVertex().copy(data.getPosition()).gwtIncrementX(data.getSize());
+			sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(1).getVertex().copy(data.getPosition()).gwtIncrementX(data.getWidth()/2);
 			sphereCalculatorAndMesh.getCalculator().update();
 			
 			double size=sphereCalculatorAndMesh.getCalculator().getResult().get(0).distanceTo(sphereCalculatorAndMesh.getCalculator().getResult().get(1));
