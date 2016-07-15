@@ -43,6 +43,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 	
 	private SphereData defaultValue;
 	private SphereDataPanel panel;
+	private LabeledInputRangeWidget2 heightRange;
 	
 	public SphereDataEditor(final SphereData defaultValue,SphereDataPanel panel){
 		this.defaultValue=defaultValue;
@@ -132,6 +133,19 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		
 		RangeButtons scaleButtons=new RangeButtons(scaleRange);
 		positionPanel.add(scaleButtons);
+		
+		heightRange = new LabeledInputRangeWidget2("height", .001, 0.4, .001);
+		heightRange.getLabel().setWidth("40px");
+		heightRange.getRange().setWidth("220px");
+		
+		positionPanel.add(heightRange);
+		heightRange.addtRangeListener(new ValueChangeHandler<Number>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Number> event) {
+				flush();
+			}
+		});
+		
 		
 		VerticalPanel rotatePanel=new VerticalPanel();
 		tab.add(rotatePanel,"rotate");
@@ -260,6 +274,8 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			
 			value.getRotation().setFromEuler(rotateEditor.getValue());
 			
+			value.setHeight(heightRange.getValue());
+			
 			//sync here?
 			panel.onFlushed();
 		}
@@ -343,6 +359,8 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 				
 				rotateEditor.setEnabled(false);
 				typeEditor.setEnabled(false);
+				
+				heightRange.setEnabled(false);
 				return;
 			}
 			
@@ -352,6 +370,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			scaleRange.setEnabled(true);
 			rotateEditor.setEnabled(true);
 			typeEditor.setEnabled(true);
+			heightRange.setEnabled(true);
 			
 			//no need flush here
 			xRange.setValue(value.getX());
@@ -374,6 +393,8 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			channelBox.setSelectedIndex(value.getChannel());
 			
 			copyHorizontalCheck.setValue(value.isCopyHorizontal());
+			
+			heightRange.setValue(value.getHeight());
 		}
 		
 		public static interface SphereUpdateListener{

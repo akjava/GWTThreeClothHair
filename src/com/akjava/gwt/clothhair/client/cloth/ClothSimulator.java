@@ -36,6 +36,7 @@ import com.akjava.gwt.three.client.js.extras.geometries.BoxGeometry;
 import com.akjava.gwt.three.client.js.extras.geometries.SphereGeometry;
 import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
+import com.akjava.gwt.three.client.js.math.Euler;
 import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector2;
@@ -219,8 +220,11 @@ public class ClothSimulator  {
 		SphereData data2=mirrorMap.get(data);
 		if(data2!=null){
 			removeSphereMesh(data2);
+			sphereMeshMap.remove(data2);
 			mirrorMap.remove(data);
 		}
+		
+		sphereMeshMap.remove(data);
 	}
 	
 
@@ -241,15 +245,19 @@ public class ClothSimulator  {
 		//difference case
 		if(jsData.getType()!=data.getType()){
 			//LogUtils.log("syncSphereDataAndSkinningVertexCalculator:replace body type");
+			//LogUtils.log("sphereMap-size:"+sphereMeshMap.size());
 			removeSphereData(data);
+			//LogUtils.log("sphereMap-size:"+sphereMeshMap.size());
 			addSphereData(data);
+			//LogUtils.log("sphereMap-size:"+sphereMeshMap.size());
 			return;
 		}
 		
 		//update jsData
 		
 		//replace user data
-		sphereMeshMap.get(data).getMesh().setUserData(sphereDataToJsData(data));
+		jsData=sphereDataToJsData(data);
+		sphereMeshMap.get(data).getMesh().setUserData(jsData);
 		
 		//same time just update size & miror
 		
@@ -281,6 +289,8 @@ public class ClothSimulator  {
 			
 			if(sphereMeshMap.get(data2)==null){
 				initSphereCalculatorAndMesh(data2,0x880000).getCalculator();;
+			}else{//update
+				sphereMeshMap.get(data2).getMesh().setUserData(sphereDataToJsData(data2));
 			}
 			
 			SkinningVertexCalculator calculator2=sphereMeshMap.get(data2).getCalculator();
@@ -298,6 +308,7 @@ public class ClothSimulator  {
 			if(data2!=null){
 				removeSphereMesh(data2);
 				mirrorMap.remove(data);
+				sphereMeshMap.remove(data2);
 			}
 		}
 		
@@ -360,6 +371,10 @@ public class ClothSimulator  {
 			//LogUtils.log(mirrowName+","+index);
 		}
 		
+		//swap-z
+		Euler euler=THREE.Euler().setFromQuaternion(data.getRotation());
+		euler.setZ(-euler.getZ());
+		data.getRotation().setFromEuler(euler);
 		//TODO support rotation
 	}
 
@@ -382,7 +397,6 @@ public class ClothSimulator  {
 		
 		
 		this.getClothControler().addSphere(sphere,data.getChannel());
-		
 		
 		
 		sphereMeshMap.put(data, new SphereCalculatorAndMesh(characterMesh, data.getBoneIndex(), sphere));
@@ -416,13 +430,15 @@ public class ClothSimulator  {
 		Mesh collisionMesh=null;
 		if(data.getType()==SphereData.TYPE_SPHERE){
 			collisionMesh = THREE.Mesh( sphereGeometry, material );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
+			collisionMesh.getScale().setScalar(data.getWidth()/2);
 			}else {
 			//rotate here must be good?
 			Geometry geometry=boxGeometry;
 			//geometry.applyMatrix(THREE.Matrix4().makeRotationFromQuaternion(data.getRotate()));
-			collisionMesh = THREE.Mesh( geometry, material );	
+			collisionMesh = THREE.Mesh( geometry, material );
+			collisionMesh.getScale().set(data.getWidth()/2, data.getHeight()/2, data.getWidth()/2);
 			}
-		collisionMesh.getScale().setScalar(data.getWidth()/2);
+		
 		collisionMesh.setUserData(sphereDataToJsData(data));
 		return collisionMesh;
 	}
@@ -449,15 +465,25 @@ public class ClothSimulator  {
 	}
 	
 	public void updateSphereMeshs(){
+		//LogUtils.log("sphereMeshMap size="+sphereMeshMap.keySet().size());
 		for(SphereData data:sphereMeshMap.keySet()){
 			SphereCalculatorAndMesh sphereCalculatorAndMesh=sphereMeshMap.get(data);
 			sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(0).getVertex().copy(data.getPosition());
+			//i guess no need size scale
 			sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(1).getVertex().copy(data.getPosition()).gwtIncrementX(data.getWidth()/2);
 			sphereCalculatorAndMesh.getCalculator().update();
 			
 			double size=sphereCalculatorAndMesh.getCalculator().getResult().get(0).distanceTo(sphereCalculatorAndMesh.getCalculator().getResult().get(1));
 			//update sphere
-			sphereCalculatorAndMesh.getMesh().getScale().setScalar(size);
+			
+			double characterScale=getCharacterMesh().getScale().getX();
+			if(data.getType()==SphereData.TYPE_SPHERE){
+			//sphereCalculatorAndMesh.getMesh().getScale().setScalar(data.getX()/2*characterScale);
+				sphereCalculatorAndMesh.getMesh().getScale().setScalar(size);
+			}else if(data.getType()==SphereData.TYPE_BOX){
+				//LogUtils.log(size+","+(data.getWidth()*characterScale));
+				sphereCalculatorAndMesh.getMesh().getScale().set(data.getWidth()/2*characterScale,data.getHeight()/2*characterScale,data.getWidth()/2*characterScale);
+			}
 			sphereCalculatorAndMesh.getMesh().getPosition().copy(sphereCalculatorAndMesh.getCalculator().getResult().get(0));
 			
 			JsSphereData jsData=sphereCalculatorAndMesh.getMesh().getUserData().cast();

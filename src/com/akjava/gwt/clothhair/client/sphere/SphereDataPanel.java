@@ -301,7 +301,7 @@ public class SphereDataPanel extends VerticalPanel{
 			 for(SphereData newData:newDatas){
 				// LogUtils.log("newData-a:"+newData.getWidth());
 				 if(isCsv){
-					 newData.setWidth(newData.getWidth()*2);//csv data is radius
+					 newData.setWidth(newData.getWidth()*2);//csv data used radius need double-size
 				 }
 				 addSpereData(newData);
 				 cellObjects.setSelected(newData, true);//maybe last selected
