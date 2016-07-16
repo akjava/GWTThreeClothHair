@@ -497,21 +497,26 @@ public class ClothSimulator  {
 			if(jsData.getType()==SphereData.TYPE_BOX){
 			SkinnedMesh skinnedMesh=sphereCalculatorAndMesh.getCalculator().getSkinnedMesh();
 			
-			Matrix4 matrixWorldInv = THREE.Matrix4().getInverse( skinnedMesh.getMatrixWorld() );
-			Matrix4 boneMatrix =  THREE.Matrix4();
+		//	Matrix4 matrixWorldInv = THREE.Matrix4().getInverse( skinnedMesh.getMatrixWorld() );
+		//	Matrix4 boneMatrix =  THREE.Matrix4();
 			
 			Bone bone=skinnedMesh.getSkeleton().getBones().get(jsData.getBoneIndex());
 			
-			boneMatrix.multiplyMatrices( matrixWorldInv, bone.getMatrixWorld());
+		//	boneMatrix.multiplyMatrices( matrixWorldInv, bone.getMatrixWorld());
 			
 			/*
 			 * i trid this.some how not work correctly
 			 */
-			//Quaternion q=THREE.Quaternion().setFromRotationMatrix(bone.getMatrixWorld());
+			Quaternion q=bone.getWorldQuaternion(null);
 			
-			Quaternion q=THREE.Quaternion().setFromRotationMatrix(boneMatrix);
+			//Quaternion cq=THREE.Quaternion().setFromEuler(skinnedMesh.getRotation() );
+			
+			//Quaternion q=THREE.Quaternion().setFromRotationMatrix(boneMatrix);
+			//jsData.getRotate().multiplyQuaternions(jsData.getRotate(), cq);
 			q.multiplyQuaternions(q,jsData.getRotate());
 			
+			//q.multiplyQuaternions(q, cq);
+			//q.multiplyQuaternions(q, THREE.Quaternion().setFromRotationMatrix(skinnedMesh.getMatrixWorld() ));
 			
 			
 			/*
@@ -525,8 +530,8 @@ public class ClothSimulator  {
 			Euler euler3=THREE.Euler(euler.getX()+euler2.getX(), euler.getY()+euler2.getY(), euler.getZ()+euler2.getZ());
 			q.multiplyQuaternions(q,THREE.Quaternion().setFromEuler(euler3));
 			*/
-			
-			sphereCalculatorAndMesh.getMesh().setRotationFromQuaternion(q.normalize());
+			sphereCalculatorAndMesh.getMesh().setRotationFromQuaternion(q);
+			//sphereCalculatorAndMesh.getMesh().setRotationFromQuaternion(q.normalize());//why need normalize?
 			}
 		}
 	}
