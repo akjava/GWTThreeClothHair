@@ -64,7 +64,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		
 		
 		
-		xRange = new LabeledInputRangeWidget2("x", -.2, .2, .001);
+		xRange = new LabeledInputRangeWidget2("x", -.8, .8, .001);
 		positionPanel.add(xRange);
 		xRange.addtRangeListener(new ValueChangeHandler<Number>() {
 			@Override
@@ -219,6 +219,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		typeEditor = new ListBox();
 		typeEditor.addItem("Sphere");
 		typeEditor.addItem("Box");
+		typeEditor.addItem("Capsule");
 		typePanel.add(typeEditor);
 		typeEditor.addChangeHandler(new ChangeHandler() {
 			@Override

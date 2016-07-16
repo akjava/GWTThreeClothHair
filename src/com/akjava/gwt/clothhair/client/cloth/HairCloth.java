@@ -960,8 +960,19 @@ public class HairCloth {
 					double characterScale=simulator.getCharacterMesh().getScale().getX();
 					if(bodyAndMesh.getShapeType()==BodyAndMesh.TYPE_SPHERE){
 						double radius=bodyAndMesh.castToSphere().getRadius()/ammoMultipleScalar/characterScale;
-						if(!isSame(4, radius, jsData.getRadius())){
-							LogUtils.log("sphere-radius:"+jsData.getRadius()+","+radius);
+						if(!isSame(4, radius, jsData.getWidth()/2)){
+							LogUtils.log("sphere-radius:"+(jsData.getWidth()/2)+","+radius);
+							needReCreate=true;
+						}
+					}else if(bodyAndMesh.getShapeType()==BodyAndMesh.TYPE_CAPSULE){
+						double radius=bodyAndMesh.castToCapsule().getRadius()/ammoMultipleScalar/characterScale;
+						double height=bodyAndMesh.castToCapsule().getHeight()/ammoMultipleScalar/characterScale;
+						if(!isSame(4, radius, jsData.getWidth()/2)){
+							LogUtils.log("capsule-radius:"+(jsData.getWidth()/2)+","+radius);
+							needReCreate=true;
+						}else 
+						if(!isSame(4, height, jsData.getHeight())){
+							LogUtils.log("capsule-height:"+(jsData.getHeight())+","+height);
 							needReCreate=true;
 						}
 					}else{//box
@@ -1316,9 +1327,15 @@ public class HairCloth {
 		double w=sphereData.getWidth()*ammoMultipleScalar*characterScale;
 		double h=sphereData.getHeight()*ammoMultipleScalar*characterScale;
 		double d=sphereData.getDepth()*ammoMultipleScalar*characterScale;
-		body=BodyAndMesh.createBox(THREE.Vector3(w,h,w), 0, position.getX(),position.getY(),position.getZ(),material);
+		body=BodyAndMesh.createBox(THREE.Vector3(w,h,d), 0, position.getX(),position.getY(),position.getZ(),material);
 		//rotate later
-		}else{
+		}else if(sphereData.getType()==SphereData.TYPE_CAPSULE){
+			double radius=sphereData.getWidth()/2*ammoMultipleScalar*characterScale;
+			double h=sphereData.getHeight()*ammoMultipleScalar*characterScale;
+			
+			body=BodyAndMesh.createCapsule(radius,h, 0, position.getX(),position.getY(),position.getZ(),material);
+			//rotate later
+			}else{
 		double w=sphereData.getWidth()/2*ammoMultipleScalar*characterScale;
 		body=BodyAndMesh.createSphere(w, 0, position.getX(),position.getY(),position.getZ(),material);	
 		}

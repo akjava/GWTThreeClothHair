@@ -8,7 +8,8 @@ public class SphereData {
 public static final String DATA_TYPE="SphereData";
 public static final int TYPE_SPHERE=0;
 public static final int TYPE_BOX=1;
-	
+public static final int TYPE_CAPSULE=2;
+
 private Vector3 position=THREE.Vector3();
 private boolean enabled;
 private boolean copyHorizontal;

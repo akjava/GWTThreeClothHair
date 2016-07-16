@@ -48,6 +48,7 @@ import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
+import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.akjava.lib.common.utils.CSVUtils;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
@@ -243,15 +244,26 @@ public class ClothSimulator  {
 			return;
 		}
 		//difference case
+		boolean needRecreate=false;
 		if(jsData.getType()!=data.getType()){
-			//LogUtils.log("syncSphereDataAndSkinningVertexCalculator:replace body type");
-			//LogUtils.log("sphereMap-size:"+sphereMeshMap.size());
+			needRecreate=true;
+		}
+		
+		//this type can't handle size with scale
+		if(jsData.getType()==SphereData.TYPE_CAPSULE){
+			if(jsData.getWidth()!=data.getWidth() || jsData.getHeight()!=data.getHeight()){
+				needRecreate=true;
+			}
+		}
+		
+		if(needRecreate){
+			//LogUtils.log("cloth-simulator:sphere need re-create");
 			removeSphereData(data);
-			//LogUtils.log("sphereMap-size:"+sphereMeshMap.size());
 			addSphereData(data);
-			//LogUtils.log("sphereMap-size:"+sphereMeshMap.size());
 			return;
 		}
+		
+		
 		
 		//update jsData
 		
@@ -371,9 +383,10 @@ public class ClothSimulator  {
 			//LogUtils.log(mirrowName+","+index);
 		}
 		
-		//swap-z
+		//swap-x-z
 		Euler euler=THREE.Euler().setFromQuaternion(data.getRotation());
 		euler.setZ(-euler.getZ());
+		euler.setY(-euler.getY());
 		data.getRotation().setFromEuler(euler);
 		//TODO support rotation
 	}
@@ -431,7 +444,11 @@ public class ClothSimulator  {
 		if(data.getType()==SphereData.TYPE_SPHERE){
 			collisionMesh = THREE.Mesh( sphereGeometry, material );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
 			collisionMesh.getScale().setScalar(data.getWidth()/2);
-			}else {
+			}else if(data.getType()==SphereData.TYPE_CAPSULE){
+				Geometry geometry=BodyAndMesh.createCapsuleGeometry(data.getWidth()/2, data.getHeight());
+				collisionMesh = THREE.Mesh( geometry, material );//		sphere = new THREE.Mesh( ballGeo, ballMaterial );
+				collisionMesh.getScale().setScalar(1);
+				}else {
 			//rotate here must be good?
 			Geometry geometry=boxGeometry;
 			//geometry.applyMatrix(THREE.Matrix4().makeRotationFromQuaternion(data.getRotate()));
@@ -484,7 +501,12 @@ public class ClothSimulator  {
 			}else if(data.getType()==SphereData.TYPE_BOX){
 				//LogUtils.log(size+","+(data.getWidth()*characterScale));
 				sphereCalculatorAndMesh.getMesh().getScale().set(data.getWidth()/2*characterScale,data.getHeight()/2*characterScale,data.getDepth()/2*characterScale);
-			}
+			}else if(data.getType()==SphereData.TYPE_CAPSULE){
+				
+				//how to upgrade geometry
+				
+				sphereCalculatorAndMesh.getMesh().getScale().setScalar(characterScale);
+				}
 			sphereCalculatorAndMesh.getMesh().getPosition().copy(sphereCalculatorAndMesh.getCalculator().getResult().get(0));
 			
 			JsSphereData jsData=sphereCalculatorAndMesh.getMesh().getUserData().cast();
@@ -494,7 +516,7 @@ public class ClothSimulator  {
 			
 			
 			//box shape need rotation.
-			if(jsData.getType()==SphereData.TYPE_BOX){
+			if(jsData.getType()!=SphereData.TYPE_SPHERE){
 			SkinnedMesh skinnedMesh=sphereCalculatorAndMesh.getCalculator().getSkinnedMesh();
 			
 		//	Matrix4 matrixWorldInv = THREE.Matrix4().getInverse( skinnedMesh.getMatrixWorld() );
