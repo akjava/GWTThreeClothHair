@@ -697,7 +697,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			this.mesh = sphere;
 			calculator=new SkinningVertexCalculator(character);
 			calculator.add(new SkinningVertex(THREE.Vector3(), THREE.Vector4(boneIndex, boneIndex, boneIndex, boneIndex), THREE.Vector4(1,0,0,0)));
-			calculator.add(new SkinningVertex(THREE.Vector3(), THREE.Vector4(boneIndex, boneIndex, boneIndex, boneIndex), THREE.Vector4(1,0,0,0)));
+			//calculator.add(new SkinningVertex(THREE.Vector3(), THREE.Vector4(boneIndex, boneIndex, boneIndex, boneIndex), THREE.Vector4(1,0,0,0)));
 			
 		}
 		public Mesh getMesh() {

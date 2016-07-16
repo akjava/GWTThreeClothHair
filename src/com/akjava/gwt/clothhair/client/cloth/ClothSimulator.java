@@ -470,16 +470,17 @@ public class ClothSimulator  {
 			SphereCalculatorAndMesh sphereCalculatorAndMesh=sphereMeshMap.get(data);
 			sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(0).getVertex().copy(data.getPosition());
 			//i guess no need size scale
-			sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(1).getVertex().copy(data.getPosition()).gwtIncrementX(data.getWidth()/2);
+			
+			//sphereCalculatorAndMesh.getCalculator().getSkinningVertexs().get(1).getVertex().copy(data.getPosition()).gwtIncrementX(data.getWidth()/2);
 			sphereCalculatorAndMesh.getCalculator().update();
 			
-			double size=sphereCalculatorAndMesh.getCalculator().getResult().get(0).distanceTo(sphereCalculatorAndMesh.getCalculator().getResult().get(1));
+			//double size=sphereCalculatorAndMesh.getCalculator().getResult().get(0).distanceTo(sphereCalculatorAndMesh.getCalculator().getResult().get(1));
 			//update sphere
 			
 			double characterScale=getCharacterMesh().getScale().getX();
 			if(data.getType()==SphereData.TYPE_SPHERE){
 			//sphereCalculatorAndMesh.getMesh().getScale().setScalar(data.getX()/2*characterScale);
-				sphereCalculatorAndMesh.getMesh().getScale().setScalar(size);
+				sphereCalculatorAndMesh.getMesh().getScale().setScalar(data.getWidth()/2*characterScale);
 			}else if(data.getType()==SphereData.TYPE_BOX){
 				//LogUtils.log(size+","+(data.getWidth()*characterScale));
 				sphereCalculatorAndMesh.getMesh().getScale().set(data.getWidth()/2*characterScale,data.getHeight()/2*characterScale,data.getDepth()/2*characterScale);
