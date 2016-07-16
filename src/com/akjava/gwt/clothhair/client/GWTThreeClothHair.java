@@ -1156,6 +1156,12 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		selectShpere(selectedSphere);
 		
 	}
+	
+	public void reselectSphere(SphereData data){
+		if(selectedSphere!=null && data==selectedSphere){
+			selectShpere(selectedSphere);
+		}
+	}
 
 	private void selectShpere(@Nullable SphereData selectedSphere) {
 		if(selectedSphere==null){
@@ -1166,6 +1172,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	
 	private void unselectShpere(SphereData selectedSphere) {
+		if(clothSimulator.getSphereMeshMap().get(selectedSphere)==null){
+			return;//removed
+		}
 		MeshPhongMaterial material=clothSimulator.getSphereMeshMap().get(selectedSphere).getMesh().getMaterial().gwtCastMeshPhongMaterial();
 		material.getColor().setHex(0x888888);
 	}

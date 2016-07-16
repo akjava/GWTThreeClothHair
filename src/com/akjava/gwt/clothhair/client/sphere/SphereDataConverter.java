@@ -71,4 +71,8 @@ public class SphereDataConverter extends Converter<SphereData,JSONObject>{
 		return data;
 	}
 
+	public SphereData copy(SphereData data){
+		JSONObject text=doForward(data);
+		return doBackward(text);
+	}
 }

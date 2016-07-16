@@ -140,13 +140,13 @@ public class SphereDataPanel extends VerticalPanel{
 					};
 					table.addColumn(zColumn,"z");
 					
-					TextColumn<SphereData> sizeColumn=new TextColumn<SphereData>() {
+					TextColumn<SphereData> typeColumn=new TextColumn<SphereData>() {
 						@Override
 						public String getValue(SphereData object) {
-							return String.valueOf(object.getWidth());
+							return SphereData.getTypeLabel(object.getType());
 						}
 					};
-					table.addColumn(sizeColumn,"size");
+					table.addColumn(typeColumn,"type");
 				}
 			};
 			
@@ -185,7 +185,7 @@ public class SphereDataPanel extends VerticalPanel{
 					if(selection==null){
 						return;
 					}
-					SphereData newData=new SphereDataCsvConverter().copy(selection);
+					SphereData newData=new SphereDataConverter().copy(selection);
 					addSpereData(newData);
 					cellObjects.setSelected(newData, true);
 					
@@ -201,7 +201,7 @@ public class SphereDataPanel extends VerticalPanel{
 					if(selection==null){
 						return;
 					}
-					SphereData newData=new SphereDataCsvConverter().copy(selection);
+					SphereData newData=new SphereDataConverter().copy(selection);
 					newData.setX(newData.getX()*-1);
 					addSpereData(newData);
 					cellObjects.setSelected(newData, true);
@@ -310,6 +310,9 @@ public class SphereDataPanel extends VerticalPanel{
 	 
 	 public void updateSphereVisible() {
 		 SphereData selection=cellObjects.getSelection();
+		 if(selection==null){
+			 return;
+		 }
 		 for(SphereData data:cellObjects.getDatas()){
 			 Mesh mesh=GWTThreeClothHair.INSTANCE.getClothSimulator().getSphereMesh(data);
 			 Mesh mirror=GWTThreeClothHair.INSTANCE.getClothSimulator().getMirrorSphereMesh(data);

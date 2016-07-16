@@ -260,6 +260,7 @@ public class ClothSimulator  {
 			//LogUtils.log("cloth-simulator:sphere need re-create");
 			removeSphereData(data);
 			addSphereData(data);
+			GWTThreeClothHair.INSTANCE.reselectSphere(data);//how to know
 			return;
 		}
 		

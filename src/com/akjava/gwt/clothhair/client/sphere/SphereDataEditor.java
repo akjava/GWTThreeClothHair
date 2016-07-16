@@ -120,7 +120,12 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		
 		h1.add(reset);
 		
-		scaleRange = new LabeledInputRangeWidget2("width", .001, 0.4, .002);
+		HorizontalPanel typePanel2=new HorizontalPanel();
+		typePanel2.setVerticalAlignment(ALIGN_MIDDLE);
+		positionPanel.add(typePanel2);
+		positionPanel.add(new Label("Capsule must be height>width"));
+		
+		scaleRange = new LabeledInputRangeWidget2("width", .001, 0.8, .001);
 		scaleRange.getLabel().setWidth("40px");
 		scaleRange.getRange().setWidth("220px");
 		
@@ -135,7 +140,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		RangeButtons scaleButtons=new RangeButtons(scaleRange);
 		positionPanel.add(scaleButtons);
 		
-		heightRange = new LabeledInputRangeWidget2("height", .001, 0.4, .002);
+		heightRange = new LabeledInputRangeWidget2("height", .001, 0.8, .001);
 		heightRange.getLabel().setWidth("40px");
 		heightRange.getRange().setWidth("220px");
 		
@@ -146,10 +151,10 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 				flush();
 			}
 		});
-		RangeButtons heightButtons=new RangeButtons(heightRange);
+		heightButtons = new RangeButtons(heightRange);
 		positionPanel.add(heightButtons);
 		
-		depthRange = new LabeledInputRangeWidget2("depth", .001, 0.4, .002);
+		depthRange = new LabeledInputRangeWidget2("depth", .001, 0.8, .001);
 		depthRange.getLabel().setWidth("40px");
 		depthRange.getRange().setWidth("220px");
 		
@@ -160,7 +165,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 				flush();
 			}
 		});
-		RangeButtons depthButtons=new RangeButtons(depthRange);
+		depthButtons = new RangeButtons(depthRange);
 		positionPanel.add(depthButtons);
 		
 		
@@ -211,19 +216,19 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		HorizontalPanel panel1=new HorizontalPanel();
 		panel1.setVerticalAlignment(ALIGN_MIDDLE);
 		
-		HorizontalPanel typePanel=new HorizontalPanel();
-		panel1.add(typePanel);
-		typePanel.setVerticalAlignment(ALIGN_MIDDLE);
-		typePanel.add(new Label("Type:"));
+		typePanel2.add(new Label("Type:"));
 		
 		typeEditor = new ListBox();
 		typeEditor.addItem("Sphere");
 		typeEditor.addItem("Box");
 		typeEditor.addItem("Capsule");
-		typePanel.add(typeEditor);
+		typePanel2.add(typeEditor);
 		typeEditor.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
+				int type=typeEditor.getSelectedIndex();
+				updateSizeButtons(type);
+				
 				flush();
 			}
 		});
@@ -265,6 +270,28 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 
 	
 	
+protected void updateSizeButtons(int type) {
+	if(type==SphereData.TYPE_BOX){
+		heightRange.setVisible(true);
+		heightButtons.setVisible(true);
+		depthRange.setVisible(true);
+		depthButtons.setVisible(true);
+	}else if(type==SphereData.TYPE_CAPSULE){
+		heightRange.setVisible(true);
+		heightButtons.setVisible(true);
+		depthRange.setVisible(false);
+		depthButtons.setVisible(false);
+	}else if(type==SphereData.TYPE_SPHERE){
+		heightRange.setVisible(false);
+		heightButtons.setVisible(false);
+		depthRange.setVisible(false);
+		depthButtons.setVisible(false);
+	}
+	}
+
+
+
+
 @Override
 		public void setDelegate(EditorDelegate<SphereData> delegate) {
 			// TODO Auto-generated method stub
@@ -361,6 +388,8 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		private CheckBox copyHorizontalCheck;
 		private ListBox typeEditor;
 		private SimpleEulerEditor rotateEditor;
+		private RangeButtons depthButtons;
+		private RangeButtons heightButtons;
 		@Override
 		public void setValue(SphereData value) {
 			this.value=value;
@@ -416,6 +445,8 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			
 			heightRange.setValue(value.getHeight());
 			depthRange.setValue(value.getDepth());
+			
+			updateSizeButtons(value.getType());
 		}
 		
 		public static interface SphereUpdateListener{

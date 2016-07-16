@@ -149,4 +149,15 @@ public void setType(int type) {
 	this.type = type;
 }
 
+public static String getTypeLabel(int type) {
+	if(type==TYPE_SPHERE){
+		return "Sphere";
+	}else if(type==TYPE_BOX){
+		return "Box";
+	}else if(type==TYPE_CAPSULE){
+		return "Capsule";
+	}
+	return "Unknown";
+}
+
 }
