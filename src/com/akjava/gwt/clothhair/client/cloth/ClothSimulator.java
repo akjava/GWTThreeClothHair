@@ -436,7 +436,7 @@ public class ClothSimulator  {
 			Geometry geometry=boxGeometry;
 			//geometry.applyMatrix(THREE.Matrix4().makeRotationFromQuaternion(data.getRotate()));
 			collisionMesh = THREE.Mesh( geometry, material );
-			collisionMesh.getScale().set(data.getWidth()/2, data.getHeight()/2, data.getWidth()/2);
+			collisionMesh.getScale().set(data.getWidth()/2, data.getHeight()/2, data.getDepth()/2);
 			}
 		
 		collisionMesh.setUserData(sphereDataToJsData(data));
@@ -482,7 +482,7 @@ public class ClothSimulator  {
 				sphereCalculatorAndMesh.getMesh().getScale().setScalar(size);
 			}else if(data.getType()==SphereData.TYPE_BOX){
 				//LogUtils.log(size+","+(data.getWidth()*characterScale));
-				sphereCalculatorAndMesh.getMesh().getScale().set(data.getWidth()/2*characterScale,data.getHeight()/2*characterScale,data.getWidth()/2*characterScale);
+				sphereCalculatorAndMesh.getMesh().getScale().set(data.getWidth()/2*characterScale,data.getHeight()/2*characterScale,data.getDepth()/2*characterScale);
 			}
 			sphereCalculatorAndMesh.getMesh().getPosition().copy(sphereCalculatorAndMesh.getCalculator().getResult().get(0));
 			
@@ -511,8 +511,18 @@ public class ClothSimulator  {
 			Quaternion q=THREE.Quaternion().setFromRotationMatrix(boneMatrix);
 			q.multiplyQuaternions(q,jsData.getRotate());
 			
-			/*
 			
+			
+			/*
+			 * without animation works good,however faild on animation
+			 */
+			/*
+			Euler euler=THREE.Euler().setFromQuaternion(jsData.getRotate());
+			Euler euler2=THREE.Euler().setFromQuaternion(characterMesh.getQuaternion());
+			//ThreeLog.log("jsData:",euler);
+			
+			Euler euler3=THREE.Euler(euler.getX()+euler2.getX(), euler.getY()+euler2.getY(), euler.getZ()+euler2.getZ());
+			q.multiplyQuaternions(q,THREE.Quaternion().setFromEuler(euler3));
 			*/
 			
 			sphereCalculatorAndMesh.getMesh().setRotationFromQuaternion(q.normalize());

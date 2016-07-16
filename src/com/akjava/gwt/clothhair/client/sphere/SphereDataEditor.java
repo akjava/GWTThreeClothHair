@@ -44,6 +44,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 	private SphereData defaultValue;
 	private SphereDataPanel panel;
 	private LabeledInputRangeWidget2 heightRange;
+	private LabeledInputRangeWidget2 depthRange;
 	
 	public SphereDataEditor(final SphereData defaultValue,SphereDataPanel panel){
 		this.defaultValue=defaultValue;
@@ -119,7 +120,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		
 		h1.add(reset);
 		
-		scaleRange = new LabeledInputRangeWidget2("width", .001, 0.4, .001);
+		scaleRange = new LabeledInputRangeWidget2("width", .001, 0.4, .002);
 		scaleRange.getLabel().setWidth("40px");
 		scaleRange.getRange().setWidth("220px");
 		
@@ -134,7 +135,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 		RangeButtons scaleButtons=new RangeButtons(scaleRange);
 		positionPanel.add(scaleButtons);
 		
-		heightRange = new LabeledInputRangeWidget2("height", .001, 0.4, .001);
+		heightRange = new LabeledInputRangeWidget2("height", .001, 0.4, .002);
 		heightRange.getLabel().setWidth("40px");
 		heightRange.getRange().setWidth("220px");
 		
@@ -145,6 +146,22 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 				flush();
 			}
 		});
+		RangeButtons heightButtons=new RangeButtons(heightRange);
+		positionPanel.add(heightButtons);
+		
+		depthRange = new LabeledInputRangeWidget2("depth", .001, 0.4, .002);
+		depthRange.getLabel().setWidth("40px");
+		depthRange.getRange().setWidth("220px");
+		
+		positionPanel.add(depthRange);
+		depthRange.addtRangeListener(new ValueChangeHandler<Number>() {
+			@Override
+			public void onValueChange(ValueChangeEvent<Number> event) {
+				flush();
+			}
+		});
+		RangeButtons depthButtons=new RangeButtons(depthRange);
+		positionPanel.add(depthButtons);
 		
 		
 		VerticalPanel rotatePanel=new VerticalPanel();
@@ -275,7 +292,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			value.getRotation().setFromEuler(rotateEditor.getValue());
 			
 			value.setHeight(heightRange.getValue());
-			
+			value.setDepth(depthRange.getValue());
 			//sync here?
 			panel.onFlushed();
 		}
@@ -361,6 +378,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 				typeEditor.setEnabled(false);
 				
 				heightRange.setEnabled(false);
+				depthRange.setEnabled(false);
 				return;
 			}
 			
@@ -371,6 +389,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			rotateEditor.setEnabled(true);
 			typeEditor.setEnabled(true);
 			heightRange.setEnabled(true);
+			depthRange.setEnabled(true);
 			
 			//no need flush here
 			xRange.setValue(value.getX());
@@ -395,6 +414,7 @@ public class SphereDataEditor extends VerticalPanel implements Editor<SphereData
 			copyHorizontalCheck.setValue(value.isCopyHorizontal());
 			
 			heightRange.setValue(value.getHeight());
+			depthRange.setValue(value.getDepth());
 		}
 		
 		public static interface SphereUpdateListener{
