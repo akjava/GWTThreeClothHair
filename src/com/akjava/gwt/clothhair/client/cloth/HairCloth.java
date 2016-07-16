@@ -1076,7 +1076,7 @@ public class HairCloth {
 				}
 				*/
 				
-				BodyAndMesh p=createAmmoParticle(simulator,particle.getOriginal().clone().multiplyScalar(ammoMultipleScalar), mass);
+				BodyAndMesh p=createAmmoParticle(simulator,particle.getOriginal().clone().multiplyScalar(ammoMultipleScalar), mass,v);
 				p.setAmmoMultipleScalar(ammoMultipleScalar);
 				ammoParticles.add(p);
 				
@@ -1098,12 +1098,9 @@ public class HairCloth {
 				int p1y=p1/(w+1);
 				int p2y=p2/(w+1);
 				
-				boolean useB=false;
 				
 				boolean horizontalConnection=p1y==p2y;
-				if(p1y>5 ){
-					//useB=true;
-				}
+				
 				
 				
 				BodyAndMesh bm1=ammoParticles.get(p1);
@@ -1116,25 +1113,15 @@ public class HairCloth {
 				
 				AmmoConstraintPropertyData distanceConstraintProperties=simulator.getAmmoHairControler().getParticleConstraintData();
 				
-				if(useB){//trying tight maybe narrow is good for this
-					distanceConstraintProperties.setFrameInARelativePosRatio(0.5);
-					distanceConstraintProperties.setFrameInBRelativePosRatio(-0.5);
+				if(horizontalConnection){ 
+					//use tight make shaking but tigh together.
+					distanceConstraintProperties.setFrameInARelativePosRatio(distanceConstraintProperties.getFrameInARelativePosRatio());
+					distanceConstraintProperties.setFrameInBRelativePosRatio(distanceConstraintProperties.getFrameInBRelativePosRatio());
 				}else{
-					
-					if(horizontalConnection){ 
-						//use tight make shaking but tigh together.
-						distanceConstraintProperties.setFrameInARelativePosRatio(0);
-						distanceConstraintProperties.setFrameInBRelativePosRatio(-1);
-					}else{
-						//A alway fixed,never rotate
-						distanceConstraintProperties.setFrameInARelativePosRatio(0);
-						distanceConstraintProperties.setFrameInBRelativePosRatio(-1);
-					}
-					
+					//A alway fixed,never rotate
+					distanceConstraintProperties.setFrameInARelativePosRatio(distanceConstraintProperties.getFrameInARelativePosRatio());
+					distanceConstraintProperties.setFrameInBRelativePosRatio(distanceConstraintProperties.getFrameInBRelativePosRatio());
 				}
-				//not using distance here.
-				
-				//is half working?
 				
 				
 				
@@ -1347,23 +1334,30 @@ public class HairCloth {
 		
 	}
 
-	private BodyAndMesh createAmmoParticle(ClothSimulator simulator,Vector3 p,double mass){
+	private BodyAndMesh createAmmoParticle(ClothSimulator simulator,Vector3 p,double mass,int v){
 		//i tried x-y-z differenct size,but it's seems impossible to control side on circle
 		double x=restDistance*ammoMultipleScalar*hairData.getParticleRadiusRatio();
 		
+		if(v==h){
+			//TODO interporate
+		}
 		int type=hairData.getParticleType();
 		
 		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x008800).visible(visibleDummy));//dummy
 		
-		LogUtils.log("particle-type:"+type);
+		//LogUtils.log("particle-type:"+type);
 		//SphereBodyAndMesh 
 		BodyAndMesh body=null;
 		if(type==BodyAndMesh.TYPE_BOX){
 			body=BodyAndMesh.createBox(THREE.Vector3(x*2,x*2,x*2), mass, p,material);
+			//body=BodyAndMesh.createBox(THREE.Vector3(x*2*4,x*2*4,x*2), mass, p,material);//plain
 		}else if(type==BodyAndMesh.TYPE_CAPSULE){
-			body=BodyAndMesh.createCapsule(x,x*2*2, mass, p,material);
+			//tryied but faild,maybe becaus of gravity can't keep direction
+			body=BodyAndMesh.createCapsule(x,x*2, mass, p,THREE.Quaternion().setFromEuler(THREE.Euler(0,0, Math.toRadians(0))),material);
+			//body.getBody().setRotation());
 		}else if(type==BodyAndMesh.TYPE_CYLINDER){
 			body=BodyAndMesh.createCylinder(x,x*2, mass, p,material);
+			
 		}else if(type==BodyAndMesh.TYPE_CONE){
 			body=BodyAndMesh.createCone(x,x*2, mass, p,material);
 		}else{
