@@ -504,6 +504,16 @@ public void setHairPins(List<HairPin> hairPins) {
 	 */
 	private double ammoParticleRadiusRatio=0.5;//for ammo cloth
 	
+	private double ammoEndParticleRadiusRatio=0;
+	
+	public double getAmmoEndParticleRadiusRatio() {
+		return ammoEndParticleRadiusRatio;
+	}
+
+	public void setAmmoEndParticleRadiusRatio(double ammoEndParticleRadiusRatio) {
+		this.ammoEndParticleRadiusRatio = ammoEndParticleRadiusRatio;
+	}
+
 	public double getParticleRadiusRatio() {
 		return ammoParticleRadiusRatio;
 	}

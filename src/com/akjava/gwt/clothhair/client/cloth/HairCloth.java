@@ -1337,9 +1337,13 @@ public class HairCloth {
 	private BodyAndMesh createAmmoParticle(ClothSimulator simulator,Vector3 p,double mass,int v){
 		//i tried x-y-z differenct size,but it's seems impossible to control side on circle
 		double x=restDistance*ammoMultipleScalar*hairData.getParticleRadiusRatio();
+		double endX=restDistance*ammoMultipleScalar*hairData.getAmmoEndParticleRadiusRatio();
 		
 		if(v==h){
 			//TODO interporate
+			if(endX!=0){
+				x=endX;
+			}
 		}
 		int type=hairData.getParticleType();
 		

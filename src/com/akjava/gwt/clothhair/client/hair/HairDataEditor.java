@@ -83,6 +83,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private LabeledInputRangeWidget2 thickEditor;
 		private DoubleBox extendOutsideRatioEditor;
 		private LabeledInputRangeWidget2 particleRadiusEditor;
+		private LabeledInputRangeWidget2 particleEndRadiusEditor;
 		private ValueListBox<HairType> hairTypeEditor;
 		private List<HairType> hairTypeList;
 		
@@ -383,11 +384,17 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			
 			
 			//option1Pane2.add(new Label("particleRadiusR:"));
-			particleRadiusEditor = new LabeledInputRangeWidget2("particleRadiusR",0,10,0.01);
+			particleRadiusEditor = new LabeledInputRangeWidget2("particleRadiusR",0.01,10,0.01);
 			particleRadiusEditor.setTitle("ratio 0.5 is max.can visible on particle setting");
 			particleRadiusEditor.setButtonVisible(true);
 			option1Pane2.add(particleRadiusEditor);
 			particleRadiusEditor.getLabel().setWidth("115px");
+			
+			particleEndRadiusEditor = new LabeledInputRangeWidget2("par..EndRadiusR",0,10,0.01);
+			particleEndRadiusEditor.setTitle("ratio 0.5 is max.can visible on particle setting");
+			particleEndRadiusEditor.setButtonVisible(true);
+			ammoPanel.add(particleEndRadiusEditor);
+			particleEndRadiusEditor.getLabel().setWidth("115px");
 			
 			
 			HorizontalPanel option1Pane3=new HorizontalPanel();
@@ -486,6 +493,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setExtendOutsideRatio(extendOutsideRatioEditor.getValue());
 				value.setThickRatio(thickEditor.getValue());
 				value.setParticleRadiusRatio(particleRadiusEditor.getValue());
+				value.setAmmoEndParticleRadiusRatio(particleEndRadiusEditor.getValue());
 				
 				value.setSyncForceLinear(syncForceLinearEditor.getValue());
 				value.setSyncMoveLinear(syncMoveLinearEditor.getValue());
@@ -542,6 +550,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				extendOutsideRatioEditor.setValue(value.getExtendOutsideRatio());
 				thickEditor.setValue(value.getThickRatio());
 				particleRadiusEditor.setValue(value.getParticleRadiusRatio());
+				particleEndRadiusEditor.setValue(value.getAmmoEndParticleRadiusRatio());
 				
 				syncForceLinearEditor.setValue(value.getSyncForceLinear());
 				syncMoveLinearEditor.setValue(value.getSyncMoveLinear());
