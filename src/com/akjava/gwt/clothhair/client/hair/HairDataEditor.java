@@ -97,6 +97,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private DoubleBox circleRangeMin;
 		private DoubleBox circleRangeMax;
 		private DoubleBox circleInRangeRatio;
+		private ListBox particleTypeBox;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -360,9 +361,25 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			
 			
 			
+			HorizontalPanel option1Pane0=new HorizontalPanel();
+			option1Pane0.setVerticalAlignment(ALIGN_MIDDLE);
+			ammoPanel.add(option1Pane0);
+			
+			particleTypeBox = new ListBox();
+			particleTypeBox.addItem("Sphere");
+			particleTypeBox.addItem("Box");
+			particleTypeBox.addItem("Capsule");
+			particleTypeBox.addItem("Cylinder");
+			particleTypeBox.addItem("Cone");
+			particleTypeBox.setSelectedIndex(1);
+			option1Pane0.add(particleTypeBox);
+			
+			
 			HorizontalPanel option1Pane2=new HorizontalPanel();
 			option1Pane2.setVerticalAlignment(ALIGN_MIDDLE);
 			ammoPanel.add(option1Pane2);
+			
+			
 			
 			
 			//option1Pane2.add(new Label("particleRadiusR:"));
@@ -482,6 +499,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setAmmoCircleRangeMin(circleRangeMin.getValue());
 				value.setAmmoCircleRangeMax(circleRangeMax.getValue());
 				value.setAmmoCircleInRangeRatio(circleInRangeRatio.getValue());
+				value.setParticleType(particleTypeBox.getSelectedIndex());
 			}
 
 			@Override
@@ -553,6 +571,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				circleRangeMin.setValue(value.getAmmoCircleRangeMin());
 				circleRangeMax.setValue(value.getAmmoCircleRangeMax());
 				circleInRangeRatio.setValue(value.getAmmoCircleInRangeRatio());
+				particleTypeBox.setSelectedIndex(value.getParticleType());
 				
 			}
 	}

@@ -63,6 +63,7 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		JSONObject ammoObject=new JSONObject();
 		JSONObjectWrapper ammoObjectWrapper=new JSONObjectWrapper(ammoObject);
 		wrapper.setObject("ammo", ammoObject);
+		ammoObjectWrapper.setInt("particleType", hairData.getParticleType());
 		ammoObjectWrapper.setDouble("particleRadiusRatio", hairData.getParticleRadiusRatio());
 		ammoObjectWrapper.setDouble("syncMoveLinear", hairData.getSyncMoveLinear());
 		ammoObjectWrapper.setDouble("syncForceLinear", hairData.getSyncForceLinear());
@@ -166,6 +167,7 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		
 		JSONObjectWrapper ammoObjectWrapper=object.getObject("ammo");
 		if(ammoObjectWrapper!=null){
+			hairData.setParticleType(ammoObjectWrapper.getInt("particleType", hairData.getParticleType()));
 			hairData.setParticleRadiusRatio(ammoObjectWrapper.getDouble("particleRadiusRatio", hairData.getParticleRadiusRatio()));
 			hairData.setSyncMoveLinear(ammoObjectWrapper.getDouble("syncMoveLinear", hairData.getSyncMoveLinear()));
 			hairData.setSyncForceLinear(ammoObjectWrapper.getDouble("syncForceLinear", hairData.getSyncForceLinear()));

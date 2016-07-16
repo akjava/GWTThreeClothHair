@@ -1351,12 +1351,24 @@ public class HairCloth {
 		//i tried x-y-z differenct size,but it's seems impossible to control side on circle
 		double x=restDistance*ammoMultipleScalar*hairData.getParticleRadiusRatio();
 		
-		
+		int type=hairData.getParticleType();
 		
 		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x008800).visible(visibleDummy));//dummy
 		
-		//SphereBodyAndMesh body=BodyAndMesh.createSphere(s, mass, p,material);
-		BoxBodyAndMesh body=BodyAndMesh.createBox(THREE.Vector3(x*2,x*2,x*2), mass, p,material);
+		LogUtils.log("particle-type:"+type);
+		//SphereBodyAndMesh 
+		BodyAndMesh body=null;
+		if(type==BodyAndMesh.TYPE_BOX){
+			body=BodyAndMesh.createBox(THREE.Vector3(x*2,x*2,x*2), mass, p,material);
+		}else if(type==BodyAndMesh.TYPE_CAPSULE){
+			body=BodyAndMesh.createCapsule(x,x*2*2, mass, p,material);
+		}else if(type==BodyAndMesh.TYPE_CYLINDER){
+			body=BodyAndMesh.createCylinder(x,x*2, mass, p,material);
+		}else if(type==BodyAndMesh.TYPE_CONE){
+			body=BodyAndMesh.createCone(x,x*2, mass, p,material);
+		}else{
+			body=BodyAndMesh.createSphere(x, mass, p,material);
+		}
 		
 		
 		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getParticleBodyData());

@@ -3,6 +3,7 @@ package com.akjava.gwt.clothhair.client.hair;
 import java.util.List;
 
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
+import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import com.google.gwt.json.client.JSONObject;
@@ -13,7 +14,16 @@ import com.google.gwt.json.client.JSONObject;
  *
  */
 public class HairData {
-	public static final String DATA_TYPE="HairData";
+public static final String DATA_TYPE="HairData";
+private int particleType=BodyAndMesh.TYPE_BOX;
+
+public int getParticleType() {
+	return particleType;
+}
+
+public void setParticleType(int particleType) {
+	this.particleType = particleType;
+}
 private boolean ammoStartCenterCircle;
 	
 public boolean isAmmoStartCenterCircle() {
