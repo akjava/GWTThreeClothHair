@@ -1195,7 +1195,7 @@ public class HairCloth {
 			
 			helper.setVisible(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone());//TODO get visible from setting
 			
-			
+			skipSync=true;
 			}else  if(hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_HAIR){
 				//create bone mesh
 				//position keep same
@@ -1204,6 +1204,7 @@ public class HairCloth {
 				}
 			
 			simulator.getAmmoHairControler().setParticleData(this,data );
+			skipSync=true;
 		}else{
 			updateParticles(simulator);
 		}
