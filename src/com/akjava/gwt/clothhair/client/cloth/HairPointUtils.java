@@ -2,6 +2,7 @@ package com.akjava.gwt.clothhair.client.cloth;
 
 import java.util.List;
 
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.math.Vector2;
@@ -12,10 +13,23 @@ public class HairPointUtils {
 	private HairPointUtils(){}
 	//two point style
 	public static void syncCircleStyle(HairCloth hairCloth,Vector3 centerPoint,Vector3 addPoint,boolean hairPinOnly){
+		
+		
+		
 		boolean startCenter=hairCloth.isStartCircleCenter();//start circle from center or not
 		boolean startAndEndSame=hairCloth.isStartAndEndSameCircle();
 		
 		boolean useFirstPointY=hairCloth.isUseFirstPointY();
+		
+		
+		//TODO parameter,to keep extrude shape same direction
+		if(centerPoint.getX() == addPoint.getX()){
+			addPoint.gwtIncrementX(0.001);
+		}
+		if(centerPoint.getZ() == addPoint.getZ()){
+			addPoint.gwtIncrementZ(0.001);
+		}
+		
 		
 		int cw=hairCloth.getSizeOfU();
 		
@@ -51,6 +65,9 @@ public class HairPointUtils {
 		if(hairPinOnly){
 			return;
 		}
+		
+		ThreeLog.log("center",centerPoint);
+		ThreeLog.log("add",addPoint);
 		
 		for(int j=hairCloth.getW()+1;j<hairCloth.particles.size();j++){
 			int x=j%(hairCloth.getW()+1);
