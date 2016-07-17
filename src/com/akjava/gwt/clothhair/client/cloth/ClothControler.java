@@ -211,16 +211,16 @@ public class ClothControler {
 			
 			
 			
-			List<Vector3> generalPinVectors=Lists.newArrayList();
-			List<Vector3> customlVector=Lists.newArrayList();
+			List<Vector3> generalPinVertex=Lists.newArrayList();
+			List<Vector3> customlVertex=Lists.newArrayList();
 			List<Integer> customTarget=Lists.newArrayList();
 			
 			
 			for(int i=0;i<data.getCalculator().getSkinningVertexs().size();i++){
 				if(data.getCalculator().getSkinningVertexs().get(i).getTargetClothIndex()==-1){
-					generalPinVectors.add(data.getCalculator().getResult().get(i));
+					generalPinVertex.add(data.getCalculator().getResult().get(i));
 				}else{
-					customlVector.add(data.getCalculator().getResult().get(i));
+					customlVertex.add(data.getCalculator().getResult().get(i));
 					customTarget.add(data.getCalculator().getSkinningVertexs().get(i).getTargetClothIndex());
 				}
 			}
@@ -237,21 +237,21 @@ public class ClothControler {
 			 * 
 			 */
 			
-			int pinSize=generalPinVectors.size();
+			int generalPinSize=generalPinVertex.size();
 			
-			int cw=data.getCloth().getW()/(pinSize-1);//TODO change just size of U
+			int sizeOfU=data.getCloth().getW()/(generalPinSize-1);//TODO change just size of U
 			
-			if(cw!=data.getCloth().getSizeOfU()){
-				LogUtils.log("invalid size of u:"+cw);
+			if(sizeOfU!=data.getCloth().getSizeOfU()){
+				LogUtils.log("invalid size of u:"+sizeOfU);
 			}
 			
 			Vector3 diff=THREE.Vector3();
-			for(int i=0;i<pinSize;i++){
-				Vector3 v1=generalPinVectors.get(i);//data.getCalculator().getResult().get(i);
+			for(int i=0;i<generalPinSize;i++){
+				Vector3 v1=generalPinVertex.get(i);//data.getCalculator().getResult().get(i);
 				
-				int index=cw*i;
+				int index=sizeOfU*i;
 				
-				if(i==0){
+				if(i==0){//used for sync
 					diff.copy(data.getCloth().particles.get(0).position).sub(v1);
 				}
 				
@@ -260,16 +260,16 @@ public class ClothControler {
 				}
 				//LogUtils.log("main:"+index);
 				
-				
-				if(i!=pinSize-1){
+				//interpolate
+				if(i!=generalPinSize-1){
 					//has next;
-					Vector3 v2=generalPinVectors.get(i+1);
+					Vector3 v2=generalPinVertex.get(i+1);
 					//Vector3 v2=data.getCalculator().getResult().get(i+1);
 					
 					
-					Vector3 sub=v2.clone().sub(v1).divideScalar(cw);
+					Vector3 sub=v2.clone().sub(v1).divideScalar(sizeOfU);
 					
-					for(int j=1;j<cw;j++){
+					for(int j=1;j<sizeOfU;j++){
 						int multiple=j;
 						int at=index+j;
 						Vector3 v=sub.clone().multiplyScalar(multiple).add(v1);
@@ -287,7 +287,7 @@ public class ClothControler {
 			
 			//complete sync
 			if(data.getCloth().isSyncMove()){
-				for(int i=cw;i<data.getCloth().particles.size();i++){
+				for(int i=sizeOfU;i<data.getCloth().particles.size();i++){
 					data.getCloth().particles.get(i).position.sub(diff);
 					data.getCloth().particles.get(i).previous.sub(diff);
 				}
@@ -295,8 +295,8 @@ public class ClothControler {
 			
 			//custom - update
 			
-			for(int i=0;i<customlVector.size();i++){
-				Vector3 v=customlVector.get(i);
+			for(int i=0;i<customlVertex.size();i++){
+				Vector3 v=customlVertex.get(i);
 				
 				if(data.getCloth().isPinned(customTarget.get(i))){
 					data.getCloth().particles.get(customTarget.get(i)).setAllPosition(v);

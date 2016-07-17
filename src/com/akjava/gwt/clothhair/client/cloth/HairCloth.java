@@ -159,6 +159,10 @@ public class HairCloth {
 	
 	double TIMESTEP_SQ = PLAIN_CLOTH_TIMESTEP * PLAIN_CLOTH_TIMESTEP;
 
+	/*
+	 * created hairPin(excluded having target hairPin)-1 * sizeOfU:-1 means last pin has no interpolate
+	 * Pin(static) particle index of particles
+	 */
 	private int[] pins;
 
 
@@ -583,8 +587,9 @@ public class HairCloth {
 			if(hairData.isConnectHorizontal()){
 			for (int v=0;v<=h;v++) {
 				int u=w;
-				
+				if((!hairData.isCutU() || v<hairData.getStartCutUIndexV())){
 				addConstrain(particles.get(index(u,v)), particles.get(index(0,v)), distance);
+				}
 						
 			}
 			}
