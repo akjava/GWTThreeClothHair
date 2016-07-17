@@ -651,10 +651,11 @@ public class ClothSimulator  {
 			Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
 			Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
 			//TODO move and fix
+			HairPointUtils.syncCircleStyle(data.getCloth(), v1, v2,false);
+			/*
 			int cw=hairData.getSizeOfU();
 			int ch=hairData.getSizeOfV();
 			int angleSplit=startAndEndSame?cw:cw+1;
-			
 			Vector2 center=THREE.Vector2(v1.getX(), v1.getZ());
 			Vector2 point=THREE.Vector2(v2.getX(), v2.getZ());
 			List<Vector3> corePositions=Lists.newArrayList();
@@ -714,6 +715,7 @@ public class ClothSimulator  {
 					
 					data.getCloth().particles.get(j).setAllPosition(newPosition);
 				}
+				*/
 			//}
 			
 		}else 

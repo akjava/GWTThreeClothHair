@@ -146,6 +146,9 @@ public class ClothControler {
 			//TODO merge method
 			Vector3 v1=data.getCalculator().getResult().get(0);
 			Vector3 v2=data.getCalculator().getResult().get(1);
+			
+			HairPointUtils.syncCircleStyle(data.getCloth(), v1, v2,true);
+			/*
 			//TODO move and fix
 			int cw=data.getCloth().getW();
 			int angleSplit=startAndEndSame?cw:cw+1;
@@ -173,6 +176,7 @@ public class ClothControler {
 					data.getCloth().particles.get(i).setAllPosition(corePositions.get(i));
 				}
 			}
+			*/
 			//TODO sync
 		}else //old one not reach code
 		if(data.getCalculator().getResult().size()<3){//2pins

@@ -65,6 +65,7 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 	//SkinningVertex no need apply matrix,
 	HairPinToNormal hairPinToNormalFunction=new HairPinToNormal(mesh,false);
 	
+	double characterScale=mesh.getScale().getX();
 	
 	calculator=new SkinningVertexCalculator(mesh);
 	for(HairPin pin:hairData.getHairPins()){
@@ -75,11 +76,10 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 		calculator.add(
 				svertex
 		);
-		//TODO add option
-		//if extend outside,extend-ratio
+		
 		double extendRatio=hairData.getExtendOutsideRatio();
 		Vector3 normal=hairPinToNormalFunction.apply(pin);
-		double distance=cloth.getRestDistance()/mesh.getScale().getX()*extendRatio;
+		double distance=cloth.getRestDistance()/characterScale*extendRatio;
 		Vector3 appendPos=normal.normalize().multiplyScalar(distance);
 		svertex.getVertex().add(appendPos);
 		
