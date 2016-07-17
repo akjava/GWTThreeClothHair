@@ -1089,7 +1089,7 @@ private void clearAllPoints(){
 		cellObjects.removeItem(data);
 		//remove physics data
 		
-		GWTThreeClothHair.INSTANCE.getAmmoControler()
+		GWTThreeClothHair.INSTANCE.getAmmoHairControler()
 		.removeParticleData(data.getClothData().getCloth());
 		
 		

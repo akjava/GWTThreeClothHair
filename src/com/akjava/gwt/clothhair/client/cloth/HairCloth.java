@@ -1113,6 +1113,7 @@ public class HairCloth {
 				
 				AmmoConstraintPropertyData distanceConstraintProperties=simulator.getAmmoHairControler().getParticleConstraintData();
 				
+				//right now no difference
 				if(horizontalConnection){ 
 					//use tight make shaking but tigh together.
 					distanceConstraintProperties.setFrameInARelativePosRatio(distanceConstraintProperties.getFrameInARelativePosRatio());
@@ -1128,11 +1129,15 @@ public class HairCloth {
 				distanceConstraintProperties.updateFrameInA(transform1, pos1, pos2);
 				distanceConstraintProperties.updateFrameInB(transform2, pos1, pos2);
 				
+				
+				
 				//try to fixed length but not good
 				//transform2.getOrigin().copy(pos2.clone().sub(pos1).normalize().multiplyScalar(restDistance*ammoMultipleScalar));//keep length
 				
 				ConstraintAndLine constraintAndMesh=simulator.getAmmoHairControler().getAmmoControler().createGeneric6DofSpringConstraint(bm1, bm2, transform1, transform2, distanceConstraintProperties.isDisableCollisionsBetweenLinkedBodies());
 				constraintAndMesh.setVisibleLine(false);
+				
+				
 				
 				simulator.getAmmoHairControler().getAmmoControler().updateConstraint(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint(), distanceConstraintProperties,restDistance);
 				
@@ -1343,6 +1348,7 @@ public class HairCloth {
 			//TODO interporate
 			if(endX!=0){
 				x=endX;
+			//	mass*=10;
 			}
 		}
 		int type=hairData.getParticleType();
@@ -1357,7 +1363,7 @@ public class HairCloth {
 			//body=BodyAndMesh.createBox(THREE.Vector3(x*2*4,x*2*4,x*2), mass, p,material);//plain
 		}else if(type==BodyAndMesh.TYPE_CAPSULE){
 			//tryied but faild,maybe becaus of gravity can't keep direction
-			body=BodyAndMesh.createCapsule(x,x*2, mass, p,THREE.Quaternion().setFromEuler(THREE.Euler(0,0, Math.toRadians(0))),material);
+			body=BodyAndMesh.createCapsule(x,x*2*4, mass, p,THREE.Quaternion().setFromEuler(THREE.Euler(Math.toRadians(0),0, 0)),material);
 			//body.getBody().setRotation());
 		}else if(type==BodyAndMesh.TYPE_CYLINDER){
 			body=BodyAndMesh.createCylinder(x,x*2, mass, p,material);

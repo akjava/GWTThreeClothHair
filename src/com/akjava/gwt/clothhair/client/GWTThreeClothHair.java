@@ -673,7 +673,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 
 
-	public AmmoHairControler getAmmoControler() {
+	public AmmoHairControler getAmmoHairControler() {
 	return clothSimulator.getAmmoHairControler();
 }
 
@@ -988,14 +988,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	private void createControler() {
 		TabPanel tab=new TabPanel();
-		tab.addSelectionHandler(new SelectionHandler<Integer>() {
-			@Override
-			public void onSelection(SelectionEvent<Integer> event) {
-				int index=event.getSelectedItem();
-				onTabSelected(index);
-			}
-		});
-		controlerRootPanel.add(tab);
+		
 		
 		
 		tab.add(createSpherePanel(), "spheres");
@@ -1017,7 +1010,15 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//link
 		
-		tab.selectTab(3);
+		tab.selectTab(0);
+		tab.addSelectionHandler(new SelectionHandler<Integer>() {
+			@Override
+			public void onSelection(SelectionEvent<Integer> event) {
+				int index=event.getSelectedItem();
+				onTabSelected(index);
+			}
+		});
+		controlerRootPanel.add(tab);
 	}
 	private Widget createHairPinPanel() {
 		hairPinPanel = new HairPinPanel();
@@ -1320,8 +1321,18 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		}
 			
 	public double getAmmoWorldScale(){
-		double scale=ValuesUtils.toDouble(GWTThreeClothHair.INSTANCE.getStorageControler().getValue(GWTThreeClothHairStorageKeys.KEY_AMMO_WORLD_SCALE,String.valueOf(0.1)), 0.1);
-		return scale;
+		double value=ValuesUtils.toDouble(GWTThreeClothHair.INSTANCE.getStorageControler().getValue(GWTThreeClothHairStorageKeys.KEY_AMMO_WORLD_SCALE,String.valueOf(0.1)), 0.1);
+		return value;
+	}
+	
+	public double getAmmoGravity(){
+		double value=ValuesUtils.toDouble(GWTThreeClothHair.INSTANCE.getStorageControler().getValue(GWTThreeClothHairStorageKeys.KEY_AMMO_GRAVITY,String.valueOf(-10)), -10);
+		return value;
+	}
+	
+	public int getAmmoSubsteps(){
+		int value=ValuesUtils.toInt(GWTThreeClothHair.INSTANCE.getStorageControler().getValue(GWTThreeClothHairStorageKeys.KEY_AMMO_SUBSTEPS,String.valueOf(0)), 0);
+		return value;
 	}
 	public AmmoBodyPropertyData getAmmoParticleBodyData(){
 		String text=storageControler.getValue(GWTThreeClothHairStorageKeys.KEY_AMMO_PARTICLE_BODY, null);

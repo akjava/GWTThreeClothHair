@@ -17,13 +17,18 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.DoubleBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class AmmoPreferencePanel extends VerticalPanel{
+private DoubleBox gravityEditor;
+private IntegerBox substepsEditor;
+
 public AmmoPreferencePanel(){
 	HorizontalPanel ha=new HorizontalPanel();
 	this.add(ha);
@@ -34,7 +39,7 @@ public AmmoPreferencePanel(){
 
 		@Override
 		public void onValueChange(ValueChangeEvent<Boolean> event) {
-			GWTThreeClothHair.INSTANCE.getAmmoControler().setStopped(event.getValue());
+			GWTThreeClothHair.INSTANCE.getAmmoHairControler().setStopped(event.getValue());
 		}
 		
 	});
@@ -42,7 +47,7 @@ public AmmoPreferencePanel(){
 	Button ammostep=new Button("step",new ClickHandler() {
 		@Override
 		public void onClick(ClickEvent event) {
-			GWTThreeClothHair.INSTANCE.getAmmoControler().getAmmoControler().update();
+			GWTThreeClothHair.INSTANCE.getAmmoHairControler().getAmmoControler().update();
 		}
 	});
 	ha.add(ammostep);
@@ -74,13 +79,51 @@ public AmmoPreferencePanel(){
 	});
 	ha.add(particleBoneCheck);
 	
+	this.add(new Label("gravity"));
+	gravityEditor = new DoubleBox();
+	gravityEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoGravity());
+	gravityEditor.addValueChangeHandler(new ValueChangeHandler<Double>() {
+
+		@Override
+		public void onValueChange(ValueChangeEvent<Double> event) {
+			double value=event.getValue().doubleValue();
+			try {
+				GWTThreeClothHair.INSTANCE.getStorageControler().setValue(GWTThreeClothHairStorageKeys.KEY_AMMO_GRAVITY, String.valueOf(value));
+			} catch (StorageException e) {
+				LogUtils.logAndAlert("maybe quote error:"+e.getMessage());
+			}
+			GWTThreeClothHair.INSTANCE.getAmmoHairControler().getAmmoControler().setGravity(0,value,0);
+			LogUtils.log("newGravity:"+GWTThreeClothHair.INSTANCE.getAmmoHairControler().getAmmoControler().getWorld().getGravity().y());
+		}
+	});
+	this.add(gravityEditor);
+	
+	this.add(new Label("substeps"));
+	substepsEditor = new IntegerBox();
+	substepsEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoSubsteps());
+	substepsEditor.addValueChangeHandler(new ValueChangeHandler<Integer>() {
+
+		@Override
+		public void onValueChange(ValueChangeEvent<Integer> event) {
+			int value=event.getValue();
+			try {
+				GWTThreeClothHair.INSTANCE.getStorageControler().setValue(GWTThreeClothHairStorageKeys.KEY_AMMO_SUBSTEPS, String.valueOf(value));
+			} catch (StorageException e) {
+				LogUtils.logAndAlert("maybe quote error:"+e.getMessage());
+			}
+			GWTThreeClothHair.INSTANCE.getAmmoHairControler().getAmmoControler().setSubsteps(value);
+			
+		}
+	});
+	this.add(substepsEditor);
+	
 	LabeledInputRangeWidget2 worldScale=new LabeledInputRangeWidget2("WorldScale", 0.001, 1, 0.001);
 	worldScale.getLabel().setWidth("90px");
 	this.add(worldScale);
 	worldScale.setButtonVisible(true);
 	
 	worldScale.setValue(GWTThreeClothHair.INSTANCE.getAmmoWorldScale());
-	LogUtils.log(GWTThreeClothHair.INSTANCE.getAmmoWorldScale());
+	
 	worldScale.addtRangeListener(new ValueChangeHandler<Number>() {
 		@Override
 		public void onValueChange(ValueChangeEvent<Number> event) {

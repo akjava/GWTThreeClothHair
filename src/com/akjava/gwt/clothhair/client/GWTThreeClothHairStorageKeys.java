@@ -14,6 +14,8 @@ public static final String KEY_GROUND_COLOR="ground_color";
 public static final String KEY_LIGHTS="threejs_lights";
 
 public static final String KEY_AMMO_WORLD_SCALE="ammo_world_scale";
+public static final String KEY_AMMO_GRAVITY="ammo_gravity";
+public static final String KEY_AMMO_SUBSTEPS="ammo_substeps";
 public static final String KEY_AMMO_PARTICLE_BODY="ammo_particle_body";
 public static final String KEY_AMMO_PARTICLE_CONSTRAINT="ammo_particle_constraint";
 public static final String KEY_AMMO_COLLISION_BODY="ammo_collision_body";//sphere or box

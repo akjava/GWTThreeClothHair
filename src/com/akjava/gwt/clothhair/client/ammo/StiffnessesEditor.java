@@ -78,6 +78,36 @@ public class StiffnessesEditor extends VerticalPanel{
 		});
 		panel0.add(max);
 		
+		Button max2=new Button("10",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				double v=10;
+				int target=targetBox.getSelectedIndex();
+				setValue(target,v);
+			}
+		});
+		panel0.add(max2);
+		
+		Button max3=new Button("100",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				double v=100;
+				int target=targetBox.getSelectedIndex();
+				setValue(target,v);
+			}
+		});
+		panel0.add(max3);
+		
+		Button max4=new Button("1000",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				double v=1000;
+				int target=targetBox.getSelectedIndex();
+				setValue(target,v);
+			}
+		});
+		panel0.add(max4);
+		
 		final DoubleBox customBox=new DoubleBox();
 		customBox.setWidth("40px");
 		panel0.add(customBox);
