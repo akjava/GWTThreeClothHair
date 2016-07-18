@@ -38,7 +38,7 @@ public class HairDataCsvConverter extends Converter<HairData,String> {
 		csv.add(data.isCutU()+":"+data.getStartCutUIndexV());//4 cutU 
 		csv.add(data.isDoNarrow()+":"+data.getStartNarrowIndexV()+":"+data.getNarrowScale());//5 do narrow
 		
-		csv.add(data.getEdgeMode()+":"+data.getEdgeModeScale());//6 edge mode
+		csv.add(":");//6 edge mode deprecated
 		
 		
 		csv.add(String.valueOf(data.getScaleOfU()));//7
@@ -123,8 +123,7 @@ public class HairDataCsvConverter extends Converter<HairData,String> {
 		data.setNarrowScale(Double.valueOf(narrows[2]));
 		
 		String[] edges=csv[6].split(":");
-		data.setEdgeMode(Integer.valueOf(edges[0]));
-		data.setEdgeModeScale(Double.valueOf(edges[1]));
+		//deprecated
 		
 		data.setScaleOfU(Double.valueOf(csv[7]));
 		

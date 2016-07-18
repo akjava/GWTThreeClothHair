@@ -69,8 +69,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private CheckBox narrowCheck;
 		private LabeledInputRangeWidget2 narrowIndex;
 		private LabeledInputRangeWidget2 narrowScale;
-		private LabeledInputRangeWidget2 edgeScale;
-		private ListBox edgeMode;
+		
+		
 		private ListBox channelBox;
 		private CheckBox syncCheck;
 		private CheckBox connectHorizontalCheck;
@@ -201,21 +201,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			h3.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 			//this.add(h3);
 			
-			/**
-			 * edgeMode is deprecated
-			 * 
-			 */
 			
-			edgeMode = new ListBox();
-			edgeMode.addItem("none");
-			edgeMode.addItem("first");
-			edgeMode.addItem("center");
-			edgeMode.addItem("end");
-			//h3.add(edgeMode);
-			edgeMode.setWidth("80px");
-			edgeScale = new LabeledInputRangeWidget2("scale", 0.25, 4, 0.01);
-			edgeScale.getLabel().setWidth("40px");
-			//h3.add(edgeScale);
 			
 			//channel
 			
@@ -479,8 +465,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setDoNarrow(narrowCheck.getValue());
 				value.setStartNarrowIndexV((int)narrowIndex.getValue());
 				value.setNarrowScale(narrowScale.getValue());
-				value.setEdgeMode(edgeMode.getSelectedIndex());
-				value.setEdgeModeScale(edgeScale.getValue());
+				
 				value.setChannel(channelBox.getSelectedIndex());
 				value.setSyncMove(syncCheck.getValue());
 				value.setMass(mass.getValue());
@@ -539,8 +524,6 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				narrowCheck.setValue(value.isDoNarrow());
 				narrowIndex.setValue(value.getStartNarrowIndexV());
 				narrowScale.setValue(value.getNarrowScale());
-				edgeMode.setSelectedIndex(value.getEdgeMode());
-				edgeScale.setValue(value.getEdgeModeScale());
 				channelBox.setSelectedIndex(value.getChannel());
 				syncCheck.setValue(value.isSyncMove());
 				mass.setValue(value.getMass());

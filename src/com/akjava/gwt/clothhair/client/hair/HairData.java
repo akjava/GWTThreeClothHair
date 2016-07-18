@@ -250,57 +250,6 @@ public void setNarrowScale(double narrowScale) {
 	this.narrowScale = narrowScale;
 }
 
-/**
- * @deprecated
- * @return
- */
-public int getEdgeMode() {
-	return edgeMode;
-}
-/**
- * @deprecated
- */
-public void setEdgeMode(int edgeMode) {
-	this.edgeMode = edgeMode;
-}
-/**
- * @deprecated
- */
-public static final int EDGE_NONE=0;
-/**
- * @deprecated
- */
-public static final int EDGE_FIRST=1;
-/**
- * @deprecated
- */
-public static final int EDGE_CENTEr=2;
-/**
- * @deprecated
- */
-public static final int EDGE_LAST=3;
-/**
- * @deprecated
- */
-private int edgeMode;
-
-/**
- * @deprecated
- * @return
- */
-public double getEdgeModeScale() {
-	return edgeModeScale;
-}
-/**
- * @deprecated
- */
-public void setEdgeModeScale(double edgeModeScale) {
-	this.edgeModeScale = edgeModeScale;
-}
-/**
- * @deprecated
- */
-private double edgeModeScale=1.5;
 
 
 /**

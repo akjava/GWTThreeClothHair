@@ -599,25 +599,7 @@ public class HairCloth {
 			}
 			
 			
-			//trying last one edging
-			if(hairData.getEdgeMode()!=0){
-				int targetIndex=0;//1
-				if(hairData.getEdgeMode()==2){
-				targetIndex=w/2;
-				}else if(hairData.getEdgeMode()==3){//3
-				targetIndex=w;
-				}
-				
-				//LogUtils.log(targetIndex);
-				
-				Particle centerParticle=particles.get(index(targetIndex,h));
-
-				for(Constrain constrain:constrains){
-					if(constrain.p1==centerParticle || constrain.p2==centerParticle){
-						constrain.distance=constrain.distance*hairData.getEdgeModeScale();
-					}
-				}
-			}
+	
 			
 			
 			
