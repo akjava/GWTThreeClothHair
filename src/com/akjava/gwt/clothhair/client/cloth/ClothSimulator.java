@@ -748,6 +748,7 @@ public class ClothSimulator  {
 			
 			//merging custom normal
 			//TODO add vector3,now only -1y
+			
 			if(hairData.isUseCustomNormal()){
 			
 			for(int i=0;i<noTargetedPinNormals.size();i++){
@@ -806,31 +807,43 @@ public class ClothSimulator  {
 			List<HairPin> noTargetPins=Lists.newArrayList();
 			List<HairPin> customPin=Lists.newArrayList();
 			
+			
+			
+			List<Vector3> generalPinVertex=Lists.newArrayList();
+			List<Vector3> customlPinVertex=Lists.newArrayList();
+			List<Integer> customPinTarget=Lists.newArrayList();
+			
+			//LogUtils.log("pinSize:"+data.getCalculator().getSkinningVertexs().size());
+			
 			for(HairPin pin:hairData.getHairPins()){
 				if(pin.getTargetClothIndex()==-1){
 					noTargetPins.add(pin);
+					
+					Vector3 v1=hairPinToVertex(characterMesh,pin,true);
+					generalPinVertex.add(v1);
 				}else{
 					customPin.add(pin);
+					
+					Vector3 v1=hairPinToVertex(characterMesh,pin,true);
+					customlPinVertex.add(v1);
+					customPinTarget.add(pin.getTargetClothIndex());
 				}
 			}
 			
 			
-			Vector3 diff = THREE.Vector3();
-			//List<Mesh> spheres=clothControler.getSphereList(hairData.getChannel());
 			
-			
-			
+			HairPointUtils.updateFirstRowStyle(data.getHairCloth(), generalPinVertex, customlPinVertex, customPinTarget);
 			
 			
 			int normalSize=0;//for debug
 			
 			for(int i=0;i<noTargetPins.size();i++){
-				Vector3 v1=hairPinToVertex(characterMesh,noTargetPins.get(i),true);
+				//Vector3 v1=hairPinToVertex(characterMesh,noTargetPins.get(i),true);
 				
 				//executeSphereOut(v1,spheres);//for test
 				
 				int index=hairData.getSliceFaceCount()*i;
-				data.getHairCloth().particles.get(index).setAllPosition(v1);
+				//data.getHairCloth().particles.get(index).setAllPosition(v1);
 				
 				//LogUtils.log("main:"+index);
 				
@@ -840,18 +853,18 @@ public class ClothSimulator  {
 				//interporating
 				if(i!=noTargetPins.size()-1){//not last, has next
 					//has next;
-					Vector3 v2=hairPinToVertex(characterMesh,noTargetPins.get(i+1),true);
+				//	Vector3 v2=hairPinToVertex(characterMesh,noTargetPins.get(i+1),true);
 					//Vector3 sub=v2.clone().sub(v1).divideScalar(sliceFaceCount);
 					
 					for(int j=1;j<sliceFaceCount;j++){
 						
-						int at=index+j;
+					//	int at=index+j;
 						
 						double percent=(double)j/sliceFaceCount;
 						//int multiple=j;
 						//Vector3 v=sub.clone().multiplyScalar(multiple).add(v1);
 						
-						data.getHairCloth().particles.get(at).setAllPosition(v1.clone().lerp(v2, percent));
+					//	data.getHairCloth().particles.get(at).setAllPosition(v1.clone().lerp(v2, percent));
 						
 						normals.add(noTargetedPinNormals.get(i).clone().lerp(noTargetedPinNormals.get(i+1),percent));
 						//LogUtils.log("sub:"+at);
@@ -871,6 +884,11 @@ public class ClothSimulator  {
 			
 			//init other posisions
 			for(int j=data.getHairCloth().getW()+1;j<data.getHairCloth().particles.size();j++){
+				
+				if(customPinTarget.contains(j)){
+					continue;//overwrited custom pin
+				}
+				
 				int x=j%(data.getHairCloth().getW()+1);
 				int y=j/(data.getHairCloth().getW()+1);
 				//LogUtils.log(j+"="+x);
@@ -879,7 +897,7 @@ public class ClothSimulator  {
 				
 				//without normal initial position is same as parent
 				data.getHairCloth().particles.get(j).setAllPosition(pos);
-				ThreeLog.log("origin:"+j,pos);
+				//ThreeLog.log("origin:"+j,pos);
 				
 				//try to narrow but faild
 				//pos.add(noTargetedPinNormals.get(x).clone().normalize().multiplyScalar( -data.getCloth().getRestDistance()*0.5 ));
@@ -893,16 +911,16 @@ public class ClothSimulator  {
 				//	LogUtils.log("can use normal");
 					Vector3  normalAddPosition=noTargetedPinNormals.get(x).clone().normalize().multiplyScalar( data.getHairCloth().getRestDistance()*y ).add(pos);
 					data.getHairCloth().particles.get(j).setAllPosition(normalAddPosition);
-					ThreeLog.log(""+j,normalAddPosition);
+					//ThreeLog.log(""+j,normalAddPosition);
 				}
 				
 			}
 			
 			//overwrite pin
-			for(HairPin pin:customPin){
+			/*for(HairPin pin:customPin){
 				Vector3 v=hairPinToVertex(characterMesh,pin,true);
 				data.getHairCloth().particles.get(pin.getTargetClothIndex()).setAllPosition(v);
-			}
+			}*/
 			
 			
 			/*

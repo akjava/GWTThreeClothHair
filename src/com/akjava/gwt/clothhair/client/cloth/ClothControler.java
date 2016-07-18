@@ -228,14 +228,17 @@ public class ClothControler {
 			
 			
 			
-			int generalPinSize=generalPinVertex.size();
+			/*int generalPinSize=generalPinVertex.size();*/
 			
-			int sizeOfU=data.getHairCloth().getW()/(generalPinSize-1);//TODO change just size of U
-			
-			if(sizeOfU!=data.getHairCloth().getSliceFaceCount()){
+			//int sizeOfU=data.getHairCloth().getW()/(generalPinSize-1);//TODO change just size of U
+			/*if(sizeOfU!=data.getHairCloth().getSliceFaceCount()){
 				LogUtils.log("invalid size of u:"+sizeOfU);
-			}
+			}*/
 			
+			/*int sliceFaceCount=data.getHairCloth().getSliceFaceCount();*/
+			
+			
+			//for later sync need before update
 			Vector3 diff=THREE.Vector3();
 			diff.copy(data.getHairCloth().particles.get(0).position).sub(generalPinVertex.get(0));
 			

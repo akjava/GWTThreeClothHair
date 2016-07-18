@@ -74,7 +74,7 @@ public void setConnectHorizontal(boolean connectHorizontal) {
  * 
  * it's effect on connected horizontal 
  * 
- * actual averagint normal is created in ClothSimulator.addCloth
+ * actual averaging normal is created in ClothSimulator.addCloth
  * 
  * 
  */
@@ -189,7 +189,7 @@ public void setStartCutUIndexV(int startCutUIndexV) {
 }
 
 /*
- on the default normal extrude outside and this make bottom's face having large width like skirt.
+ on the default normal extrude outside(via face-vertex-normal) and this make bottom's face having large width like skirt.
  
  right now only use -1y normal,or not
  */
