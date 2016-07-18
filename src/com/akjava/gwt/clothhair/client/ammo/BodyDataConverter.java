@@ -10,10 +10,10 @@ import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 
-public class BodyDataConverter extends Converter<AmmoBodyPropertyData,String>{
+public class BodyDataConverter extends Converter<AmmoBodyPropertyData,JSONObject>{
 	public static final String DATA_TYPE="AmmoBodyData";
 	@Override
-	protected String doForward(AmmoBodyPropertyData data) {
+	protected JSONObject doForward(AmmoBodyPropertyData data) {
 		JSONObject object=new JSONObject();
 		JSONObjectWrapper wrapper=new JSONObjectWrapper(object);
 		//header
@@ -28,21 +28,12 @@ public class BodyDataConverter extends Converter<AmmoBodyPropertyData,String>{
 		wrapper.setDouble("damping_angular", data.getDamping().getY());
 		}
 		
-		return object.toString();
+		return object;
 	}
 
 	@Override
-	protected AmmoBodyPropertyData doBackward(String json) {
-		JSONValue value=JSONParser.parseStrict(json);
-		if(value==null){
-			LogUtils.log("BodyDataConverter:parse json faild "+json);
-			return null;
-		}
-		JSONObject object=value.isObject();
-		if(object==null){
-			LogUtils.log("BodyDataConverter:not json object:"+json);
-			return null;
-		}
+	protected AmmoBodyPropertyData doBackward(JSONObject object) {
+		
 		
 		if(object.get("type")==null){
 			LogUtils.log("BodyDataConverter:has no type attribute:"+object.toString());

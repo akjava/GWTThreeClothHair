@@ -16,10 +16,10 @@ import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 
-public class ConstraintDataConverter extends Converter<AmmoConstraintPropertyData,String>{
+public class ConstraintDataConverter extends Converter<AmmoConstraintPropertyData,JSONObject>{
 	public static final String DATA_TYPE="AmmoConstraintData";
 	@Override
-	protected String doForward(AmmoConstraintPropertyData data) {
+	protected JSONObject doForward(AmmoConstraintPropertyData data) {
 		JSONObject object=new JSONObject();
 		JSONObjectWrapper wrapper=new JSONObjectWrapper(object);
 		//header
@@ -42,26 +42,12 @@ public class ConstraintDataConverter extends Converter<AmmoConstraintPropertyDat
 		
 		LogUtils.log(object.getJavaScriptObject());
 		
-		return object.toString();
+		return object;
 	}
 
 	@Override
-	protected AmmoConstraintPropertyData doBackward(String json) {
-		JSONValue value=JSONParser.parseStrict(json);
-		if(value==null){
-			LogUtils.log("ConstraintDataConverter:parse json faild "+json);
-			return null;
-		}
-		JSONObject object=value.isObject();
-		if(object==null){
-			LogUtils.log("ConstraintDataConverter:not json object:"+json);
-			return null;
-		}
+	protected AmmoConstraintPropertyData doBackward(JSONObject object) {
 		
-		if(object.get("type")==null){
-			LogUtils.log("ConstraintDataConverter:has no type attribute:"+object.toString());
-			return null;
-		}
 		
 		JSONString typeString=object.get("type").isString();
 		if(typeString==null){

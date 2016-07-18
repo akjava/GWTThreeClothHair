@@ -18,7 +18,6 @@ import com.akjava.gwt.clothhair.client.hair.HairDataPanel;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
 import com.akjava.gwt.clothhair.client.hair.HairPinPanel;
 import com.akjava.gwt.clothhair.client.sphere.SphereData;
-import com.akjava.gwt.clothhair.client.sphere.SphereDataCsvConverter;
 import com.akjava.gwt.clothhair.client.sphere.SphereDataPanel;
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
@@ -73,7 +72,6 @@ import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
-import com.akjava.lib.common.utils.CSVUtils;
 import com.akjava.lib.common.utils.ValuesUtils;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
@@ -91,6 +89,9 @@ import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Panel;
@@ -1339,7 +1340,18 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		if(text==null){
 			return new AmmoBodyPropertyData();
 		}else{
-			return new BodyDataConverter().reverse().convert(text);
+			JSONValue value=JSONParser.parseStrict(text);
+			if(value==null){
+				LogUtils.log("BodyDataConverter:parse json faild "+text);
+				return null;
+			}
+			JSONObject object=value.isObject();
+			if(object==null){
+				LogUtils.log("BodyDataConverter:not json object:"+text);
+				return null;
+			}
+			
+			return new BodyDataConverter().reverse().convert(object);
 		}
 	}
 	public AmmoBodyPropertyData getAmmoCollisionBodyData(){
@@ -1347,7 +1359,18 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		if(text==null){
 			return new AmmoBodyPropertyData();
 		}else{
-			return new BodyDataConverter().reverse().convert(text);
+			JSONValue value=JSONParser.parseStrict(text);
+			if(value==null){
+				LogUtils.log("BodyDataConverter:parse json faild "+text);
+				return null;
+			}
+			JSONObject object=value.isObject();
+			if(object==null){
+				LogUtils.log("BodyDataConverter:not json object:"+text);
+				return null;
+			}
+			
+			return new BodyDataConverter().reverse().convert(object);
 		}
 	}
 	public AmmoConstraintPropertyData getAmmoParticleConstraintData(){
@@ -1355,7 +1378,24 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		if(text==null){
 			return new AmmoConstraintPropertyData();
 		}else{
-			return new ConstraintDataConverter().reverse().convert(text);
+			
+			JSONValue value=JSONParser.parseStrict(text);
+			if(value==null){
+				LogUtils.log("ConstraintDataConverter:parse json faild "+text);
+				return null;
+			}
+			JSONObject object=value.isObject();
+			if(object==null){
+				LogUtils.log("ConstraintDataConverter:not json object:"+text);
+				return null;
+			}
+			
+			if(object.get("type")==null){
+				LogUtils.log("ConstraintDataConverter:has no type attribute:"+object.toString());
+				return null;
+			}
+			
+			return new ConstraintDataConverter().reverse().convert(object);
 		}
 	}
 		

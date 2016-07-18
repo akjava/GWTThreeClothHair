@@ -159,7 +159,7 @@ public AmmoPreferencePanel(){
 		public void onClick(ClickEvent event) {
 			particleBodyEditor.flush();
 			AmmoBodyPropertyData data=particleBodyEditor.getValue();
-			String dataText=new BodyDataConverter().convert(data);
+			String dataText=new BodyDataConverter().convert(data).toString();
 			try {
 				GWTThreeClothHair.INSTANCE.getStorageControler().setValue(GWTThreeClothHairStorageKeys.KEY_AMMO_PARTICLE_BODY,dataText);
 			} catch (StorageException e) {
@@ -191,7 +191,7 @@ public AmmoPreferencePanel(){
 		public void onClick(ClickEvent event) {
 			particleConstraintEditor.flush();
 			AmmoConstraintPropertyData data=particleConstraintEditor.getValue();
-			String dataText=new ConstraintDataConverter().convert(data);
+			String dataText=new ConstraintDataConverter().convert(data).toString();
 			try {
 				GWTThreeClothHair.INSTANCE.getStorageControler().setValue(GWTThreeClothHairStorageKeys.KEY_AMMO_PARTICLE_CONSTRAINT,dataText);
 			} catch (StorageException e) {
@@ -224,7 +224,7 @@ public AmmoPreferencePanel(){
 		public void onClick(ClickEvent event) {
 			collisionBodyEditor.flush();
 			AmmoBodyPropertyData data=collisionBodyEditor.getValue();
-			String dataText=new BodyDataConverter().convert(data);
+			String dataText=new BodyDataConverter().convert(data).toString();
 			try {
 				GWTThreeClothHair.INSTANCE.getStorageControler().setValue(GWTThreeClothHairStorageKeys.KEY_AMMO_COLLISION_BODY,dataText);
 			} catch (StorageException e) {
