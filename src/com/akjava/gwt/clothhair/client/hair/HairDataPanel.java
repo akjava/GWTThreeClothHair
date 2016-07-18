@@ -87,6 +87,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class HairDataPanel extends VerticalPanel{
@@ -204,6 +205,12 @@ public class HairDataPanel extends VerticalPanel{
 			}
 		});
 		
+		
+		
+		
+		
+		
+		
 
 		hairDataEditor = new HairDataEditor(this);
 		hairDataEditor.setHairTextureDataEditor(hairTextureDataEditor);
@@ -212,6 +219,7 @@ public class HairDataPanel extends VerticalPanel{
 		
 		
 		hairPanel.add(hairDataEditor);
+		
 		createClothPanel(hairPanel);
 		
 		HorizontalPanel distancePanel=new HorizontalPanel();
@@ -504,6 +512,9 @@ public class HairDataPanel extends VerticalPanel{
 		
 		hairPanel.add(createGeometryImportExportPanel());
 	}
+	
+	
+	
 	
 	public String toJsonText(List<JSONObject> list){
 		JSONObject root=new JSONObject();
