@@ -941,17 +941,6 @@ public class ClothSimulator  {
 			data.getHairCloth().setPins(newPins);
 			
 			
-			LogUtils.log("pins");
-			for(int i=0;i<newPins.length;i++){
-				LogUtils.log(newPins[i]);
-			}
-			
-			LogUtils.log("mass");
-			for (int i=0;i<data.getHairCloth().particles.size();i++) {
-				if(data.getHairCloth().particles.get(i).getMass()==0){
-					LogUtils.log(i);
-				}
-			}
 			
 		
 			/*
