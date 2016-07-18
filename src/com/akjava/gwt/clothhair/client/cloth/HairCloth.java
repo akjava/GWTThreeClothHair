@@ -1143,46 +1143,7 @@ public class HairCloth {
 			
 			
 			if(hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_CLOTH){
-			//create bone mesh
-			//position keep same
-			List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).transform(new CloneDivided(ammoMultipleScalar)).toList();
-			
-			//force up normal //THREE.Vector3(0,1,0)
-			Geometry clothBox=new PointsToGeometry().debug(false).flipNormal(true).reverseFirstSurface(true).createGeometry(positions, w, restDistance*hairData.getThickRatio(), isConnectHorizontal());
-			
-			//I'm not sure why circle effect vertical thick
-			
-			
-			clothBox.setBones(new PlainBoneCreator().createBone(positions, w));
-			
-			int influence=1;
-			WeightResult result=new SimpleAutoWeight(influence).autoWeight(clothBox, clothBox.getBones(),Lists.newArrayList(0));//ignore root
-			result.insertToGeometry(clothBox);
-			//LogUtils.log(result.toString());
-			
-			
-			MeshPhongMaterial boxhMaterial = THREE.MeshPhongMaterial(
-					GWTParamUtils.MeshPhongMaterial().alphaTest(0.5).color(0x880000).specular(0x030303).emissive(0x111111).shininess(10)
-					//.map(clothTexture)
-					.skinning(true)
-					.visible(true)
-					//.wireframe(true)//wire frame
-					//.side(THREE.DoubleSide)
-					);
-			
-			SkinnedMesh clothBoxMesh = THREE.SkinnedMesh(clothBox,boxhMaterial);
-			data.setSkinnedMesh(clothBoxMesh);
-			simulator.getAmmoHairControler().getAmmoControler().getScene().add(clothBoxMesh);
-			clothBoxMesh.getGeometry().computeBoundingSphere();//for camera
-			clothBoxMesh.getGeometry().computeBoundingBox();
-			
-			SkeletonHelper helper=THREE.SkeletonHelper(clothBoxMesh);
-			simulator.getAmmoHairControler().getAmmoControler().getScene().add(helper);
-			data.setSkeltonHelper(helper);
-			
-			
-			helper.setVisible(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone());//TODO get visible from setting
-			
+			createAmmoBoneCloth(simulator, data, ammoParticles);
 			skipSync=true;
 			}else  if(hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_HAIR){
 				//create bone mesh
@@ -1205,10 +1166,11 @@ public class HairCloth {
 		Vector3 threePos=THREE.Vector3();//share and improve fps
 		//basically never changed length
 		for(int i=0;i<ammoParticles.size();i++){
-			if(isPinned(i)){
+			if(isPinned(i)){//both plain & hair type need sync
 				threePos.copy(particles.get(i).getOriginal()).multiplyScalar(ammoMultipleScalar);
 				ammoParticles.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
 			}else{
+				//only plain-cloth need sync position here
 				if(!isBoneType(hairData.getHairPhysicsType())){
 				Vector3 ammoPos=ammoParticles.get(i).getBody().getReadOnlyPosition(threePos);
 				particles.get(i).position.copy(ammoPos).divideScalar(ammoMultipleScalar);
@@ -1217,7 +1179,7 @@ public class HairCloth {
 		}
 		
 		
-		//update mesh
+		//hair is handled as bone
 		if(isBoneType(hairData.getHairPhysicsType())){
 		PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles,ammoMultipleScalar);
 		
@@ -1238,6 +1200,48 @@ public class HairCloth {
 		}
 	}
 	
+	private void createAmmoBoneCloth(ClothSimulator simulator,AmmoHairControler.ParticleBodyDatas data,List<BodyAndMesh> ammoParticles) {
+		//create bone mesh
+		//position keep same
+		List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).transform(new CloneDivided(ammoMultipleScalar)).toList();
+		
+		//force up normal //THREE.Vector3(0,1,0)
+		Geometry clothBox=new PointsToGeometry().debug(false).flipNormal(true).reverseFirstSurface(true).createGeometry(positions, w, restDistance*hairData.getThickRatio(), isConnectHorizontal());
+		
+		//I'm not sure why circle effect vertical thick
+		
+		
+		clothBox.setBones(new PlainBoneCreator().createBone(positions, w));
+		
+		int influence=1;
+		WeightResult result=new SimpleAutoWeight(influence).autoWeight(clothBox, clothBox.getBones(),Lists.newArrayList(0));//ignore root
+		result.insertToGeometry(clothBox);
+		//LogUtils.log(result.toString());
+		
+		
+		MeshPhongMaterial boxhMaterial = THREE.MeshPhongMaterial(
+				GWTParamUtils.MeshPhongMaterial().alphaTest(0.5).color(0x880000).specular(0x030303).emissive(0x111111).shininess(10)
+				//.map(clothTexture)
+				.skinning(true)
+				.visible(true)
+				//.wireframe(true)//wire frame
+				//.side(THREE.DoubleSide)
+				);
+		
+		SkinnedMesh clothBoxMesh = THREE.SkinnedMesh(clothBox,boxhMaterial);
+		data.setSkinnedMesh(clothBoxMesh);
+		simulator.getAmmoHairControler().getAmmoControler().getScene().add(clothBoxMesh);
+		clothBoxMesh.getGeometry().computeBoundingSphere();//for camera
+		clothBoxMesh.getGeometry().computeBoundingBox();
+		
+		SkeletonHelper helper=THREE.SkeletonHelper(clothBoxMesh);
+		simulator.getAmmoHairControler().getAmmoControler().getScene().add(helper);
+		data.setSkeltonHelper(helper);
+		
+		
+		helper.setVisible(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone());//TODO get visible from setting
+		
+	}
 	private void createAmmoBoneHair(ClothSimulator simulator,AmmoHairControler.ParticleBodyDatas data,List<BodyAndMesh> ammoParticles) {
 		List<Vector3> positions=FluentIterable.from(ammoParticles).transform(BodyAndMeshFunctions.getMeshPosition()).transform(new CloneDivided(ammoMultipleScalar)).toList();
 		

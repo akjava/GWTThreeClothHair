@@ -114,15 +114,14 @@ public class HairGeometryCreator {
 				/*
 				 * TODO make face?
 				 */
-				/*
-				Vector3 pos=THREE.Vector3();
+				
 				
 				
 				for(int j=0;j<lastVertexSize;j++){
-					int at=geometry.getVertices().length()-1-j;
-					geometry.getVertices().get(at).copy(pos);
+					geometry.getVertices().get(j).copy(centerPos);
 				}
-				*/
+				
+				
 				
 				}
 			if(bonesEnableIndexList!=null && bonesEnableIndexList.size()==horizontalVertexCount){
