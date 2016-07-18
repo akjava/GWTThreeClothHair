@@ -750,12 +750,12 @@ public class ClothSimulator  {
 			//TODO add vector3,now only -1y
 			
 			if(hairData.isUseCustomNormal()){
-			
+			Vector3 customNormal=THREE.Vector3(0, -1, 0);
 			for(int i=0;i<noTargetedPinNormals.size();i++){
-				Vector3 tmp=noTargetedPinNormals.get(i).clone().normalize();
-				Vector3 tmp2=THREE.Vector3(0, -1, 0).add(tmp.multiplyScalar(hairData.getOriginalNormalRatio())).normalize();
+				//Vector3 tmp=noTargetedPinNormals.get(i).clone().normalize();
+				//Vector3 tmp2=THREE.Vector3(0, -1, 0).add(tmp.multiplyScalar(hairData.getOriginalNormalRatio())).normalize();
 				//ThreeLog.log("normal",tmp2);
-				noTargetedPinNormals.get(i).copy(tmp2);
+				noTargetedPinNormals.get(i).copy(customNormal.clone().lerp(noTargetedPinNormals.get(i).normalize(), hairData.getOriginalNormalRatio()));
 			}
 			}
 			
