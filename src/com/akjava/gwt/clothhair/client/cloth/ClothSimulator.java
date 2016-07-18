@@ -759,7 +759,7 @@ public class ClothSimulator  {
 			}
 			}
 			
-			// averaing normal 
+			// averaing normal add both side and normalize,take care of connect-horizontal
 			//TODO make function
 			if(hairData.isExecAverageNormal()){
 			List<Vector3> averageNormals=Lists.newArrayList();
