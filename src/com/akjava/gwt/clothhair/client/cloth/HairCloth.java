@@ -1243,15 +1243,11 @@ public class HairCloth {
 		
 		//force up normal //THREE.Vector3(0,1,0)
 		//Geometry clothBox=new PointsToGeometry().debug(false).flipNormal(true).reverseFirstSurface(true).createGeometry(positions, w, restDistance*ammoThick, isConnectHorizontal());
-		
-		//I'm not sure why circle effect vertical thick
-		//shape would rotate differenctly on path
-		double thick2=hairData.getAmmoBoneThickRatio2()==0?hairData.getThickRatio():hairData.getAmmoBoneThickRatio2();
-		
-		Geometry clothBox=HairGeometryCreator.merge(new HairGeometryCreator().horizontalThick(hairData.getThickRatio()).verticalThick(thick2).createGeometry(positions, w));
-		
-		
 		//
+		
+		/*
+		 * bone skip system  not good,still testing?
+		 */
 		int boneSkipStack=0; //useless,because particle start 0 make unstable 
 		int startPos=boneSkipStack*(w+1);
 		
@@ -1262,12 +1258,23 @@ public class HairCloth {
 			bonePos.add(positions.get(i));
 		}
 		JsArray<AnimationBone> bones=new PlainBoneCreator().startVerticalIndex(boneSkipStack).createBone(bonePos, w);
+		List<List<Integer>> enableList=PlainBoneCreator.splitBySlices(bones, w);
+		
+		
+		
+		//I'm not sure why circle effect vertical thick
+		//shape would rotate differenctly on path
+		double thick2=hairData.getAmmoBoneThickRatio2()==0?hairData.getThickRatio():hairData.getAmmoBoneThickRatio2();
+		
+		Geometry clothBox=HairGeometryCreator.merge(new HairGeometryCreator().bonesList(bones, enableList).horizontalThick(hairData.getThickRatio()).verticalThick(thick2).createGeometry(positions, w));
 		
 		clothBox.setBones(bones);
 		
-		int influence=2;
-		WeightResult result=new SimpleAutoWeight(influence).autoWeight(clothBox, clothBox.getBones(),Lists.newArrayList(0));//ignore root
-		result.insertToGeometry(clothBox);
+		
+		//int influence=2;
+		//WeightResult result=new SimpleAutoWeight(influence).autoWeight(clothBox, clothBox.getBones(),Lists.newArrayList(0));//ignore root
+		//result.insertToGeometry(clothBox);
+		
 		//LogUtils.log(result.toString());
 		
 		

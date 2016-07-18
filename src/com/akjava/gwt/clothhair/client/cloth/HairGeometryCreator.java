@@ -7,7 +7,10 @@ import java.util.List;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
+import com.akjava.gwt.three.client.gwt.boneanimation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.extras.geometries.ExtrudeGeometryParameter;
+import com.akjava.gwt.three.client.java.bone.SimpleAutoWeight;
+import com.akjava.gwt.three.client.java.bone.WeightResult;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.extras.core.Shape;
@@ -15,6 +18,7 @@ import com.akjava.gwt.three.client.js.extras.curves.CatmullRomCurve3;
 import com.akjava.gwt.three.client.js.extras.geometries.ExtrudeGeometry;
 import com.akjava.gwt.three.client.js.math.Vector2;
 import com.akjava.gwt.three.client.js.math.Vector3;
+import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 
 public class HairGeometryCreator {
@@ -31,6 +35,15 @@ public class HairGeometryCreator {
 		verticalThick=v;
 		return this;
 	}
+	
+	private List<List<Integer>> bonesEnableIndexList;
+	private JsArray<AnimationBone> bones;
+	public HairGeometryCreator bonesList(JsArray<AnimationBone> bones,List<List<Integer>> bonesEnableIndexList){
+		this.bones=bones;
+		this.bonesEnableIndexList=bonesEnableIndexList;
+		return this;
+	}
+	
 	public JsArray<Geometry> createGeometry(List<Vector3> positions,int slices){
 		checkArgument(positions.size()>1,"HairGeometryCreator:need atleast 2 points");
 		checkArgument(positions.size()>slices,"need at least slices");
@@ -112,6 +125,11 @@ public class HairGeometryCreator {
 				*/
 				
 				}
+			if(bonesEnableIndexList!=null && bonesEnableIndexList.size()==horizontalVertexCount){
+				WeightResult result=new SimpleAutoWeight(1).enableBones(bonesEnableIndexList.get(i)).autoWeight(geometry, bones);//ignore root
+				result.insertToGeometry(geometry);
+				
+			}
 			
 			geometries.push(geometry);
 		}
@@ -125,7 +143,7 @@ public class HairGeometryCreator {
 	
 	public static Geometry merge(JsArray<Geometry> geometries){
 		for(int i=1;i<geometries.length();i++){
-			geometries.get(0).merge(geometries.get(i));
+			geometries.get(0).gwtMergeWithSkinIndicesAndWeights(geometries.get(i));
 		}
 		return geometries.get(0);
 	}
