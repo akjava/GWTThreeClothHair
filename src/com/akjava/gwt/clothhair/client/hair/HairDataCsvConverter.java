@@ -33,7 +33,7 @@ public class HairDataCsvConverter extends Converter<HairData,String> {
 		csv.add(joiner.join(faceIndex));//1 face index
 		csv.add(joiner.join(vertexIndex));//2 vertex index
 		
-		csv.add(data.getSizeOfU()+":"+data.getSizeOfV());//3 u x v
+		csv.add(data.getSliceFaceCount()+":"+data.getSizeOfV());//3 u x v
 		
 		csv.add(data.isCutU()+":"+data.getStartCutUIndexV());//4 cutU 
 		csv.add(data.isDoNarrow()+":"+data.getStartNarrowIndexV()+":"+data.getNarrowScale());//5 do narrow

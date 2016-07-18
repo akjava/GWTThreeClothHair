@@ -33,7 +33,7 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		wrapper.setArrayNumber("vertexOfFaceIndexes", vertexIndexes);
 		wrapper.setArrayNumber("targetIndexes", targetIndexes);
 		//general
-		wrapper.setInt("sliceFace", hairData.getSizeOfU());
+		wrapper.setInt("sliceFace", hairData.getSliceFaceCount());
 		wrapper.setInt("stackFace", hairData.getSizeOfV());
 		wrapper.setDouble("faceWidthScale", hairData.getScaleOfU());
 		wrapper.setBoolean("cutHorizontal", hairData.isCutU());
@@ -117,7 +117,7 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 			hairData.getHairPins().add(pin);
 		}
 		//parse common
-		int sliceFace=object.getInt("sliceFace", hairData.getSizeOfU());
+		int sliceFace=object.getInt("sliceFace", hairData.getSliceFaceCount());
 		int stackFace=object.getInt("stackFace", hairData.getSizeOfV());
 		double faceWidthScale=object.getDouble("faceWidthScale", hairData.getScaleOfU());
 		//TODO add faceHeightScale

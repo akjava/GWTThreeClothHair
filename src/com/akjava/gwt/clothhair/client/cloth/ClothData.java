@@ -25,7 +25,7 @@ public Mesh getClothMesh() {
 public void setClothMesh(Mesh clothMesh) {
 	this.clothMesh = clothMesh;
 }
-public HairCloth getCloth() {
+public HairCloth getHairCloth() {
 	return cloth;
 }
 public void setCloth(HairCloth cloth) {

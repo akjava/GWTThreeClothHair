@@ -12,7 +12,47 @@ import com.google.common.collect.Lists;
 public class HairPointUtils {
 	private HairPointUtils(){}
 	//two point style
-	public static void syncCircleStyle(HairCloth hairCloth,Vector3 centerPoint,Vector3 addPoint,boolean hairPinOnly){
+	
+	public static void updateFirstRowStyle(HairCloth hairCloth,List<Vector3> generalPinVertex,List<Vector3> customlPinVertex,List<Integer> customPinTarget){
+		int generalPinSize=generalPinVertex.size();
+		int sliceFaceCount=hairCloth.getSliceFaceCount();
+		
+		for(int i=0;i<generalPinSize;i++){
+			Vector3 v1=generalPinVertex.get(i);//data.getCalculator().getResult().get(i);
+			
+			int index=sliceFaceCount*i;
+			
+			hairCloth.particles.get(index).setAllPosition(v1);
+			
+			
+			if(i!=generalPinSize-1){ //has next;
+				Vector3 v2=generalPinVertex.get(i+1);
+				for(int j=1;j<sliceFaceCount;j++){//0 is core
+					int at=index+j;
+					
+					double percent=(double)j/sliceFaceCount;
+					if(hairCloth.isPinned(at)){
+					hairCloth.particles.get(at).setAllPosition(v1.clone().lerp(v2, percent));
+					}else{
+						
+					}
+					
+				}
+				
+			}
+		}
+		
+		//handle custom pin not tested so much
+		for(int i=0;i<customlPinVertex.size();i++){
+			Vector3 v=customlPinVertex.get(i);
+			
+			if(hairCloth.isPinned(customPinTarget.get(i))){
+				hairCloth.particles.get(customPinTarget.get(i)).setAllPosition(v);
+			}
+		}
+		
+	}
+	public static void updateCircleStyle(HairCloth hairCloth,Vector3 centerPoint,Vector3 addPoint,boolean hairPinOnly){
 		
 		
 		
@@ -31,7 +71,7 @@ public class HairPointUtils {
 		}
 		
 		
-		int cw=hairCloth.getSizeOfU();
+		int cw=hairCloth.getSliceFaceCount();
 		
 		int angleSplit=startAndEndSame?cw:cw+1;
 		

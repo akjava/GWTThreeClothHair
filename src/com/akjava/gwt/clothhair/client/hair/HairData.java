@@ -125,7 +125,7 @@ public int countNormalPin(){
  * Interpolate linear.
  */
 private int sliceFaceCount=8;//sizeOfU
-public int getSizeOfU() {
+public int getSliceFaceCount() {
 	return sliceFaceCount;
 }
 public void setSizeOfU(int sizeOfU) {

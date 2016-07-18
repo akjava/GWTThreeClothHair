@@ -568,7 +568,7 @@ public class ClothSimulator  {
 		ClothData data=new ClothData(hairData,characterMesh);
 		
 		
-		data.getCloth().setPinAll();//force pin all
+		data.getHairCloth().setPinAll();//force pin all
 		
 		
 		//data.getCloth().ballSize=clothControls.getBallSize();
@@ -642,16 +642,16 @@ public class ClothSimulator  {
 		
 		HairMixedData cellData=new HairMixedData(hairData,data,clothMesh);
 		
-		boolean startCenter=data.getCloth().isStartCircleCenter();//start circle from center or not
-		boolean startAndEndSame=data.getCloth().isStartAndEndSameCircle();
+		boolean startCenter=data.getHairCloth().isStartCircleCenter();//start circle from center or not
+		boolean startAndEndSame=data.getHairCloth().isStartAndEndSameCircle();
 		
-		boolean useFirstPointY=data.getCloth().isUseFirstPointY();
+		boolean useFirstPointY=data.getHairCloth().isUseFirstPointY();
 		//TODO make function,WARNING do same things in ClothControlers:syncPinPositions()
 		if(hairData.getHairPins().size()==2){
 			Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
 			Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
 			//TODO move and fix
-			HairPointUtils.syncCircleStyle(data.getCloth(), v1, v2,false);
+			HairPointUtils.updateCircleStyle(data.getHairCloth(), v1, v2,false);
 			/*
 			int cw=hairData.getSizeOfU();
 			int ch=hairData.getSizeOfV();
@@ -724,22 +724,23 @@ public class ClothSimulator  {
 		Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
 		
 		//TODO move and fix
-		int cw=hairData.getSizeOfU();
+		int cw=hairData.getSliceFaceCount();
 		int ch=hairData.getSizeOfV();
 		
-		data.getCloth().particles.get(0).setAllPosition(v1);
-		data.getCloth().particles.get(cw).setAllPosition(v2);
+		data.getHairCloth().particles.get(0).setAllPosition(v1);
+		data.getHairCloth().particles.get(cw).setAllPosition(v2);
 		
 		
 		Vector3 sub=v2.clone().sub(v1).divideScalar(cw+1);
 		for(int i=1;i<cw;i++){
 			Vector3 v=sub.clone().multiplyScalar(i).add(v1);
-			data.getCloth().particles.get(i).setAllPosition(v);
+			data.getHairCloth().particles.get(i).setAllPosition(v);
 		}
 		
 		
 		
 		}else{
+			
 			//only core pins,only use no-custom pin
 			//THIS IS IMMUTABLE
 			List<Vector3> noTargetedPinNormals=FluentIterable.from(hairData.getHairPins()).filter(HairPinPredicates.NoTargetOnly()).transform(new HairPinToNormal(characterMesh,true)).toList();
@@ -764,7 +765,7 @@ public class ClothSimulator  {
 			for(int i=0;i<noTargetedPinNormals.size();i++){
 				Vector3 normal=THREE.Vector3();
 				if(i-1<0){
-					if(data.getCloth().isConnectHorizontal()){
+					if(data.getHairCloth().isConnectHorizontal()){
 						normal.add(noTargetedPinNormals.get(noTargetedPinNormals.size()-1));
 					}
 				}else{
@@ -774,7 +775,7 @@ public class ClothSimulator  {
 				normal.add(noTargetedPinNormals.get(i));
 				
 				if(i+1==noTargetedPinNormals.size()){
-					if(data.getCloth().isConnectHorizontal()){
+					if(data.getHairCloth().isConnectHorizontal()){
 						normal.add(noTargetedPinNormals.get(0));
 					}
 				}else{
@@ -800,7 +801,7 @@ public class ClothSimulator  {
 			
 			
 			//separate custom and notarget
-			int cw=hairData.getSizeOfU();
+			int sliceFaceCount=hairData.getSliceFaceCount();
 			
 			List<HairPin> noTargetPins=Lists.newArrayList();
 			List<HairPin> customPin=Lists.newArrayList();
@@ -821,15 +822,15 @@ public class ClothSimulator  {
 			
 			
 			
-			int normalSize=0;
+			int normalSize=0;//for debug
 			
 			for(int i=0;i<noTargetPins.size();i++){
 				Vector3 v1=hairPinToVertex(characterMesh,noTargetPins.get(i),true);
 				
 				//executeSphereOut(v1,spheres);//for test
 				
-				int index=hairData.getSizeOfU()*i;
-				data.getCloth().particles.get(index).setAllPosition(v1);
+				int index=hairData.getSliceFaceCount()*i;
+				data.getHairCloth().particles.get(index).setAllPosition(v1);
 				
 				//LogUtils.log("main:"+index);
 				
@@ -837,18 +838,22 @@ public class ClothSimulator  {
 				normals.add(noTargetedPinNormals.get(i));
 				
 				//interporating
-				if(i!=noTargetPins.size()-1){
+				if(i!=noTargetPins.size()-1){//not last, has next
 					//has next;
 					Vector3 v2=hairPinToVertex(characterMesh,noTargetPins.get(i+1),true);
-					Vector3 sub=v2.clone().sub(v1).divideScalar(cw);
+					//Vector3 sub=v2.clone().sub(v1).divideScalar(sliceFaceCount);
 					
-					for(int j=1;j<cw;j++){
-						int multiple=j;
-						int at=index+j;
-						Vector3 v=sub.clone().multiplyScalar(multiple).add(v1);
-						data.getCloth().particles.get(at).setAllPosition(v);
+					for(int j=1;j<sliceFaceCount;j++){
 						
-						normals.add(noTargetedPinNormals.get(i).clone().add(noTargetedPinNormals.get(i+1)).divideScalar(2));
+						int at=index+j;
+						
+						double percent=(double)j/sliceFaceCount;
+						//int multiple=j;
+						//Vector3 v=sub.clone().multiplyScalar(multiple).add(v1);
+						
+						data.getHairCloth().particles.get(at).setAllPosition(v1.clone().lerp(v2, percent));
+						
+						normals.add(noTargetedPinNormals.get(i).clone().lerp(noTargetedPinNormals.get(i+1),percent));
 						//LogUtils.log("sub:"+at);
 						normalSize++;
 					}
@@ -865,15 +870,16 @@ public class ClothSimulator  {
 			
 			
 			//init other posisions
-			for(int j=data.getCloth().getW()+1;j<data.getCloth().particles.size();j++){
-				int x=j%(data.getCloth().getW()+1);
-				int y=j/(data.getCloth().getW()+1);
+			for(int j=data.getHairCloth().getW()+1;j<data.getHairCloth().particles.size();j++){
+				int x=j%(data.getHairCloth().getW()+1);
+				int y=j/(data.getHairCloth().getW()+1);
 				//LogUtils.log(j+"="+x);
-				Vector3 pos=data.getCloth().particles.get(x).getOriginal().clone();
+				Vector3 pos=data.getHairCloth().particles.get(x).getOriginal().clone();
 				//copy upper x
 				
-				//open widely
-				data.getCloth().particles.get(j).setAllPosition(pos);
+				//without normal initial position is same as parent
+				data.getHairCloth().particles.get(j).setAllPosition(pos);
+				ThreeLog.log("origin:"+j,pos);
 				
 				//try to narrow but faild
 				//pos.add(noTargetedPinNormals.get(x).clone().normalize().multiplyScalar( -data.getCloth().getRestDistance()*0.5 ));
@@ -883,17 +889,19 @@ public class ClothSimulator  {
 				//Vector3  start=normals.get(x).clone().normalize().multiplyScalar( data.getCloth().getRestDistance()*y ).add(pos);
 				//data.getCloth().particles.get(j).setAllPosition(start);
 			
-				if(noTargetedPinNormals.size()==data.getCloth().getW()+1){
+				if(noTargetedPinNormals.size()==data.getHairCloth().getW()+1){
 				//	LogUtils.log("can use normal");
-					Vector3  normalPosition=noTargetedPinNormals.get(x).clone().normalize().multiplyScalar( data.getCloth().getRestDistance()*y ).add(pos);
-					data.getCloth().particles.get(j).setAllPosition(normalPosition);
+					Vector3  normalAddPosition=noTargetedPinNormals.get(x).clone().normalize().multiplyScalar( data.getHairCloth().getRestDistance()*y ).add(pos);
+					data.getHairCloth().particles.get(j).setAllPosition(normalAddPosition);
+					ThreeLog.log(""+j,normalAddPosition);
 				}
 				
 			}
 			
+			//overwrite pin
 			for(HairPin pin:customPin){
 				Vector3 v=hairPinToVertex(characterMesh,pin,true);
-				data.getCloth().particles.get(pin.getTargetClothIndex()).setAllPosition(v);
+				data.getHairCloth().particles.get(pin.getTargetClothIndex()).setAllPosition(v);
 			}
 			
 			
@@ -903,7 +911,8 @@ public class ClothSimulator  {
 			}
 			*/
 			
-			int w=data.getCloth().getW()+1;
+			//initialize pin
+			int w=data.getHairCloth().getW()+1;
 			int[] newPins=new int[w+customPin.size()];
 			for(int i=0;i<w;i++){
 				newPins[i]=i;
@@ -911,14 +920,21 @@ public class ClothSimulator  {
 			for(int i=0;i<customPin.size();i++){
 				newPins[w+i]=customPin.get(i).getTargetClothIndex();
 			}
-			data.getCloth().setPins(newPins);
+			data.getHairCloth().setPins(newPins);
 			
-			/*
+			
 			LogUtils.log("pins");
 			for(int i=0;i<newPins.length;i++){
 				LogUtils.log(newPins[i]);
 			}
-			*/
+			
+			LogUtils.log("mass");
+			for (int i=0;i<data.getHairCloth().particles.size();i++) {
+				if(data.getHairCloth().particles.get(i).getMass()==0){
+					LogUtils.log(i);
+				}
+			}
+			
 		
 			/*
 			if(customPin.size()>0){
@@ -978,8 +994,8 @@ public class ClothSimulator  {
 		//data.getCloth().recalcurateHorizontalConstraintsDistance();
 		
 		//LogUtils.log("constraints-distance");
-		for(int i=0;i<data.getCloth().getConstrains().size();i++){
-			if(!data.getCloth().isHorizontalConstraints(data.getCloth().getConstrains().get(i))){
+		for(int i=0;i<data.getHairCloth().getConstrains().size();i++){
+			if(!data.getHairCloth().isHorizontalConstraints(data.getHairCloth().getConstrains().get(i))){
 			//	LogUtils.log(i+","+data.getCloth().getConstrains().get(i).getDistance());
 			}
 		}
@@ -1005,8 +1021,8 @@ public class ClothSimulator  {
 	
 	
 	//replace if ammo data exist
-	if(getAmmoHairControler().getAmmoData(selection.getClothData().getCloth())!=null){
-		ParticleBodyDatas datas=getAmmoHairControler().getAmmoData(selection.getClothData().getCloth());
+	if(getAmmoHairControler().getAmmoData(selection.getClothData().getHairCloth())!=null){
+		ParticleBodyDatas datas=getAmmoHairControler().getAmmoData(selection.getClothData().getHairCloth());
 		if(datas.getSkinnedMesh()!=null){//AMMO_BONE mode
 			material=datas.getSkinnedMesh().getMaterial().gwtCastMeshPhongMaterial();
 		}

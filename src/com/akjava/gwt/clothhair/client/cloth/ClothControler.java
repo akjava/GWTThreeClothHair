@@ -54,8 +54,8 @@ public class ClothControler {
 	}
 
 	public void addClothData(ClothData data){
-		data.getCloth().wind=wind;
-		data.getCloth().setFloorModifier(floorModifier);
+		data.getHairCloth().wind=wind;
+		data.getHairCloth().setFloorModifier(floorModifier);
 		cloths.add(data);
 	}
 	public void removeClothData(ClothData data){
@@ -67,7 +67,7 @@ public class ClothControler {
 		syncPins();
 		
 		for(ClothData data:cloths){
-			HairCloth cloth=data.getCloth();
+			HairCloth cloth=data.getHairCloth();
 			Geometry clothGeometry=data.getClothGeometry();
 			
 			cloth.beforeSimulate(simulator,clothGeometry,getSphereList(cloth.getChannel()));//set otherwhere?
@@ -80,7 +80,7 @@ public class ClothControler {
 		
 		Vector3 windForce=THREE.Vector3().set(Math.sin( time / 2000 ), Math.cos( time / 3000 ), Math.sin( time / 1000 ) ).normalize().multiplyScalar( windStrength );
 		for(ClothData data:cloths){
-			HairCloth cloth=data.getCloth();
+			HairCloth cloth=data.getHairCloth();
 			//cloth.wind=true;
 			Geometry clothGeometry=data.getClothGeometry();
 			
@@ -125,7 +125,7 @@ public class ClothControler {
 	public void setFloorModifier(FloorModifier floorModifier) {
 		this.floorModifier = floorModifier;
 		for(ClothData data:cloths){
-			HairCloth cloth=data.getCloth();
+			HairCloth cloth=data.getHairCloth();
 			cloth.setFloorModifier(floorModifier);
 		}
 	}
@@ -137,17 +137,17 @@ public class ClothControler {
 			return;
 		}
 		
-		boolean startCenter=data.getCloth().isStartCircleCenter();
-		boolean startAndEndSame=data.getCloth().isStartAndEndSameCircle();
+		boolean startCenter=data.getHairCloth().isStartCircleCenter();
+		boolean startAndEndSame=data.getHairCloth().isStartAndEndSameCircle();
 		
-		boolean useFirstPointY=data.getCloth().isUseFirstPointY();
+		boolean useFirstPointY=data.getHairCloth().isUseFirstPointY();
 		
 		if(data.getCalculator().getResult().size()==2){
 			//TODO merge method
 			Vector3 v1=data.getCalculator().getResult().get(0);
 			Vector3 v2=data.getCalculator().getResult().get(1);
 			
-			HairPointUtils.syncCircleStyle(data.getCloth(), v1, v2,true);
+			HairPointUtils.updateCircleStyle(data.getHairCloth(), v1, v2,true);
 			/*
 			//TODO move and fix
 			int cw=data.getCloth().getW();
@@ -180,27 +180,27 @@ public class ClothControler {
 			//TODO sync
 		}else //old one not reach code
 		if(data.getCalculator().getResult().size()<3){//2pins
-			int cw=data.getCloth().getW();
+			int cw=data.getHairCloth().getW();
 			Vector3 v1=data.getCalculator().getResult().get(0);
 			Vector3 v2=data.getCalculator().getResult().get(1);
 			
 			Vector3 diff=THREE.Vector3();
-			diff.copy(data.getCloth().particles.get(0).position).sub(v1);
+			diff.copy(data.getHairCloth().particles.get(0).position).sub(v1);
 			
-			data.getCloth().particles.get(0).setAllPosition(v1);
-			data.getCloth().particles.get(cw).setAllPosition(v2);
+			data.getHairCloth().particles.get(0).setAllPosition(v1);
+			data.getHairCloth().particles.get(cw).setAllPosition(v2);
 			
 			
 			Vector3 sub=v2.clone().sub(v1).divideScalar(cw+1);
 			for(int i=1;i<cw;i++){
 				Vector3 v=sub.clone().multiplyScalar(i).add(v1);
-				data.getCloth().particles.get(i).setAllPosition(v);
+				data.getHairCloth().particles.get(i).setAllPosition(v);
 			}
 			
-			if(data.getCloth().isSyncMove()){
-				for(int i=cw;i<data.getCloth().particles.size();i++){
-					data.getCloth().particles.get(i).position.sub(diff);
-					data.getCloth().particles.get(i).previous.sub(diff);
+			if(data.getHairCloth().isSyncMove()){
+				for(int i=cw;i<data.getHairCloth().particles.size();i++){
+					data.getHairCloth().particles.get(i).position.sub(diff);
+					data.getHairCloth().particles.get(i).previous.sub(diff);
 				}
 			}
 			
@@ -212,18 +212,36 @@ public class ClothControler {
 			
 			
 			List<Vector3> generalPinVertex=Lists.newArrayList();
-			List<Vector3> customlVertex=Lists.newArrayList();
-			List<Integer> customTarget=Lists.newArrayList();
+			List<Vector3> customlPinVertex=Lists.newArrayList();
+			List<Integer> customPinTarget=Lists.newArrayList();
 			
+			//LogUtils.log("pinSize:"+data.getCalculator().getSkinningVertexs().size());
 			
 			for(int i=0;i<data.getCalculator().getSkinningVertexs().size();i++){
 				if(data.getCalculator().getSkinningVertexs().get(i).getTargetClothIndex()==-1){
 					generalPinVertex.add(data.getCalculator().getResult().get(i));
 				}else{
-					customlVertex.add(data.getCalculator().getResult().get(i));
-					customTarget.add(data.getCalculator().getSkinningVertexs().get(i).getTargetClothIndex());
+					customlPinVertex.add(data.getCalculator().getResult().get(i));
+					customPinTarget.add(data.getCalculator().getSkinningVertexs().get(i).getTargetClothIndex());
 				}
 			}
+			
+			
+			
+			int generalPinSize=generalPinVertex.size();
+			
+			int sizeOfU=data.getHairCloth().getW()/(generalPinSize-1);//TODO change just size of U
+			
+			if(sizeOfU!=data.getHairCloth().getSliceFaceCount()){
+				LogUtils.log("invalid size of u:"+sizeOfU);
+			}
+			
+			Vector3 diff=THREE.Vector3();
+			diff.copy(data.getHairCloth().particles.get(0).position).sub(generalPinVertex.get(0));
+			
+			
+			HairPointUtils.updateFirstRowStyle(data.getHairCloth(), generalPinVertex, customlPinVertex, customPinTarget);
+			
 			
 			/**
 			 * 
@@ -237,71 +255,16 @@ public class ClothControler {
 			 * 
 			 */
 			
-			int generalPinSize=generalPinVertex.size();
-			
-			int sizeOfU=data.getCloth().getW()/(generalPinSize-1);//TODO change just size of U
-			
-			if(sizeOfU!=data.getCloth().getSizeOfU()){
-				LogUtils.log("invalid size of u:"+sizeOfU);
-			}
-			
-			Vector3 diff=THREE.Vector3();
-			for(int i=0;i<generalPinSize;i++){
-				Vector3 v1=generalPinVertex.get(i);//data.getCalculator().getResult().get(i);
-				
-				int index=sizeOfU*i;
-				
-				if(i==0){//used for sync
-					diff.copy(data.getCloth().particles.get(0).position).sub(v1);
-				}
-				
-				if(data.getCloth().isPinned(index)){
-					data.getCloth().particles.get(index).setAllPosition(v1);
-				}
-				//LogUtils.log("main:"+index);
-				
-				//interpolate
-				if(i!=generalPinSize-1){
-					//has next;
-					Vector3 v2=generalPinVertex.get(i+1);
-					//Vector3 v2=data.getCalculator().getResult().get(i+1);
-					
-					
-					Vector3 sub=v2.clone().sub(v1).divideScalar(sizeOfU);
-					
-					for(int j=1;j<sizeOfU;j++){
-						int multiple=j;
-						int at=index+j;
-						Vector3 v=sub.clone().multiplyScalar(multiple).add(v1);
-						
-						if(data.getCloth().isPinned(at)){
-							data.getCloth().particles.get(at).setAllPosition(v);
-						}
-						
-						//LogUtils.log("sub:"+at);
-					}
-					
-				}
-			}
-			
-			
 			//complete sync
-			if(data.getCloth().isSyncMove()){
-				for(int i=sizeOfU;i<data.getCloth().particles.size();i++){
-					data.getCloth().particles.get(i).position.sub(diff);
-					data.getCloth().particles.get(i).previous.sub(diff);
+			if(data.getHairCloth().isSyncMove()){
+				//no static pin need move
+				for(int i=data.getHairCloth().getW();i<data.getHairCloth().particles.size();i++){
+					data.getHairCloth().particles.get(i).position.sub(diff);
+					data.getHairCloth().particles.get(i).previous.sub(diff);
 				}
 			}
 			
-			//custom - update
 			
-			for(int i=0;i<customlVertex.size();i++){
-				Vector3 v=customlVertex.get(i);
-				
-				if(data.getCloth().isPinned(customTarget.get(i))){
-					data.getCloth().particles.get(customTarget.get(i)).setAllPosition(v);
-				}
-			}
 			
 		}
 		//for(int i=0;i<data.getCalculator().g)
@@ -313,7 +276,7 @@ public class ClothControler {
 	public void setWind(boolean value){
 		this.wind=value;
 		for(ClothData data:cloths){
-			data.getCloth().wind=value;
+			data.getHairCloth().wind=value;
 		}
 	}
 	
@@ -340,7 +303,7 @@ public class ClothControler {
 	boolean debugfirstTime=false;
 	public void renderCloth(){
 		for(ClothData data:cloths){
-			HairCloth cloth=data.getCloth();
+			HairCloth cloth=data.getHairCloth();
 			Geometry clothGeometry=data.getClothGeometry();
 			
 			List<HairCloth.Particle> p = cloth.particles;

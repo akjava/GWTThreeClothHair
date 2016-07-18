@@ -255,6 +255,10 @@ public class HairCloth {
 
 		private Vector3 a;
 		private double mass;
+		public double getMass() {
+			return mass;
+		}
+
 		private double invMass;
 		private Vector3 tmp;
 		private Vector3 tmp2;
@@ -313,8 +317,8 @@ public class HairCloth {
 		return w;
 	}
 
-	public int getSizeOfU(){
-		return hairData.getSizeOfU();
+	public int getSliceFaceCount(){
+		return hairData.getSliceFaceCount();
 	}
 
 	/**
@@ -431,7 +435,7 @@ public class HairCloth {
 	//private int hairPhysicsType;
 	private HairData hairData;
 	public HairCloth(HairData hairData,Mesh mesh){
-		checkArgument(hairData.getSizeOfU()!=0,"HairCloth:invalid u-size 0");
+		checkArgument(hairData.getSliceFaceCount()!=0,"HairCloth:invalid u-size 0");
 		checkNotNull(mesh,"HairCloth:mesh is null");
 		this.hairData=hairData.clone();
 		
@@ -466,7 +470,7 @@ public class HairCloth {
 		
 		
 			
-			this.w = (normalPin.size()-1)*hairData.getSizeOfU();
+			this.w = (normalPin.size()-1)*hairData.getSliceFaceCount();
 			
 			
 			this.h = hairData.getSizeOfV();
@@ -762,18 +766,23 @@ public class HairCloth {
 			Particle particle = particles.get(i);
 			Vector3 pos = particle.position;
 			
-			for(Mesh data:spheres){
+			//this simple style collision detector works on sphere
+			for(Mesh mesh:spheres){
+				JsSphereData jsData=mesh.getUserData().cast();
+				if(jsData.getType()!=SphereData.TYPE_SPHERE){
+					continue;
+				}
 				/*
 				if(!data.isEnabled()){
 					continue;
 				}
 				*/
 				
-				diff.subVectors(pos, data.getPosition());
-				if (diff.length() < data.getScale().getX()) {
+				diff.subVectors(pos, mesh.getPosition());
+				if (diff.length() < mesh.getScale().getX()) {
 					// collided
-					diff.normalize().multiplyScalar(data.getScale().getX());
-					pos.copy(data.getPosition()).add(diff);
+					diff.normalize().multiplyScalar(mesh.getScale().getX());
+					pos.copy(mesh.getPosition()).add(diff);
 					//break;//?
 				}
 				

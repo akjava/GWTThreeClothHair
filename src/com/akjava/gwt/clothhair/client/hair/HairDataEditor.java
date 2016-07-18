@@ -531,7 +531,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			public void setValue(HairData value) {
 				
 				this.value=value;
-				uSize.setValue(value.getSizeOfU());
+				uSize.setValue(value.getSliceFaceCount());
 				vSize.setValue(value.getSizeOfV());
 				scaleOfU.setValue(value.getScaleOfU());
 				cutCheck.setValue(value.isCutU());

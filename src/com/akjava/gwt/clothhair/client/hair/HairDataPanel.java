@@ -269,7 +269,7 @@ public class HairDataPanel extends VerticalPanel{
 					@Override
 					public String getValue(HairMixedData object) {
 						
-						return Strings.padStart(String.valueOf(object.getHairData().getSizeOfU()),2,'0')+","+
+						return Strings.padStart(String.valueOf(object.getHairData().getSliceFaceCount()),2,'0')+","+
 								Strings.padStart(String.valueOf(object.getHairData().getSizeOfV()),2,'0')+","+
 						object.getHairData().getScaleOfU();
 						//return hairDataConverter.convert(object.getHairData());
@@ -663,7 +663,7 @@ public class HairDataPanel extends VerticalPanel{
 	
 	
 	protected Geometry convertSelectionToGeometry(HairMixedData selection) {
-		ParticleBodyDatas data=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().getAmmoData(selection.getClothData().getCloth());
+		ParticleBodyDatas data=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().getAmmoData(selection.getClothData().getHairCloth());
 		if(data.getSkinnedMesh()==null){
 			LogUtils.log("convertSelectionToGeometry:now only suuport skinnedMesh");
 		}
@@ -719,7 +719,7 @@ public class HairDataPanel extends VerticalPanel{
 	private void updateHairVisible(HairMixedData data,boolean visible){
 		
 		
-		ParticleBodyDatas ammoData=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().getAmmoData(data.getClothData().getCloth());
+		ParticleBodyDatas ammoData=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().getAmmoData(data.getClothData().getHairCloth());
 		if(ammoData!=null){
 			if(ammoData.getSkinnedMesh()!=null){
 				ammoData.getSkinnedMesh().setVisible(visible);
@@ -1090,7 +1090,7 @@ private void clearAllPoints(){
 		//remove physics data
 		
 		GWTThreeClothHair.INSTANCE.getAmmoHairControler()
-		.removeParticleData(data.getClothData().getCloth());
+		.removeParticleData(data.getClothData().getHairCloth());
 		
 		
 		//no need to sphere data

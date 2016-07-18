@@ -100,7 +100,7 @@ public class GravityPanel extends VerticalPanel{
 	protected void updateGravity() {
 		
 		for(ClothData data:controls.getCloths()){
-			data.getCloth().initGravity(mass,damping, gravity);
+			data.getHairCloth().initGravity(mass,damping, gravity);
 		}
 	}
 	
