@@ -25,7 +25,10 @@ public class HairGeometryCreator {
 	private double horizontalThick=0.5;
 	private double verticalThick=0.5;
 	
-	private boolean mergeFirstEdge=true;
+	/**
+	 * for remove hole when not start center
+	 */
+	private boolean mergeFirstCenter=false;
 	private boolean mergeLastEdge=true;
 	public HairGeometryCreator horizontalThick(double v){
 		horizontalThick=v;
@@ -71,7 +74,7 @@ public class HairGeometryCreator {
 		int lastVertexSize=shape.getPoints(12).length();//default curve
 		
 		Vector3 centerPos=THREE.Vector3();
-		if(mergeFirstEdge){
+		if(mergeFirstCenter){
 		for(int i=0;i<horizontalVertexCount;i++){
 			centerPos.add(positions.get(i));
 		}
@@ -110,7 +113,7 @@ public class HairGeometryCreator {
 			}
 			}
 			
-			if(mergeFirstEdge){
+			if(mergeFirstCenter){
 				/*
 				 * TODO make face?
 				 */

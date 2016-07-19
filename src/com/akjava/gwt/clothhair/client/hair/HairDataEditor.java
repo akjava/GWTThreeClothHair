@@ -152,6 +152,11 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			rootPanel.add(ammoBonePanel);
 			ammoBonePanel.setVisible(false);
 			
+			
+			final VerticalPanel ammoHairPanel=new VerticalPanel();
+			ammoHairPanel.setVisible(false);
+			rootPanel.add(ammoHairPanel);
+			
 			uSize = new LabeledInputRangeWidget2("Slices(horizon)", 1, 80, 1);
 			uSize.setTitle("Face Slicing(spliting).\n");
 			corePanel.add(uSize);
@@ -351,18 +356,22 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 						plainClothPanel.setVisible(true);
 						ammoPanel.setVisible(false);
 						ammoBonePanel.setVisible(false);
+						ammoHairPanel.setVisible(false);
 					}else if(type==HairData.TYPE_AMMO_CLOTH){
 						plainClothPanel.setVisible(false);
 						ammoPanel.setVisible(true);
 						ammoBonePanel.setVisible(false);
+						ammoHairPanel.setVisible(false);
 					}else if(type==HairData.TYPE_AMMO_BONE_CLOTH){
 						plainClothPanel.setVisible(false);
 						ammoPanel.setVisible(true);
 						ammoBonePanel.setVisible(true);
+						ammoHairPanel.setVisible(false);
 					}else if(type==HairData.TYPE_AMMO_BONE_HAIR){
 						plainClothPanel.setVisible(false);
 						ammoPanel.setVisible(true);
 						ammoBonePanel.setVisible(true);
+						ammoHairPanel.setVisible(true);
 					}
 				}
 				
@@ -420,12 +429,16 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			option1Pane3.add(syncMoveLinearEditor);
 			
 			
+			HorizontalPanel ammoPanel0=new HorizontalPanel();
+			ammoPanel0.setVerticalAlignment(ALIGN_MIDDLE);
+			ammoPanel.add(ammoPanel0);
+			
 			HorizontalPanel ammoPanel1=new HorizontalPanel();
 			ammoPanel1.setVerticalAlignment(ALIGN_MIDDLE);
 			ammoPanel.add(ammoPanel1);
 			
 			circleStyleCheck = new CheckBox("circleStyle");
-			ammoPanel1.add(circleStyleCheck);
+			ammoPanel0.add(circleStyleCheck);
 			
 			startCenterCircleCheck = new CheckBox("start center circle");
 			ammoPanel1.add(startCenterCircleCheck);
