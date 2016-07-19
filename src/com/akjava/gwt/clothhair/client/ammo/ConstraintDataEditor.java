@@ -223,7 +223,7 @@ public class ConstraintDataEditor extends VerticalPanel implements Editor<AmmoCo
 					angularUpperLimiEditor.setEnabled(false);
 					linearLowerLimitEditor.setEnabled(false);
 					linearUpperLimitEditor.setEnabled(false);
-
+					return;
 				}else{
 					useLinearReferenceFrameAEditor.setEnabled(true);
 					disableCollisionsBetweenLinkedBodiesEditor.setEnabled(true);

@@ -2,11 +2,11 @@ package com.akjava.gwt.clothhair.client.hair;
 
 import com.akjava.gwt.clothhair.client.JSONObjectWrapper;
 import com.akjava.gwt.clothhair.client.ammo.BodyDataConverter;
+import com.akjava.gwt.clothhair.client.ammo.ConstraintDataConverter;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataConverter;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
-import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.google.common.base.Converter;
 import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -75,6 +75,13 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		if(hairData.isUseCustomBodyParticleData() && hairData.getAmmoBodyParticleData()!=null){
 			JSONObject ammoParticleObject=new BodyDataConverter().convert(hairData.getAmmoBodyParticleData());
 			ammoObjectWrapper.setObject("ammoBodyParticleData", ammoParticleObject);
+			
+		}
+		
+		ammoObjectWrapper.setBoolean("useCustomConstraintData", hairData.isUseCustomConstraintData());
+		if(hairData.isUseCustomConstraintData() && hairData.getAmmoConstraintData()!=null){
+			JSONObject ammoConstraintObject=new ConstraintDataConverter().convert(hairData.getAmmoConstraintData());
+			ammoObjectWrapper.setObject("ammoConstraintData", ammoConstraintObject);
 			
 		}
 		
@@ -206,6 +213,20 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 					LogUtils.log("useCustomBodyParticleData is true,but no ammoBodyParticleData");
 				}
 			}
+			
+			
+			hairData.setUseCustomConstraintData(ammoObjectWrapper.getBoolean("useCustomConstraintData", hairData.isUseCustomConstraintData()));
+			if(hairData.isUseCustomConstraintData()){
+				JSONObjectWrapper ammoObject=ammoObjectWrapper.getObject("ammoConstraintData");
+				if(ammoObject!=null){
+					hairData.setAmmoConstraintData(new ConstraintDataConverter().reverse().convert(ammoObject.jsonObject()));
+					
+				}else{
+					LogUtils.log("useCustomConstraintData is true,but no ammoConstraintData");
+				}
+
+			}
+			
 			
 			
 			hairData.setParticleType(ammoObjectWrapper.getInt("particleType", hairData.getParticleType()));

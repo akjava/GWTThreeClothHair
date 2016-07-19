@@ -900,7 +900,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		}else{
 			updateVertexVisible(true);
 		}
-		
+		GWTThreeClothHair.INSTANCE.updateGUI();
 	}
 	
 

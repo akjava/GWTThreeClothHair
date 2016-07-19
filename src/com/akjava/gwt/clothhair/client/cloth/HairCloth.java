@@ -1082,64 +1082,8 @@ public class HairCloth {
 			
 			//make constraint
 
-			JsArray<btGeneric6DofSpringConstraint> ammoConstraints=JavaScriptUtils.createJSArray();
+			JsArray<btGeneric6DofSpringConstraint> ammoConstraints=createAmmoConstraints(simulator,ammoParticles);
 			
-			AmmoControler controler=simulator.getAmmoHairControler().getAmmoControler();
-			btTransform transform1=controler.makeTransform();
-			btTransform transform2=controler.makeTransform();
-			for(int i=0;i<constrains.size();i++){
-				Constrain con=constrains.get(i);
-				int p1=particles.indexOf(con.p1);
-				int p2=particles.indexOf(con.p2);
-				
-				int p1y=p1/(w+1);
-				int p2y=p2/(w+1);
-				
-				
-				boolean horizontalConnection=p1y==p2y;
-				
-				
-				
-				BodyAndMesh bm1=ammoParticles.get(p1);
-				BodyAndMesh bm2=ammoParticles.get(p2);
-				
-				//already multiple when created
-				Vector3 pos1=bm1.getMesh().getPosition();//.multiplyScalar(ammoMultipleScalar);
-				Vector3 pos2=bm2.getMesh().getPosition();//.multiplyScalar(ammoMultipleScalar);
-				
-				
-				AmmoConstraintPropertyData distanceConstraintProperties=simulator.getAmmoHairControler().getParticleConstraintData();
-				
-				//right now no difference
-				if(horizontalConnection){ 
-					//use tight make shaking but tigh together.
-					distanceConstraintProperties.setFrameInARelativePosRatio(distanceConstraintProperties.getFrameInARelativePosRatio());
-					distanceConstraintProperties.setFrameInBRelativePosRatio(distanceConstraintProperties.getFrameInBRelativePosRatio());
-				}else{
-					//A alway fixed,never rotate
-					distanceConstraintProperties.setFrameInARelativePosRatio(distanceConstraintProperties.getFrameInARelativePosRatio());
-					distanceConstraintProperties.setFrameInBRelativePosRatio(distanceConstraintProperties.getFrameInBRelativePosRatio());
-				}
-				
-				
-				
-				distanceConstraintProperties.updateFrameInA(transform1, pos1, pos2);
-				distanceConstraintProperties.updateFrameInB(transform2, pos1, pos2);
-				
-				
-				
-				//try to fixed length but not good
-				//transform2.getOrigin().copy(pos2.clone().sub(pos1).normalize().multiplyScalar(restDistance*ammoMultipleScalar));//keep length
-				
-				ConstraintAndLine constraintAndMesh=simulator.getAmmoHairControler().getAmmoControler().createGeneric6DofSpringConstraint(bm1, bm2, transform1, transform2, distanceConstraintProperties.isDisableCollisionsBetweenLinkedBodies());
-				constraintAndMesh.setVisibleLine(false);
-				
-				
-				
-				simulator.getAmmoHairControler().getAmmoControler().updateConstraint(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint(), distanceConstraintProperties,restDistance);
-				
-				ammoConstraints.push(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint());
-			}
 			AmmoHairControler.ParticleBodyDatas data=new AmmoHairControler.ParticleBodyDatas(ammoParticles,ammoConstraints);
 			
 			
@@ -1163,6 +1107,73 @@ public class HairCloth {
 		
 		//LogUtils.millisecond("total", watch);
 	}
+	private JsArray<btGeneric6DofSpringConstraint> createAmmoConstraints(ClothSimulator simulator, List<BodyAndMesh> ammoParticles) {
+		JsArray<btGeneric6DofSpringConstraint> ammoConstraints=JavaScriptUtils.createJSArray();
+		
+		AmmoControler controler=simulator.getAmmoHairControler().getAmmoControler();
+		btTransform transform1=controler.makeTransform();
+		btTransform transform2=controler.makeTransform();
+		for(int i=0;i<constrains.size();i++){
+			Constrain con=constrains.get(i);
+			int p1=particles.indexOf(con.p1);
+			int p2=particles.indexOf(con.p2);
+			
+			int p1y=p1/(w+1);
+			int p2y=p2/(w+1);
+			
+			
+			boolean horizontalConnection=p1y==p2y;
+			
+			
+			
+			BodyAndMesh bm1=ammoParticles.get(p1);
+			BodyAndMesh bm2=ammoParticles.get(p2);
+			
+			//already multiple when created
+			Vector3 pos1=bm1.getMesh().getPosition();//.multiplyScalar(ammoMultipleScalar);
+			Vector3 pos2=bm2.getMesh().getPosition();//.multiplyScalar(ammoMultipleScalar);
+			
+			
+			AmmoConstraintPropertyData distanceConstraintProperties=simulator.getAmmoHairControler().getParticleConstraintData();
+			if(hairData.isUseCustomConstraintData() && hairData.getAmmoConstraintData()!=null){
+				distanceConstraintProperties=hairData.getAmmoConstraintData();
+			}
+			
+			LogUtils.log("stiffness:"+distanceConstraintProperties.getStiffnesses().get(0));
+			
+			//right now no difference
+			if(horizontalConnection){ 
+				//use tight make shaking but tigh together.
+				distanceConstraintProperties.setFrameInARelativePosRatio(distanceConstraintProperties.getFrameInARelativePosRatio());
+				distanceConstraintProperties.setFrameInBRelativePosRatio(distanceConstraintProperties.getFrameInBRelativePosRatio());
+			}else{
+				//A alway fixed,never rotate
+				distanceConstraintProperties.setFrameInARelativePosRatio(distanceConstraintProperties.getFrameInARelativePosRatio());
+				distanceConstraintProperties.setFrameInBRelativePosRatio(distanceConstraintProperties.getFrameInBRelativePosRatio());
+			}
+			
+			
+			
+			distanceConstraintProperties.updateFrameInA(transform1, pos1, pos2);
+			distanceConstraintProperties.updateFrameInB(transform2, pos1, pos2);
+			
+			
+			
+			//try to fixed length but not good
+			//transform2.getOrigin().copy(pos2.clone().sub(pos1).normalize().multiplyScalar(restDistance*ammoMultipleScalar));//keep length
+			
+			ConstraintAndLine constraintAndMesh=simulator.getAmmoHairControler().getAmmoControler().createGeneric6DofSpringConstraint(bm1, bm2, transform1, transform2, distanceConstraintProperties.isDisableCollisionsBetweenLinkedBodies());
+			constraintAndMesh.setVisibleLine(false);
+			
+			
+			
+			simulator.getAmmoHairControler().getAmmoControler().updateConstraint(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint(), distanceConstraintProperties,restDistance);
+			
+			ammoConstraints.push(constraintAndMesh.getConstraint().castToGeneric6DofSpringConstraint());
+		}
+		return ammoConstraints;
+	}
+
 	private void updateParticles(ClothSimulator simulator){
 		AmmoHairControler.ParticleBodyDatas data=simulator.getAmmoHairControler().getAmmoData(this);
 		List<BodyAndMesh> ammoParticles=data.getAmmoParticles();

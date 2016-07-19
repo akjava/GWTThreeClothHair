@@ -602,8 +602,22 @@ public void setHairPins(List<HairPin> hairPins) {
 	
 	
 	private boolean useCustomConstraintData;
+	public boolean isUseCustomConstraintData() {
+		return useCustomConstraintData;
+	}
+
+	public void setUseCustomConstraintData(boolean useCustomConstraintData) {
+		this.useCustomConstraintData = useCustomConstraintData;
+	}
 	private AmmoConstraintPropertyData ammoConstraintData;
 	
+	public AmmoConstraintPropertyData getAmmoConstraintData() {
+		return ammoConstraintData;
+	}
+
+	public void setAmmoConstraintData(AmmoConstraintPropertyData ammoConstraintData) {
+		this.ammoConstraintData = ammoConstraintData;
+	}
 	private boolean useCustomBodyParticleData;
 	public boolean isUseCustomBodyParticleData() {
 		return useCustomBodyParticleData;

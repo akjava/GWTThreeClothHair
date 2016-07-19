@@ -4,14 +4,11 @@ import java.io.IOException;
 import java.util.List;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
-import com.akjava.gwt.clothhair.client.GWTThreeClothHairStorageKeys;
-import com.akjava.gwt.clothhair.client.ammo.BodyDataConverter;
 import com.akjava.gwt.clothhair.client.ammo.BodyDataEditor;
+import com.akjava.gwt.clothhair.client.ammo.ConstraintDataEditor;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
 import com.akjava.gwt.lib.client.LogUtils;
-import com.akjava.gwt.lib.client.StorageException;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
-import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.google.common.collect.Lists;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorDelegate;
@@ -20,6 +17,8 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.text.shared.Renderer;
@@ -109,6 +108,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private ListBox particleTypeBox;
 		private CheckBox useCustomBodyParticleDataEditor;
 		private BodyDataEditor ammoParticleBodyEditor;
+		private ConstraintDataEditor ammoParticleConstraintEditor;
+		private CheckBox useCustomConstraintParticleDataEditor;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -462,15 +463,23 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			ammoBonePanel.add(thickEditor2);
 			
 			
-			tab.add(createParticleBodyEditor(),"ParticleBody");
+			tab.add(createParticleBodyEditor(),"AmmoBody");
+			tab.add(createParticleConstraintEditor(),"AmmoConstraint");
 			
-			
+			tab.addSelectionHandler(new SelectionHandler<Integer>() {
+				
+				@Override
+				public void onSelection(SelectionEvent<Integer> event) {
+					GWTThreeClothHair.INSTANCE.updateGUI();
+				}
+			});
 		}
 		
 		private Panel createParticleBodyEditor(){
-			VerticalPanel panel=new VerticalPanel();
+			VerticalPanel bodyPanel=new VerticalPanel();
+			bodyPanel.add(new Label("hello"));
 			HorizontalPanel h1=new HorizontalPanel();
-			panel.add(h1);
+			bodyPanel.add(h1);
 			h1.setVerticalAlignment(ALIGN_MIDDLE);
 			useCustomBodyParticleDataEditor = new CheckBox("use custom particle body");
 			useCustomBodyParticleDataEditor.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -482,10 +491,32 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			h1.add(useCustomBodyParticleDataEditor);
 			
 			ammoParticleBodyEditor = new BodyDataEditor();
-			panel.add(ammoParticleBodyEditor);
+			bodyPanel.add(ammoParticleBodyEditor);
 			ammoParticleBodyEditor.setVisible(false);
 			
-			return panel;
+			return bodyPanel;
+		}
+		
+		private Panel createParticleConstraintEditor(){
+			VerticalPanel constraintPanel=new VerticalPanel();
+			constraintPanel.add(new Label("world"));
+			HorizontalPanel h2=new HorizontalPanel();
+			constraintPanel.add(h2);
+			h2.setVerticalAlignment(ALIGN_MIDDLE);
+			useCustomConstraintParticleDataEditor = new CheckBox("use custom particle constraint");
+			useCustomConstraintParticleDataEditor.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+				@Override
+				public void onValueChange(ValueChangeEvent<Boolean> event) {
+					ammoParticleConstraintEditor.setVisible(event.getValue());
+				}
+			});
+			h2.add(useCustomConstraintParticleDataEditor);
+			
+			ammoParticleConstraintEditor = new ConstraintDataEditor();
+			constraintPanel.add(ammoParticleConstraintEditor);
+			ammoParticleConstraintEditor.setVisible(false);
+			
+			return constraintPanel;
 		}
 		
 	
@@ -545,6 +576,14 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					value.setAmmoBodyParticleData(ammoParticleBodyEditor.getValue());
 				}else{
 					value.setAmmoBodyParticleData(null);
+				}
+				
+				value.setUseCustomConstraintData(useCustomConstraintParticleDataEditor.getValue());
+				if(useCustomConstraintParticleDataEditor.getValue()){
+					ammoParticleConstraintEditor.flush();
+					value.setAmmoConstraintData(ammoParticleConstraintEditor.getValue());
+				}else{
+					value.setAmmoConstraintData(null);
 				}
 			}
 
@@ -622,6 +661,12 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				ammoParticleBodyEditor.setValue(value.getAmmoBodyParticleData());
 				if(ammoParticleBodyEditor.getValue()==null){//copy default
 					ammoParticleBodyEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoParticleBodyData());//reset here,not checkbox
+				}
+				
+				useCustomConstraintParticleDataEditor.setValue(value.isUseCustomConstraintData(), true);//control visible
+				ammoParticleConstraintEditor.setValue(value.getAmmoConstraintData());
+				if(ammoParticleConstraintEditor.getValue()==null){//copy default
+					ammoParticleConstraintEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoParticleConstraintData());//reset here,not checkbox
 				}
 				
 			}
