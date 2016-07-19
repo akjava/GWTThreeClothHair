@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
+import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
@@ -597,6 +598,11 @@ public void setHairPins(List<HairPin> hairPins) {
 	public void setAmmoCircleUseFirstPointY(boolean useFirstPointY) {
 		this.ammoCircleUseFirstPointY = useFirstPointY;
 	}
+	
+	
+	
+	private boolean useCustomConstraintData;
+	private AmmoConstraintPropertyData ammoConstraintData;
 	
 	private boolean useCustomBodyParticleData;
 	public boolean isUseCustomBodyParticleData() {

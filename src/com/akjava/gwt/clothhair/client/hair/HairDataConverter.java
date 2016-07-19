@@ -49,16 +49,11 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		wrapper.setBoolean("averagingNormal", hairData.isExecAverageNormal());
 		wrapper.setBoolean("useCustomNormal", hairData.isUseCustomNormal());
 		wrapper.setDouble("originalNormalRatio", hairData.getOriginalNormalRatio());
+		
 		if(hairData.getHairTextureData()!=null){
 			wrapper.setString("hairTextureData", textureDataConverter.convert(hairData.getHairTextureData()));
 		}
 		
-		wrapper.setBoolean("useCustomBodyParticleData", hairData.isUseCustomBodyParticleData());
-		if(hairData.isUseCustomBodyParticleData() && hairData.getAmmoBodyParticleData()!=null){
-			JSONObject ammoObject=new BodyDataConverter().convert(hairData.getAmmoBodyParticleData());
-			wrapper.setObject("ammoBodyParticleData", ammoObject);
-			
-		}
 		
 		//plain
 		JSONObject plainObject=new JSONObject();
@@ -73,6 +68,17 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		JSONObject ammoObject=new JSONObject();
 		JSONObjectWrapper ammoObjectWrapper=new JSONObjectWrapper(ammoObject);
 		wrapper.setObject("ammo", ammoObject);
+		
+		
+		
+		ammoObjectWrapper.setBoolean("useCustomBodyParticleData", hairData.isUseCustomBodyParticleData());
+		if(hairData.isUseCustomBodyParticleData() && hairData.getAmmoBodyParticleData()!=null){
+			JSONObject ammoParticleObject=new BodyDataConverter().convert(hairData.getAmmoBodyParticleData());
+			ammoObjectWrapper.setObject("ammoBodyParticleData", ammoParticleObject);
+			
+		}
+		
+		
 		ammoObjectWrapper.setInt("particleType", hairData.getParticleType());
 		ammoObjectWrapper.setDouble("particleRadiusRatio", hairData.getParticleRadiusRatio());
 		ammoObjectWrapper.setDouble("endParticleRadiusRatio", hairData.getAmmoEndParticleRadiusRatio());
@@ -165,17 +171,7 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		}
 		
 		
-		hairData.setUseCustomBodyParticleData(object.getBoolean("useCustomBodyParticleData", hairData.isUseCustomBodyParticleData()));
 		
-		if(hairData.isUseCustomBodyParticleData()){
-			JSONObjectWrapper ammoObject=object.getObject("ammoBodyParticleData");
-			if(ammoObject!=null){
-				hairData.setAmmoBodyParticleData(new BodyDataConverter().reverse().convert(ammoObject.jsonObject()));
-				
-			}else{
-				LogUtils.log("useCustomBodyParticleData is true,but no ammoBodyParticleData");
-			}
-		}
 		
 		
 		
@@ -198,6 +194,20 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		
 		JSONObjectWrapper ammoObjectWrapper=object.getObject("ammo");
 		if(ammoObjectWrapper!=null){
+			
+			hairData.setUseCustomBodyParticleData(ammoObjectWrapper.getBoolean("useCustomBodyParticleData", hairData.isUseCustomBodyParticleData()));
+			
+			if(hairData.isUseCustomBodyParticleData()){
+				JSONObjectWrapper ammoObject=ammoObjectWrapper.getObject("ammoBodyParticleData");
+				if(ammoObject!=null){
+					hairData.setAmmoBodyParticleData(new BodyDataConverter().reverse().convert(ammoObject.jsonObject()));
+					
+				}else{
+					LogUtils.log("useCustomBodyParticleData is true,but no ammoBodyParticleData");
+				}
+			}
+			
+			
 			hairData.setParticleType(ammoObjectWrapper.getInt("particleType", hairData.getParticleType()));
 			hairData.setParticleRadiusRatio(ammoObjectWrapper.getDouble("particleRadiusRatio", hairData.getParticleRadiusRatio()));
 			hairData.setAmmoEndParticleRadiusRatio(ammoObjectWrapper.getDouble("endParticleRadiusRatio", hairData.getAmmoEndParticleRadiusRatio()));
