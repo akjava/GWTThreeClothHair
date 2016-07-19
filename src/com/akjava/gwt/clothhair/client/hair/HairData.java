@@ -654,4 +654,17 @@ public void setHairPins(List<HairPin> hairPins) {
 		return customNormal;
 	}
 	
+	/*
+	 * sometime without contact stable,however not become completely stable 
+	 */
+	private boolean ammoContactParticle=true;
+
+	public boolean isAmmoContactParticle() {
+		return ammoContactParticle;
+	}
+
+	public void setAmmoContactParticle(boolean ammoContactParticle) {
+		this.ammoContactParticle = ammoContactParticle;
+	}
+	
 }

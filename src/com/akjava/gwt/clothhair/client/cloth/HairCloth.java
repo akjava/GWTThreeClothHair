@@ -608,16 +608,16 @@ public class HairCloth {
 						}*/
 					}
 					
-					//test cross on first one
-					if(v==0){
-						if(u!=0){
-						//	addConstrain(particles.get(index(u,v)), particles.get(index(u-1,v+1)), distance);
+					//test cross on first one,no care connect horizontal and circle style
+					/*if(v==0){
+						if(u!=0){//has next
+							addConstrain(particles.get(index(u,v)), particles.get(index(u-1,v+1)), distance);
 						}
 						
-						if(u!=w-1){
-						//	addConstrain(particles.get(index(u,v)), particles.get(index(u+1,v+1)), distance);
+						if(u!=w-1){//has prev
+							addConstrain(particles.get(index(u,v)), particles.get(index(u+1,v+1)), distance);
 						}
-					}
+					}*/
 
 				}
 				

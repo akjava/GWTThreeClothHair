@@ -111,7 +111,7 @@ public class ClothSimulator  {
 		
 		//init setting
 		AmmoBodyPropertyData particleBodyData=GWTThreeClothHair.INSTANCE.getAmmoParticleBodyData();
-		ammoHairControler.setParticleBodyData(particleBodyData);
+		ammoHairControler.setParticleBodyPropertyData(particleBodyData);
 		
 		//ammoHairControler.getParticleBodyData().setFriction(particleBodyData.getFriction());
 		//ammoHairControler.getParticleBodyData().setRestitution(particleBodyData.getRestitution());

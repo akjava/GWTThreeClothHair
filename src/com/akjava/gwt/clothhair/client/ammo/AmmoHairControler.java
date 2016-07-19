@@ -81,7 +81,12 @@ public class AmmoHairControler {
 		for(int i=0;i<data.getAmmoParticles().size();i++){
 			
 			//i'm not sure any reason, add here
-			ammoControler.addBodyMesh(data.getAmmoParticles().get(i),1,2);
+			if(hairCloth.getHairData().isAmmoContactParticle()){
+				ammoControler.addBodyMesh(data.getAmmoParticles().get(i));
+			}else{
+				ammoControler.addBodyMesh(data.getAmmoParticles().get(i),1,2);
+			}
+			
 			//ammoControler.addBodyMesh(data.getAmmoParticles().get(i));
 		}
 		
@@ -198,7 +203,7 @@ public class AmmoHairControler {
 	}
 
 
-	public void setParticleBodyData(AmmoBodyPropertyData clothMaterial) {
+	public void setParticleBodyPropertyData(AmmoBodyPropertyData clothMaterial) {
 		this.clothProperties = clothMaterial;
 	}
 	

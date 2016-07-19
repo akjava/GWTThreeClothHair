@@ -166,7 +166,7 @@ public AmmoPreferencePanel(){
 				LogUtils.logAndAlert("maybe quote error:"+e.getMessage());
 			}
 			
-			GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().setParticleBodyData(data);
+			GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().setParticleBodyPropertyData(data);
 			
 		}
 	});

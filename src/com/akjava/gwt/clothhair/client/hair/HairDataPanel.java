@@ -407,6 +407,8 @@ public class HairDataPanel extends VerticalPanel{
 			@Override
 			public void onSelect(HairMixedData selection) {
 				
+				GWTThreeClothHair.INSTANCE.updateGUI();
+				
 				updateSelectionHairVisible(showSelectionHair.getValue());
 				
 				if(selection==null){
