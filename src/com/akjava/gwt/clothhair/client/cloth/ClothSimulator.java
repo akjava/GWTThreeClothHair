@@ -647,7 +647,7 @@ public class ClothSimulator  {
 		
 		boolean useFirstPointY=data.getHairCloth().isUseFirstPointY();
 		//TODO make function,WARNING do same things in ClothControlers:syncPinPositions()
-		if(hairData.getHairPins().size()==2){
+		if(hairData.getHairPins().size()==2 && hairData.isCircleStyle()){
 			Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
 			Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
 			//TODO move and fix
@@ -718,7 +718,9 @@ public class ClothSimulator  {
 				*/
 			//}
 			
-		}else 
+		}
+		/*
+		else 
 		if(hairData.getHairPins().size()<3){//old less pin,now not reached
 		Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
 		Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
@@ -736,10 +738,10 @@ public class ClothSimulator  {
 			Vector3 v=sub.clone().multiplyScalar(i).add(v1);
 			data.getHairCloth().particles.get(i).setAllPosition(v);
 		}
+		}
+		*/
 		
-		
-		
-		}else{
+		else{
 			
 			//only core pins,only use no-custom pin
 			//THIS IS IMMUTABLE

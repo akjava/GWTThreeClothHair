@@ -636,5 +636,14 @@ public void setHairPins(List<HairPin> hairPins) {
 		this.ammoBodyParticleData = ammoBodyParticleData;
 	}
 
+	private boolean circleStyle;
+
+	public boolean isCircleStyle() {
+		return circleStyle;
+	}
+
+	public void setCircleStyle(boolean circleStyle) {
+		this.circleStyle = circleStyle;
+	}
 	
 }

@@ -142,7 +142,7 @@ public class ClothControler {
 		
 		boolean useFirstPointY=data.getHairCloth().isUseFirstPointY();
 		
-		if(data.getCalculator().getResult().size()==2){
+		if(data.getCalculator().getResult().size()==2 && data.getHairCloth().isCircleStyle()){
 			//TODO merge method
 			Vector3 v1=data.getCalculator().getResult().get(0);
 			Vector3 v2=data.getCalculator().getResult().get(1);
@@ -178,7 +178,8 @@ public class ClothControler {
 			}
 			*/
 			//TODO sync
-		}else //old one not reach code
+		}
+		/*else //old one not reach code
 		if(data.getCalculator().getResult().size()<3){//2pins
 			int cw=data.getHairCloth().getW();
 			Vector3 v1=data.getCalculator().getResult().get(0);
@@ -205,7 +206,7 @@ public class ClothControler {
 			}
 			
 			
-		}else{
+		}*/else{
 			
 			//int pinSize=data.getCalculator().getResult().size();
 			

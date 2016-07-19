@@ -430,7 +430,7 @@ public class HairCloth {
 	//private double ammoThick;
 	
 	public boolean isCircleStyle(){
-		return hairData.getHairPins().size()==2;
+		return hairData.isCircleStyle();
 	}
 	
 	//private int hairPhysicsType;
