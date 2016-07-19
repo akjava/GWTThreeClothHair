@@ -1,10 +1,12 @@
 package com.akjava.gwt.clothhair.client.hair;
 
 import com.akjava.gwt.clothhair.client.JSONObjectWrapper;
+import com.akjava.gwt.clothhair.client.ammo.BodyDataConverter;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataConverter;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
+import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.google.common.base.Converter;
 import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.json.client.JSONObject;
@@ -50,6 +52,14 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		if(hairData.getHairTextureData()!=null){
 			wrapper.setString("hairTextureData", textureDataConverter.convert(hairData.getHairTextureData()));
 		}
+		
+		wrapper.setBoolean("useCustomBodyParticleData", hairData.isUseCustomBodyParticleData());
+		if(hairData.isUseCustomBodyParticleData() && hairData.getAmmoBodyParticleData()!=null){
+			JSONObject ammoObject=new BodyDataConverter().convert(hairData.getAmmoBodyParticleData());
+			wrapper.setObject("ammoBodyParticleData", ammoObject);
+			
+		}
+		
 		//plain
 		JSONObject plainObject=new JSONObject();
 		JSONObjectWrapper plainObjectWrapper=new JSONObjectWrapper(plainObject);
@@ -74,6 +84,9 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		ammoObjectWrapper.setDouble("circleRangeMin", hairData.getAmmoCircleRangeMin());
 		ammoObjectWrapper.setDouble("circleRangeMax", hairData.getAmmoCircleRangeMax());
 		ammoObjectWrapper.setDouble("circleInRangeRatio", hairData.getAmmoCircleInRangeRatio());
+		
+		
+		
 		
 		//ammo-cloth
 		
@@ -150,6 +163,23 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		}else{
 			//no need,had has default
 		}
+		
+		
+		hairData.setUseCustomBodyParticleData(object.getBoolean("useCustomBodyParticleData", hairData.isUseCustomBodyParticleData()));
+		
+		if(hairData.isUseCustomBodyParticleData()){
+			JSONObjectWrapper ammoObject=object.getObject("ammoBodyParticleData");
+			if(ammoObject!=null){
+				hairData.setAmmoBodyParticleData(new BodyDataConverter().reverse().convert(ammoObject.jsonObject()));
+				
+			}else{
+				LogUtils.log("useCustomBodyParticleData is true,but no ammoBodyParticleData");
+			}
+		}
+		
+		
+		
+		
 		
 		//parse plain-cloth
 		JSONObjectWrapper plaintClothObject=object.getObject("plain-cloth");

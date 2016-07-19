@@ -541,6 +541,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				
 				value.setUseCustomBodyParticleData(useCustomBodyParticleDataEditor.getValue());
 				if(useCustomBodyParticleDataEditor.getValue()){
+					ammoParticleBodyEditor.flush();
 					value.setAmmoBodyParticleData(ammoParticleBodyEditor.getValue());
 				}else{
 					value.setAmmoBodyParticleData(null);

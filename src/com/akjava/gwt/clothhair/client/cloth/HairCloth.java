@@ -30,6 +30,7 @@ import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
+import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
 import com.akjava.gwt.threeammo.client.AmmoControler;
 import com.akjava.gwt.threeammo.client.AmmoUtils;
@@ -1152,6 +1153,8 @@ public class HairCloth {
 				
 				}
 			
+			LogUtils.log("buttlet-object-size:"+restDistance*ammoMultipleScalar);
+			
 			simulator.getAmmoHairControler().setParticleData(this,data );
 			skipSync=true;
 		}else{
@@ -1381,8 +1384,16 @@ public class HairCloth {
 			body=BodyAndMesh.createSphere(x, mass, p,material);
 		}
 		
+		AmmoBodyPropertyData property=simulator.getAmmoHairControler().getParticleBodyData();
+		if(hairData.isUseCustomBodyParticleData()){
+			if(hairData.getAmmoBodyParticleData()!=null){
+				property=hairData.getAmmoBodyParticleData();
+				//LogUtils.log("body-p from data");
+			}
+		}
 		
-		AmmoUtils.updateBodyProperties(body.getBody(),simulator.getAmmoHairControler().getParticleBodyData());
+		//LogUtils.log("tmp-body-property:"+property.getDamping().getX());
+		AmmoUtils.updateBodyProperties(body.getBody(),property);
 		body.getBody().setActivationState(Ammo.DISABLE_DEACTIVATION);
 		
 		

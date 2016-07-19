@@ -14,6 +14,9 @@ import com.google.gwt.json.client.JSONString;
 public  class JSONObjectWrapper{
 	private JSONObject jsonObject;
 
+	public JSONObject jsonObject(){
+		return jsonObject;
+	}
 	public JSONObjectWrapper(JSONObject object) {
 		super();
 		this.jsonObject = object;
