@@ -435,6 +435,64 @@ public class HairCloth {
 	
 	//private int hairPhysicsType;
 	private HairData hairData;
+	public HairData getHairData() {
+		return hairData;
+	}
+
+	private List<Integer> ignoreConnectionIndexs;
+	
+	private void createIgnoreHorizontalConnections(){
+		if(hairData.getHairPins().size()!=2 || !hairData.isCircleStyle()){
+			return;
+		}
+		
+		if(!hairData.isUseAmmoCircleInRange()){
+			return;
+		}
+		
+		boolean startAndEndSame=isStartAndEndSameCircle();
+		int sliceFaceCount=getSliceFaceCount();
+				
+		int angleSplit=startAndEndSame?sliceFaceCount:sliceFaceCount+1;
+
+		double perAngle=360.0/(angleSplit); //not support connect-horizontal
+		
+		List<Integer> ignoreConnection=Lists.newArrayList();
+		for(int i=0;i<sliceFaceCount;i++){
+			double angle=perAngle*i;
+			boolean inRangeMy=hairData.isAmmoInCircleInRange(angle);
+			boolean inRangeNext=hairData.isAmmoInCircleInRange(angle+perAngle);
+			if(inRangeMy!=inRangeNext){
+				ignoreConnection.add(i+1);
+			}
+		}
+		if(hairData.isConnectHorizontal()){
+			double angle=perAngle*sliceFaceCount;
+			boolean inRangeMy=hairData.isAmmoInCircleInRange(angle);
+			boolean inRangeNext=hairData.isAmmoInCircleInRange(0);
+			if(inRangeMy!=inRangeNext){
+				ignoreConnection.add(0);
+			}
+		}
+		
+			if(!ignoreConnection.isEmpty()){
+				ignoreConnectionIndexs=ignoreConnection;
+			}
+		
+	}
+	
+	private boolean notContainIgnoreCoonectionIndexs(int index){
+		if(ignoreConnectionIndexs==null){
+			return true;
+		}
+		
+		if(!ignoreConnectionIndexs.contains(index)){
+			LogUtils.log("ignored index "+index);
+		}
+		
+		return !ignoreConnectionIndexs.contains(index);
+	}
+	
 	public HairCloth(HairData hairData,Mesh mesh){
 		checkArgument(hairData.getSliceFaceCount()!=0,"HairCloth:invalid u-size 0");
 		checkNotNull(mesh,"HairCloth:mesh is null");
@@ -443,6 +501,10 @@ public class HairCloth {
 		ammoMultipleScalar=GWTThreeClothHair.INSTANCE.getAmmoWorldScale();
 		LogUtils.log("ammoMultipleScalar:"+ammoMultipleScalar);
 		
+		
+		
+		createIgnoreHorizontalConnections();//for circle-style
+	
 		
 		
 		List<HairPin> normalPin=Lists.newArrayList();//trying cutom pin
@@ -529,8 +591,13 @@ public class HairCloth {
 					//add horizontal constraint
 					//first one skipped to reduce constraint count,i think not so differenct
 					if(v!=0 && (!hairData.isCutU() || v<hairData.getStartCutUIndexV())){
+						
+						if(notContainIgnoreCoonectionIndexs(u+1)){
+							addConstrain(particles.get(index(u,v)), particles.get(index(u+1,v)), distance);
+						}
+						
 						//if(v%2==1){ // i tried mutually add,and faild
-						addConstrain(particles.get(index(u,v)), particles.get(index(u+1,v)), distance);
+						
 							
 						//}
 					}else{
@@ -546,11 +613,11 @@ public class HairCloth {
 					//test cross on first one
 					if(v==0){
 						if(u!=0){
-							addConstrain(particles.get(index(u,v)), particles.get(index(u-1,v+1)), distance);
+						//	addConstrain(particles.get(index(u,v)), particles.get(index(u-1,v+1)), distance);
 						}
 						
 						if(u!=w-1){
-							addConstrain(particles.get(index(u,v)), particles.get(index(u+1,v+1)), distance);
+						//	addConstrain(particles.get(index(u,v)), particles.get(index(u+1,v+1)), distance);
 						}
 					}
 
@@ -580,7 +647,9 @@ public class HairCloth {
 			for (int v=h, u=0;u<w;u++) {
 				if((!hairData.isCutU() || v<hairData.getStartCutUIndexV())){
 				//	if(v%2==1){
+					if(notContainIgnoreCoonectionIndexs(u+1)){
 					addConstrain(particles.get(index(u,v)), particles.get(index(u+1,v)), distance);
+					}
 						
 				//	}
 				}
@@ -593,7 +662,9 @@ public class HairCloth {
 			for (int v=0;v<=h;v++) {
 				int u=w;
 				if((!hairData.isCutU() || v<hairData.getStartCutUIndexV())){
-				addConstrain(particles.get(index(u,v)), particles.get(index(0,v)), distance);
+					if(notContainIgnoreCoonectionIndexs(0)){
+						addConstrain(particles.get(index(u,v)), particles.get(index(0,v)), distance);
+					}
 				}
 						
 			}

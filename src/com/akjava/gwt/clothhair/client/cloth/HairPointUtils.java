@@ -71,9 +71,9 @@ public class HairPointUtils {
 		}
 		
 		
-		int cw=hairCloth.getSliceFaceCount();
+		int sliceFaceCount=hairCloth.getSliceFaceCount();
 		
-		int angleSplit=startAndEndSame?cw:cw+1;
+		int angleSplit=startAndEndSame?sliceFaceCount:sliceFaceCount+1;
 		
 		Vector2 center=THREE.Vector2(centerPoint.getX(), centerPoint.getZ());
 		Vector2 point=THREE.Vector2(addPoint.getX(), addPoint.getZ());
@@ -81,7 +81,7 @@ public class HairPointUtils {
 		
 		double perAngle=360.0/(angleSplit); //not support connect-horizontal
 		
-		for(int i=0;i<=cw;i++){//+1
+		for(int i=0;i<=sliceFaceCount;i++){//+1
 			Vector2 rotated=point.clone().rotateAround(center, Math.toRadians(perAngle*i));
 			//ThreeLog.log("angle:"+(perAngle*i),rotated);
 			
@@ -93,7 +93,7 @@ public class HairPointUtils {
 			
 		}
 		
-		for(int i=0;i<=cw;i++){
+		for(int i=0;i<=sliceFaceCount;i++){
 			if(startCenter){//no hole,but unstable as physics
 				hairCloth.particles.get(i).setAllPosition(centerPoint);
 				}
@@ -134,5 +134,7 @@ public class HairPointUtils {
 			
 			hairCloth.particles.get(j).setAllPosition(newPosition);
 		}
+		
+	
 	}
 }
