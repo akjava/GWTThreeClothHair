@@ -3,6 +3,8 @@ package com.akjava.gwt.clothhair.client.hair;
 import java.util.List;
 
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
+import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
@@ -644,6 +646,12 @@ public void setHairPins(List<HairPin> hairPins) {
 
 	public void setCircleStyle(boolean circleStyle) {
 		this.circleStyle = circleStyle;
+	}
+
+	private Vector3 customNormal=THREE.Vector3(0, -1, 0);//TODO modify
+	public Vector3 getCustomNormal() {
+		// TODO Auto-generated method stub
+		return customNormal;
 	}
 	
 }

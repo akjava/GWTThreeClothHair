@@ -486,9 +486,7 @@ public class HairCloth {
 			return true;
 		}
 		
-		if(!ignoreConnectionIndexs.contains(index)){
-			LogUtils.log("ignored index "+index);
-		}
+		
 		
 		return !ignoreConnectionIndexs.contains(index);
 	}
