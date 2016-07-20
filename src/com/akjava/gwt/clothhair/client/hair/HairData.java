@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
@@ -665,6 +666,30 @@ public void setHairPins(List<HairPin> hairPins) {
 
 	public void setAmmoContactParticle(boolean ammoContactParticle) {
 		this.ammoContactParticle = ammoContactParticle;
+	}
+	
+	
+	
+	private String customGeometryName="testhair.json";//TESTING
+	
+	//can set from upload from but can't from filename,need sync,hair cloth need initializing check
+	
+	public String getCustomGeometryName() {
+		return customGeometryName;
+	}
+
+	public void setCustomGeometryName(String customGeometryName) {
+		this.customGeometryName = customGeometryName;
+	}
+	//for internal value loaded via upload-form or setting customGeometryName.
+	private Geometry customGeometry;
+
+	public Geometry getCustomGeometry() {
+		return customGeometry;
+	}
+
+	public void setCustomGeometry(Geometry customGeometry) {
+		this.customGeometry = customGeometry;
 	}
 	
 }
