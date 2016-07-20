@@ -23,6 +23,7 @@ import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.html5.client.file.FileUtils.DataURLListener;
 import com.akjava.gwt.html5.client.input.ColorBox;
 import com.akjava.gwt.lib.client.CanvasUtils;
+import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.StorageControler;
 import com.akjava.gwt.lib.client.StorageException;
@@ -31,6 +32,7 @@ import com.akjava.gwt.lib.client.widget.cell.EasyCellTableObjects;
 import com.akjava.gwt.lib.client.widget.cell.SimpleCellTable;
 import com.akjava.gwt.three.client.examples.js.THREEExp;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
+import com.akjava.gwt.three.client.gwt.boneanimation.AnimationBone;
 import com.akjava.gwt.three.client.java.bone.CloseVertexAutoWeight;
 import com.akjava.gwt.three.client.java.bone.WeightResult;
 import com.akjava.gwt.three.client.js.THREE;
@@ -43,6 +45,7 @@ import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Matrix3;
 import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Vector3;
+import com.akjava.gwt.three.client.js.objects.Bone;
 import com.akjava.gwt.three.client.js.objects.LineSegments;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
@@ -61,6 +64,7 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.ImageData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.ImageElement;
@@ -87,7 +91,6 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class HairDataPanel extends VerticalPanel{
@@ -549,7 +552,7 @@ public class HairDataPanel extends VerticalPanel{
 					}
 					SkinnedMesh character=GWTThreeClothHair.INSTANCE.getCharacterMesh();
 					
-					Geometry geometry=convertSelectionToGeometry(cellObjects.getSelection());
+					Geometry geometry=convertSelectionToGeometryWithOriginalBone(cellObjects.getSelection());
 					
 					MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0x00ff00).skinning(true));
 					
@@ -561,7 +564,7 @@ public class HairDataPanel extends VerticalPanel{
 					Anchor a=HTML5Download.get().generateTextDownloadLink(object.toString(), "geometry.json", "geometry to download",true);
 					downloadArea.add(a);
 					
-					String text=object.toString();
+					/*String text=object.toString();
 					//this is XXXX 4.4 FORMAT
 					JavaScriptObject js=JSONParser.parseStrict(text).isObject().get("data").isObject().getJavaScriptObject();
 					LogUtils.log("json-parsed");
@@ -575,7 +578,7 @@ public class HairDataPanel extends VerticalPanel{
 					newMesh.setScale(character.getScale().getX(), character.getScale().getY(), character.getScale().getZ());
 					newMesh.setSkeleton(character.getSkeleton());//can share the bone
 					
-					GWTThreeClothHair.INSTANCE.getScene().add(newMesh);
+					GWTThreeClothHair.INSTANCE.getScene().add(newMesh);*/
 				}
 			});
 			 testPanel.add(test);
@@ -588,7 +591,7 @@ public class HairDataPanel extends VerticalPanel{
 						return;
 					}
 					
-					Geometry geometry=convertSelectionToGeometry(cellObjects.getSelection());
+					Geometry geometry=convertSelectionToGeometryWithCharacterBone(cellObjects.getSelection());
 					LogUtils.log(geometry);
 					int m=geometry.mergeVertices();
 					LogUtils.log("merged "+m);
@@ -675,7 +678,90 @@ public class HairDataPanel extends VerticalPanel{
 	}
 	
 	
-	protected Geometry convertSelectionToGeometry(HairMixedData selection) {
+	protected Geometry convertSelectionToGeometryWithOriginalBone(HairMixedData selection) {
+		ParticleBodyDatas data=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().getAmmoData(selection.getClothData().getHairCloth());
+		if(data.getSkinnedMesh()==null){
+			LogUtils.log("convertSelectionToGeometry:now only suuport skinnedMesh");
+		}
+		
+		SkinnedMesh character=GWTThreeClothHair.INSTANCE.getCharacterMesh();
+		
+		
+		//AnimationBone ab=character.getGeometry().getBones().get(0).clone();
+		
+		
+		
+		Geometry geometry=makeSkeltonAnimationAppliedGeometry(data.getSkinnedMesh());
+		data.getSkinnedMesh().getGeometry().gwtSoftCopyToWeightsAndIndicesAndBone(geometry);
+		
+		
+		geometry.setBones(recreateBoneFromCurrentPosition(data.getSkinnedMesh()));
+		
+		//some how this geometry is already scale up
+		Matrix4 matrix4=THREE.Matrix4();
+		matrix4.makeScale(1.0/character.getScale().getX(), 1.0/character.getScale().getY(), 1.0/character.getScale().getZ());
+		geometry.applyMatrix(matrix4);
+		
+		
+		
+		return geometry;
+		/*
+		 * error
+		 * HREE.WebGLProgram: shader error:  0 gl.VALIDATE_STATUS false gl.getProgramInfoLog invalid shaders
+		 */
+		
+	}
+	
+	public JsArray<AnimationBone> recreateBoneFromCurrentPosition(SkinnedMesh mesh){
+		JsArray<AnimationBone> newBones=JavaScriptUtils.createJSArray();
+		for(int i=0;i<mesh.getGeometry().getBones().length();i++){
+			AnimationBone bone=mesh.getGeometry().getBones().get(i).gwtClone();
+			AnimationBone newBone=JavaScriptObject.createObject().cast();
+			newBone.setName(bone.getName());
+			newBone.setParent(bone.getParent());
+			
+			
+			
+			newBone.setRotq(THREE.Quaternion());
+			newBones.push(newBone);
+		}
+		
+		SkinnedMesh character=GWTThreeClothHair.INSTANCE.getCharacterMesh();
+		
+		
+		Matrix4 matrixWorldInv =  THREE.Matrix4().getInverse( mesh.getMatrixWorld());
+
+		Matrix4 boneMatrix =  THREE.Matrix4();
+		
+		
+		Matrix4 matrix4=THREE.Matrix4();
+		for(int i=0;i<mesh.getSkeleton().getBones().length();i++){
+			Bone bone=mesh.getSkeleton().getBones().get(i);
+			boneMatrix.multiplyMatrices( matrixWorldInv, bone.getMatrixWorld() );
+			
+			Vector3 pos=THREE.Vector3().setFromMatrixPosition( boneMatrix );
+			
+			if(mesh.getGeometry().getBones().get(i).getParent()!=-1){
+				Bone parent=mesh.getSkeleton().getBones().get(i).getParent().cast();
+				boneMatrix.multiplyMatrices( matrixWorldInv, parent.getMatrixWorld() );
+				
+				Vector3 parentPos=THREE.Vector3().setFromMatrixPosition( boneMatrix );
+				pos=pos.sub(parentPos);
+			}
+			
+			
+			
+			matrix4.makeScale(1.0/character.getScale().getX(), 1.0/character.getScale().getY(), 1.0/character.getScale().getZ());
+			pos.applyMatrix4(matrix4);
+			
+			newBones.get(i).setPos(pos);
+		}
+		
+		return newBones;
+	}
+	
+	
+	protected Geometry convertSelectionToGeometryWithCharacterBone(HairMixedData selection) {
 		ParticleBodyDatas data=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().getAmmoData(selection.getClothData().getHairCloth());
 		if(data.getSkinnedMesh()==null){
 			LogUtils.log("convertSelectionToGeometry:now only suuport skinnedMesh");
@@ -690,14 +776,14 @@ public class HairDataPanel extends VerticalPanel{
 		
 		Geometry geometry=makeSkeltonAnimationAppliedGeometry(data.getSkinnedMesh());
 		
-		
+		//some how this geometry is already scale up
 		Matrix4 matrix4=THREE.Matrix4();
 		matrix4.makeScale(1.0/character.getScale().getX(), 1.0/character.getScale().getY(), 1.0/character.getScale().getZ());
 		geometry.applyMatrix(matrix4);
 		
 		//geometry.setBones(AnimationBone.gwtClone(character.getGeometry().getBones()));
 		
-		geometry.gwtSetInfluencesPerVertex(4);
+		geometry.gwtSetInfluencesPerVertex(1);
 		geometry.setBones(character.getGeometry().getBones());
 		
 		//TODO average

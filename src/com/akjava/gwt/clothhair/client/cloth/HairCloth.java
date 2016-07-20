@@ -1175,7 +1175,9 @@ public class HairCloth {
 			
 			LogUtils.log("buttlet-object-size:"+restDistance*ammoMultipleScalar);
 			
-			simulator.getAmmoHairControler().setParticleData(this,data );
+			if(!initializing){
+				simulator.getAmmoHairControler().setParticleData(this,data );
+			}
 			skipSync=true;
 		}else{
 			updateParticles(simulator);
@@ -1214,8 +1216,6 @@ public class HairCloth {
 			if(hairData.isUseCustomConstraintData() && hairData.getAmmoConstraintData()!=null){
 				distanceConstraintProperties=hairData.getAmmoConstraintData();
 			}
-			
-			LogUtils.log("stiffness:"+distanceConstraintProperties.getStiffnesses().get(0));
 			
 			//right now no difference
 			if(horizontalConnection){ 
@@ -1370,7 +1370,7 @@ public class HairCloth {
 		double thick2=hairData.getAmmoBoneThickRatio2()==0?hairData.getThickRatio():hairData.getAmmoBoneThickRatio2();
 		
 		if(hairData.getCustomGeometryName()==null){
-		
+			LogUtils.log("no custom-hair geometry");
 		Geometry clothBox=HairGeometryCreator.merge(new HairGeometryCreator().bonesList(bones, enableList).horizontalThick(hairData.getThickRatio()).verticalThick(thick2).createGeometry(positions, w));
 		
 		clothBox.setBones(bones);
@@ -1388,6 +1388,7 @@ public class HairCloth {
 		helper.setVisible(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone());//TODO get visible from setting
 		
 		}else{
+			LogUtils.log("custom-hair geometry");
 			String basePath="/models/";
 			initializing=true;
 			//load geometry
@@ -1397,10 +1398,13 @@ public class HairCloth {
 				@Override
 				public void loaded(Geometry geometry, JsArray<Material> materials) {
 					//resize
+					LogUtils.log("geometry loaded");
+					LogUtils.log(geometry);
 					geometry.applyMatrix(GWTThreeClothHair.INSTANCE.getCharacterMesh().getMatrixWorld());
+					geometry.setBones(bones);
 					
 					//TODO auto weight setting
-					int influence=4;
+					int influence=1;
 					WeightResult result=new SimpleAutoWeight(influence).autoWeight(geometry, bones,Lists.newArrayList(0));//ignore root
 					result.insertToGeometry(geometry);
 					
@@ -1414,6 +1418,9 @@ public class HairCloth {
 					simulator.getAmmoHairControler().getAmmoControler().getScene().add(helper);
 					data.setSkeltonHelper(helper);
 					helper.setVisible(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone());//TODO get visible from setting
+					
+					
+					simulator.getAmmoHairControler().setParticleData(HairCloth.this,data );
 					
 					initializing=false;
 				}
