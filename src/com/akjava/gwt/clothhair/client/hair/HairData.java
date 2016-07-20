@@ -657,7 +657,7 @@ public void setHairPins(List<HairPin> hairPins) {
 	/*
 	 * sometime without contact stable,however not become completely stable 
 	 */
-	private boolean ammoContactParticle=true;
+	private boolean ammoContactParticle=false;
 
 	public boolean isAmmoContactParticle() {
 		return ammoContactParticle;

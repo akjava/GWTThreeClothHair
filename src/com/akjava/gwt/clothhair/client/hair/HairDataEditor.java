@@ -111,6 +111,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private ConstraintDataEditor ammoParticleConstraintEditor;
 		private CheckBox useCustomConstraintParticleDataEditor;
 		private CheckBox circleStyleCheck;
+		private CheckBox contactParticleCheck;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -440,6 +441,9 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			circleStyleCheck = new CheckBox("circleStyle");
 			ammoPanel0.add(circleStyleCheck);
 			
+			contactParticleCheck = new CheckBox("contactParticle");
+			ammoPanel0.add(contactParticleCheck);
+			
 			startCenterCircleCheck = new CheckBox("start center circle");
 			ammoPanel1.add(startCenterCircleCheck);
 			
@@ -579,6 +583,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setOriginalNormalRatio(originalNormalRatioEditor.getValue());
 				//no need getHairTextureData update,because these value are updated dynamic
 				
+				value.setAmmoContactParticle(contactParticleCheck.getValue());
 				value.setAmmoStartCenterCircle(startCenterCircleCheck.getValue());
 				value.setAmmoBoneThickRatio2(thickEditor2.getValue());
 				value.setAmmoCircleUseFirstPointY(ammoCircleUseFirstPointYEditor.getValue());
@@ -668,6 +673,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					LogUtils.log("no hairPinPanel");
 				}
 				
+				contactParticleCheck.setValue(value.isAmmoContactParticle());
 				circleStyleCheck.setValue(value.isCircleStyle());
 				startCenterCircleCheck.setValue(value.isAmmoStartCenterCircle());
 				thickEditor2.setValue(value.getAmmoBoneThickRatio2());

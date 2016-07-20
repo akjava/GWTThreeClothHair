@@ -70,6 +70,8 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		wrapper.setObject("ammo", ammoObject);
 		
 		
+		ammoObjectWrapper.setBoolean("contactParticle", hairData.isAmmoContactParticle());
+		
 		ammoObjectWrapper.setBoolean("circleStyle", hairData.isCircleStyle());
 		
 		ammoObjectWrapper.setBoolean("useCustomBodyParticleData", hairData.isUseCustomBodyParticleData());
@@ -202,7 +204,7 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		
 		JSONObjectWrapper ammoObjectWrapper=object.getObject("ammo");
 		if(ammoObjectWrapper!=null){
-			
+			hairData.setAmmoContactParticle(ammoObjectWrapper.getBoolean("contactParticle", hairData.isAmmoContactParticle()));
 			hairData.setUseCustomBodyParticleData(ammoObjectWrapper.getBoolean("useCustomBodyParticleData", hairData.isUseCustomBodyParticleData()));
 			
 			if(hairData.isUseCustomBodyParticleData()){
