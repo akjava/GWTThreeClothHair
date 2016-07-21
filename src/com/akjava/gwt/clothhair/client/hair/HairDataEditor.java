@@ -30,6 +30,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TabPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.ValueListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -112,6 +113,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private CheckBox useCustomConstraintParticleDataEditor;
 		private CheckBox circleStyleCheck;
 		private CheckBox contactParticleCheck;
+		private TextBox cutstomGeometryEditor;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -483,6 +485,14 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			thickEditor2.setButtonVisible(true);
 			ammoBonePanel.add(thickEditor2);
 			
+			HorizontalPanel h4=new HorizontalPanel();
+			ammoPanel.add(h4);
+			h4.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+			h4.add(new Label("custom-geometry"));
+			cutstomGeometryEditor = new TextBox();
+			h4.add(cutstomGeometryEditor);
+			
+			
 			
 			tab.add(createParticleBodyEditor(),"AmmoBody");
 			tab.add(createParticleConstraintEditor(),"AmmoConstraint");
@@ -609,6 +619,12 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				}else{
 					value.setAmmoConstraintData(null);
 				}
+				
+				if(!cutstomGeometryEditor.getValue().isEmpty()){
+					value.setCustomGeometryName(cutstomGeometryEditor.getValue());
+				}else{
+					value.setCustomGeometryName(null);
+				}
 			}
 
 			@Override
@@ -694,6 +710,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				if(ammoParticleConstraintEditor.getValue()==null){//copy default
 					ammoParticleConstraintEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoParticleConstraintData());//reset here,not checkbox
 				}
+				cutstomGeometryEditor.setValue(value.getCustomGeometryName());
 				
 			}
 	}

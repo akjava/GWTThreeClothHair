@@ -8,6 +8,8 @@ import com.akjava.gwt.clothhair.client.texture.HairTextureDataConverter;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.google.common.base.Converter;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
 import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.json.client.JSONObject;
 
@@ -68,6 +70,10 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		JSONObject ammoObject=new JSONObject();
 		JSONObjectWrapper ammoObjectWrapper=new JSONObjectWrapper(ammoObject);
 		wrapper.setObject("ammo", ammoObject);
+		
+		if(!Strings.isNullOrEmpty(hairData.getCustomGeometryName())){
+			ammoObjectWrapper.setString("customGeometryName", hairData.getCustomGeometryName());
+		}
 		
 		
 		ammoObjectWrapper.setBoolean("contactParticle", hairData.isAmmoContactParticle());
@@ -204,6 +210,12 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		
 		JSONObjectWrapper ammoObjectWrapper=object.getObject("ammo");
 		if(ammoObjectWrapper!=null){
+			
+			String customGeometryName=ammoObjectWrapper.getString("customGeometryName", hairData.getCustomGeometryName());;
+			if(!Strings.isNullOrEmpty(customGeometryName)){
+				hairData.setCustomGeometryName(customGeometryName);
+			}
+			
 			hairData.setAmmoContactParticle(ammoObjectWrapper.getBoolean("contactParticle", hairData.isAmmoContactParticle()));
 			hairData.setUseCustomBodyParticleData(ammoObjectWrapper.getBoolean("useCustomBodyParticleData", hairData.isUseCustomBodyParticleData()));
 			

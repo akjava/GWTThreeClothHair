@@ -114,15 +114,17 @@ public class HairPointUtils {
 			int y=j/(hairCloth.getW()+1);
 			
 			Vector3 delta=corePositions.get(x).clone().sub(centerPoint).setY(0);
-			/* trying merge normal but faild
-			 double length=corePositions.get(x).distanceTo(centerPoint.setY(corePositions.get(x).getX()));
+			double length=delta.length();
+			//delta.normalize().multiplyScalar(length);
+			// trying merge normal but faild
+			 
 			if(hairCloth.getHairData().isUseCustomNormal()){
 				Vector3 customNormal=hairCloth.getHairData().getCustomNormal();
-				Vector3 vector=customNormal.clone().normalize().lerp(delta.normalize(), hairCloth.getHairData().getOriginalNormalRatio());
-				ThreeLog.log("vector",vector);
+				Vector3 vector=customNormal.clone().normalize().lerp(delta.clone().normalize(), hairCloth.getHairData().getOriginalNormalRatio());
+				
 				delta=vector.multiplyScalar(length);
 			}
-			*/
+			
 			
 			
 			
