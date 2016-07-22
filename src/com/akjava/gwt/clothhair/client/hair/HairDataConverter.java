@@ -7,9 +7,12 @@ import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataConverter;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
+import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
+import com.akjava.gwt.three.client.js.math.Vector3;
 import com.google.common.base.Converter;
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.json.client.JSONObject;
 
@@ -56,6 +59,20 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 			wrapper.setString("hairTextureData", textureDataConverter.convert(hairData.getHairTextureData()));
 		}
 		
+		
+		wrapper.setInt("pointMode",hairData.getPointMode());
+		if(hairData.getPointMode()==HairData.POINT_MODE_SEMI_AUTO){
+			if(hairData.getSemiAutoPoints()!=null){
+				JsArray<JsArrayNumber> pts=GWTThreeUtils.toJsArrayNumber(hairData.getSemiAutoPoints());
+				wrapper.setArray("semiAutoPoints",pts);
+			}else{
+				LogUtils.log("some how semiauto point is null");
+			}
+			
+			if(hairData.getSemiAutoPins()!=null){
+				wrapper.setArrayNumber("semiAutoPins",hairData.getSemiAutoPins());
+			}
+		}
 		
 		//plain
 		JSONObject plainObject=new JSONObject();
@@ -190,7 +207,21 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		
 		
 		
-		
+		hairData.setPointMode(object.getInt("pointMode",hairData.getPointMode()));
+		if(hairData.getPointMode()==HairData.POINT_MODE_SEMI_AUTO){
+			JsArray<JavaScriptObject> ptsArray=object.getArray("semiAutoPoints");
+			if(ptsArray!=null){
+				@SuppressWarnings("unchecked")
+				JsArray<Vector3> pts=GWTThreeUtils.fromJsArrayNumberToVector3((JsArray<JsArrayNumber>)ptsArray.cast());
+				hairData.setSemiAutoPoints(pts);
+			}else{
+				LogUtils.log("some how semiauto point is null");
+			}
+			JsArrayNumber pinsArray=object.getArrayNumber("semiAutoPins");
+			if(pinsArray!=null){
+				hairData.setSemiAutoPins(pinsArray);
+			}
+		}
 		
 		
 		//parse plain-cloth

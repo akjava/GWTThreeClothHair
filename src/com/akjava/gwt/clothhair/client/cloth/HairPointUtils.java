@@ -149,6 +149,13 @@ public class HairPointUtils {
 			hairCloth.particles.get(j).setAllPosition(newPosition);
 		}
 		
+		//update pins
+		int[] newPins=new int[sliceFaceCount+1];
+		for(int i=0;i<=sliceFaceCount;i++){
+			newPins[i]=i;
+		}
+		
+		hairCloth.setPins(newPins);
 	
 	}
 }

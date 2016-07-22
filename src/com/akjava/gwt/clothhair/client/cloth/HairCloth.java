@@ -327,7 +327,9 @@ public class HairCloth {
 	 */
 	int h;
 	
+	
 	private List<Constrain> constrains=new ArrayList<Constrain>();
+	//TODO convert to js array,however particle is no js object
 	public List<Particle> particles=new ArrayList<Particle>();
 	
 	/*
@@ -336,6 +338,11 @@ public class HairCloth {
 	}
 	*/
 	
+	public List<Particle> getParticles() {
+		return particles;
+	}
+
+
 	List<int[]> pinsFormation=new ArrayList<int[]>();
 	
 	
@@ -962,6 +969,11 @@ public class HairCloth {
 	 //private boolean visibleDummy=true;//use scale 1 is best //TODO fit dummys
 	 
 	 
+	public double getAmmoMultipleScalar() {
+		return ammoMultipleScalar;
+	}
+
+
 	private boolean visibleDummy;
 	
 	
@@ -1149,6 +1161,7 @@ public class HairCloth {
 				}
 				*/
 				
+				
 				BodyAndMesh p=createAmmoParticle(simulator,particle.getOriginal().clone().multiplyScalar(ammoMultipleScalar), mass,v);
 				p.setAmmoMultipleScalar(ammoMultipleScalar);
 				ammoParticles.add(p);
@@ -1250,6 +1263,8 @@ public class HairCloth {
 		return ammoConstraints;
 	}
 
+
+	
 	private void updateParticles(ClothSimulator simulator){
 		AmmoHairControler.ParticleBodyDatas data=simulator.getAmmoHairControler().getAmmoData(this);
 		List<BodyAndMesh> ammoParticles=data.getAmmoParticles();
@@ -1280,7 +1295,7 @@ public class HairCloth {
 		//Updateing bounding sphere
 		Stopwatch watch3=LogUtils.stopwatch();
 		JsArray<Vector3> pos=JavaScriptUtils.createJSArray();
-		for(int i=0;i<ammoParticles.size();i+=10){ //reduce 
+		for(int i=0;i<ammoParticles.size();i+=10){ //omit points for speed 
 			pos.push(ammoParticles.get(i).getMesh().getPosition());
 		}
 		data.getSkinnedMesh().getGeometry().getBoundingSphere().setFromPoints(pos);
@@ -1548,6 +1563,7 @@ public class HairCloth {
 	public double getAmmoCircleInRangeRatio(){
 		return hairData.getAmmoCircleInRangeRatio();
 	}
+
 
 	
 

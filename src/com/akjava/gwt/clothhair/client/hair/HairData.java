@@ -11,6 +11,8 @@ import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.json.client.JSONObject;
 
 /**
@@ -692,4 +694,32 @@ public void setHairPins(List<HairPin> hairPins) {
 		this.customGeometry = customGeometry;
 	}
 	
+	private int pointMode;
+	public int getPointMode() {
+		return pointMode;
+	}
+
+	public void setPointMode(int pointMode) {
+		this.pointMode = pointMode;
+	}
+	public static final int POINT_MODE_AUTO=0;
+	public static final int POINT_MODE_SEMI_AUTO=1;
+	
+	private JsArray<Vector3> semiAutoPoints;
+	public JsArray<Vector3> getSemiAutoPoints() {
+		return semiAutoPoints;
+	}
+
+	public void setSemiAutoPoints(JsArray<Vector3> semiAutoPoints) {
+		this.semiAutoPoints = semiAutoPoints;
+	}
+	private JsArrayNumber semiAutoPins;
+
+	public JsArrayNumber getSemiAutoPins() {
+		return semiAutoPins;
+	}
+
+	public void setSemiAutoPins(JsArrayNumber semiAutoPins) {
+		this.semiAutoPins = semiAutoPins;
+	}
 }

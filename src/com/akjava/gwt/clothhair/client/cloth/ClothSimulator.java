@@ -647,7 +647,25 @@ public class ClothSimulator  {
 		
 		boolean useFirstPointY=data.getHairCloth().isUseFirstPointY();
 		//TODO make function,WARNING do same things in ClothControlers:syncPinPositions()
-		if(hairData.getHairPins().size()==2 && hairData.isCircleStyle()){
+		
+		if(hairData.getPointMode()==HairData.POINT_MODE_SEMI_AUTO){
+			checkNotNull(hairData.getSemiAutoPoints(),"semi auto points is null");
+			checkNotNull(hairData.getSemiAutoPins(),"semi auto pins is null");
+			checkArgument(hairData.getSemiAutoPoints().length() == data.getHairCloth().getParticles().size(),"semi auto points is not same as particle size.semiauto="+(hairData.getSemiAutoPoints().length()));
+	
+			for(int i=0;i<data.getHairCloth().getParticles().size();i++){
+				data.getHairCloth().getParticles().get(i).setAllPosition(hairData.getSemiAutoPoints().get(i));
+				//no need mass setting?,maybe mass is set when ammo-particle-made
+			}
+			int[] pins=new int[hairData.getSemiAutoPins().length()];
+			for(int i=0;i<hairData.getSemiAutoPins().length();i++){
+				pins[i]=(int)hairData.getSemiAutoPins().get(i);
+				//LogUtils.log("addcloth-semi-auto-pin:"+pins[i]);
+				//ThreeLog.log("",data.getHairCloth().getParticles().get(i).getPosition());
+			}
+			data.getHairCloth().setPins(pins);
+			
+		}else if(hairData.getHairPins().size()==2 && hairData.isCircleStyle()){
 			Vector3 v1=hairPinToVertex(characterMesh,hairData.getHairPins().get(0),true);
 			Vector3 v2=hairPinToVertex(characterMesh,hairData.getHairPins().get(1),true);
 			//TODO move and fix
@@ -1188,6 +1206,24 @@ public class ClothSimulator  {
 		//replace exists
 		for(ClothData data:clothControler.getCloths()){
 			data.getClothMesh().setReceiveShadow(value);
+		}
+	}
+	
+	/*
+	 * basically for hair-mode;
+	 */
+	public void syncAmmoBodyToParticle(HairCloth hairCloth){
+		AmmoHairControler.ParticleBodyDatas data=this.getAmmoHairControler().getAmmoData(hairCloth);
+		List<BodyAndMesh> ammoParticles=data.getAmmoParticles();
+		Vector3 threePos=THREE.Vector3();//share and improve fps
+		//basically never changed length
+		for(int i=0;i<ammoParticles.size();i++){
+			if(hairCloth.isPinned(i)){//both plain & hair type need sync
+				continue;
+			}else{
+				Vector3 ammoPos=ammoParticles.get(i).getBody().getReadOnlyPosition(threePos);
+				hairCloth.getParticles().get(i).position.copy(ammoPos).divideScalar(hairCloth.getAmmoMultipleScalar());
+			}
 		}
 	}
 

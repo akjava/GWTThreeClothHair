@@ -3,6 +3,7 @@ package com.akjava.gwt.clothhair.client.cloth;
 import java.util.List;
 import java.util.Map;
 
+import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.java.ThreeLog;
@@ -142,7 +143,15 @@ public class ClothControler {
 		
 		boolean useFirstPointY=data.getHairCloth().isUseFirstPointY();
 		
-		if(data.getCalculator().getResult().size()==2 && data.getHairCloth().isCircleStyle()){
+		if(data.getHairCloth().getHairData().getPointMode()==HairData.POINT_MODE_SEMI_AUTO){
+			for(int i=0;i<data.getCalculator().getResult().size();i++){
+				Vector3 pos=data.getCalculator().getResult().get(i);//pos is scall upped by calcurateor
+				int index=data.getHairCloth().getPins()[i];
+				data.getHairCloth().getParticles().get(index).setAllPosition(pos);
+				//LogUtils.log("syn-pin:"+index);
+			}
+		}
+		else if(data.getCalculator().getResult().size()==2 && data.getHairCloth().isCircleStyle()){
 			//TODO merge method
 			Vector3 v1=data.getCalculator().getResult().get(0);
 			Vector3 v2=data.getCalculator().getResult().get(1);

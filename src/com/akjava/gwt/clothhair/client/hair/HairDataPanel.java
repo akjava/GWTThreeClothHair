@@ -65,6 +65,7 @@ import com.google.gwt.canvas.dom.client.ImageData;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayNumber;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.ImageElement;
@@ -317,6 +318,9 @@ public class HairDataPanel extends VerticalPanel{
 		HorizontalPanel editPanel=new HorizontalPanel();
 		hairPanel.add(editPanel);
 		
+		HorizontalPanel editPanel2=new HorizontalPanel();
+		hairPanel.add(editPanel2);
+		
 		
 		Button edit=new Button("Remove & Edit",new ClickHandler() {
 			@Override
@@ -404,6 +408,51 @@ public class HairDataPanel extends VerticalPanel{
 		editPanel.add(reload);
 		reload.setTitle("reload cloths without reload page");
 		
+		semiAutoButton = new Button("Convert To Semi Auto",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				HairMixedData data=cellObjects.getSelection();
+				if(data!=null){
+					//sync before remove
+					GWTThreeClothHair.INSTANCE.getClothSimulator().syncAmmoBodyToParticle(data.getClothData().getHairCloth());
+					
+					removeHairData(data);
+					
+					data.getHairData().setPointMode(HairData.POINT_MODE_SEMI_AUTO);
+					JsArray<Vector3> pos=JavaScriptUtils.createJSArray();
+					for(int i=0;i<data.getClothData().getHairCloth().getParticles().size();i++){
+						pos.push(data.getClothData().getHairCloth().getParticles().get(i).getPosition().clone());
+					}
+					JsArrayNumber pins=JavaScriptUtils.createJSArrayNumber();
+					for(int i=0;i<data.getClothData().getHairCloth().getPins().length;i++){
+						pins.push(data.getClothData().getHairCloth().getPins()[i]);
+					}
+					data.getHairData().setSemiAutoPoints(pos);
+					data.getHairData().setSemiAutoPins(pins);
+					
+					loadHairDataSync(Lists.newArrayList(data.getHairData()));
+				}
+			}
+		});
+		semiAutoButton.setVisible(false);
+		editPanel2.add(semiAutoButton);
+		fullAutoButton = new Button("Back To Full Auto",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				HairMixedData data=cellObjects.getSelection();
+				if(data!=null){
+					removeHairData(data);
+					data.getHairData().setPointMode(HairData.POINT_MODE_AUTO);
+					data.getHairData().setSemiAutoPoints(null);
+					data.getHairData().setSemiAutoPins(null);
+					
+					loadHairDataSync(Lists.newArrayList(data.getHairData()));
+				}
+			}
+		});
+		fullAutoButton.setVisible(false);
+		editPanel2.add(fullAutoButton);
+		
 		
 		
 		cellObjects = new EasyCellTableObjects<HairMixedData>(table){
@@ -421,6 +470,14 @@ public class HairDataPanel extends VerticalPanel{
 				// TODO Auto-generated method stub
 				//editor edit
 				hairDataEditor.getHairTextureDataEditor().setValue(selection.getHairData().getHairTextureData());
+				
+				if(selection.getHairData().getPointMode()==HairData.POINT_MODE_AUTO){
+					semiAutoButton.setVisible(true);
+					fullAutoButton.setVisible(false);
+				}else{
+					semiAutoButton.setVisible(false);
+					fullAutoButton.setVisible(true);
+				}
 			}};
 			
 			
@@ -1463,6 +1520,10 @@ public void updateHairDataLine(){
 	private CheckBox showHair;
 
 	private HorizontalPanel downloadArea;
+
+	private Button fullAutoButton;
+
+	private Button semiAutoButton;
 	
 	private void clearAllHairData(){
 		for(HairMixedData data:ImmutableList.copyOf(cellObjects.getDatas())){

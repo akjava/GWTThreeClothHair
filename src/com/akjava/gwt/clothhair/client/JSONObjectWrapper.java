@@ -42,6 +42,10 @@ public  class JSONObjectWrapper{
 		jsonObject.put(key, new JSONArray(value));
 	}
 	
+	public void setArray(String key,@SuppressWarnings("rawtypes") JsArray value){
+		jsonObject.put(key, new JSONArray(value));
+	}
+	
 	
 	
 	public void setObject(String key,JSONObject value){
