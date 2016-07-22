@@ -20,11 +20,13 @@ import com.akjava.gwt.three.client.gwt.boneanimation.AnimationBone;
 import com.akjava.gwt.three.client.java.bone.SimpleAutoWeight;
 import com.akjava.gwt.three.client.java.bone.WeightResult;
 import com.akjava.gwt.three.client.java.geometry.PointsToGeometry;
+import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.loaders.JSONLoader.JSONLoadHandler;
+import com.akjava.gwt.three.client.js.loaders.XHRLoader.XHRLoadHandler;
 import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Quaternion;
@@ -1408,20 +1410,20 @@ public class HairCloth {
 			initializing=true;
 			//load geometry
 		
-			THREE.JSONLoader().load(basePath+hairData.getCustomGeometryName(), new JSONLoadHandler() {
+			THREE.XHRLoader().load(basePath+hairData.getCustomGeometryName(), new XHRLoadHandler() {
 				
 				@Override
-				public void loaded(Geometry geometry, JsArray<Material> materials) {
-					//resize
-					LogUtils.log("geometry loaded");
-					LogUtils.log(geometry);
+				public void onLoad(String text) {
+					Geometry geometry=GWTThreeUtils.parseJSONGeometry(text).getGeometry();
 					geometry.applyMatrix(GWTThreeClothHair.INSTANCE.getCharacterMesh().getMatrixWorld());
 					geometry.setBones(bones);
 					
 					//TODO auto weight setting
+					if(hairData.isCustomGeometryUseAutoSkinning()){
 					int influence=1;
 					WeightResult result=new SimpleAutoWeight(influence).autoWeight(geometry, bones,Lists.newArrayList(0));//ignore root
 					result.insertToGeometry(geometry);
+					}
 					
 					SkinnedMesh clothBoxMesh = THREE.SkinnedMesh(geometry,boxhMaterial);
 					data.setSkinnedMesh(clothBoxMesh);
@@ -1440,6 +1442,8 @@ public class HairCloth {
 					initializing=false;
 				}
 			});
+			
+			
 			
 		}
 		

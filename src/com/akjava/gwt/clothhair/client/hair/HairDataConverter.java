@@ -91,6 +91,7 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		if(!Strings.isNullOrEmpty(hairData.getCustomGeometryName())){
 			ammoObjectWrapper.setString("customGeometryName", hairData.getCustomGeometryName());
 		}
+		ammoObjectWrapper.setBoolean("customGeometryUseAutoSkinning", hairData.isCustomGeometryUseAutoSkinning());
 		
 		
 		ammoObjectWrapper.setBoolean("contactParticle", hairData.isAmmoContactParticle());
@@ -246,6 +247,9 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 			if(!Strings.isNullOrEmpty(customGeometryName)){
 				hairData.setCustomGeometryName(customGeometryName);
 			}
+			
+			hairData.setCustomGeometryUseAutoSkinning(ammoObjectWrapper.getBoolean("customGeometryUseAutoSkinning", hairData.isCustomGeometryUseAutoSkinning()));
+			
 			
 			hairData.setAmmoContactParticle(ammoObjectWrapper.getBoolean("contactParticle", hairData.isAmmoContactParticle()));
 			hairData.setUseCustomBodyParticleData(ammoObjectWrapper.getBoolean("useCustomBodyParticleData", hairData.isUseCustomBodyParticleData()));

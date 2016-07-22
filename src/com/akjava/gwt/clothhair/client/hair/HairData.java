@@ -671,7 +671,14 @@ public void setHairPins(List<HairPin> hairPins) {
 	}
 	
 	
-	
+	private boolean customGeometryUseAutoSkinning=true;
+	public boolean isCustomGeometryUseAutoSkinning() {
+		return customGeometryUseAutoSkinning;
+	}
+
+	public void setCustomGeometryUseAutoSkinning(boolean customGeometryUseAutoSkinning) {
+		this.customGeometryUseAutoSkinning = customGeometryUseAutoSkinning;
+	}
 	private String customGeometryName;//="testhair.json";//TESTING
 	
 	//can set from upload from but can't from filename,need sync,hair cloth need initializing check

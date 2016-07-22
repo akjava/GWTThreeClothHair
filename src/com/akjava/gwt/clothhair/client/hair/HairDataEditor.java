@@ -114,6 +114,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private CheckBox circleStyleCheck;
 		private CheckBox contactParticleCheck;
 		private TextBox cutstomGeometryEditor;
+		private CheckBox customGeometryUseAutoSkinningEditor;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -492,7 +493,11 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			cutstomGeometryEditor = new TextBox();
 			h4.add(cutstomGeometryEditor);
 			
-			
+			HorizontalPanel h5=new HorizontalPanel();
+			ammoPanel.add(h5);
+			h5.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+			customGeometryUseAutoSkinningEditor=new CheckBox("customGeometryUseAutoSkinning");
+			h5.add(customGeometryUseAutoSkinningEditor);
 			
 			tab.add(createParticleBodyEditor(),"AmmoBody");
 			tab.add(createParticleConstraintEditor(),"AmmoConstraint");
@@ -625,6 +630,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				}else{
 					value.setCustomGeometryName(null);
 				}
+				
+				value.setCustomGeometryUseAutoSkinning(customGeometryUseAutoSkinningEditor.getValue());
 			}
 
 			@Override
@@ -711,6 +718,6 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					ammoParticleConstraintEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoParticleConstraintData());//reset here,not checkbox
 				}
 				cutstomGeometryEditor.setValue(value.getCustomGeometryName());
-				
+				customGeometryUseAutoSkinningEditor.setValue(value.isCustomGeometryUseAutoSkinning());
 			}
 	}
