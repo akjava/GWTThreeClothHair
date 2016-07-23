@@ -730,5 +730,14 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				cutstomGeometryEditor.setValue(value.getCustomGeometryName());
 				enableCustomGeometryEditor.setValue(value.isEnableCustomGeometry(),true);
 				customGeometryUseAutoSkinningEditor.setValue(value.isCustomGeometryUseAutoSkinning());
+				
+				if(value.getPointMode()==HairData.POINT_MODE_AUTO){
+					uSize.setEnabled(true);
+					vSize.setEnabled(true);
+				}else{
+					LogUtils.log("modofied");
+					uSize.setEnabled(false);
+					vSize.setEnabled(false);
+				}
 			}
 	}
