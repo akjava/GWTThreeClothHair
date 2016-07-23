@@ -683,6 +683,16 @@ public void setHairPins(List<HairPin> hairPins) {
 	
 	//can set from upload from but can't from filename,need sync,hair cloth need initializing check
 	
+	private boolean enableCustomGeometry=true;
+	
+	public boolean isEnableCustomGeometry() {
+		return enableCustomGeometry;
+	}
+
+	public void setEnableCustomGeometry(boolean enableCustomGeometry) {
+		this.enableCustomGeometry = enableCustomGeometry;
+	}
+
 	public String getCustomGeometryName() {
 		return customGeometryName;
 	}

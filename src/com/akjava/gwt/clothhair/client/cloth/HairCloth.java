@@ -47,6 +47,7 @@ import com.akjava.gwt.threeammo.client.core.btVector3;
 import com.akjava.gwt.threeammo.client.core.constraints.btGeneric6DofSpringConstraint;
 import com.akjava.gwt.threeammo.client.functions.BodyAndMeshFunctions;
 import com.akjava.gwt.threeammo.client.functions.BodyAndMeshFunctions.CloneDivided;
+import com.akjava.lib.common.utils.FileNames;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
@@ -1386,7 +1387,7 @@ public class HairCloth {
 		//shape would rotate differenctly on path
 		double thick2=hairData.getAmmoBoneThickRatio2()==0?hairData.getThickRatio():hairData.getAmmoBoneThickRatio2();
 		
-		if(hairData.getCustomGeometryName()==null){
+		if(!hairData.isEnableCustomGeometry() || hairData.getCustomGeometryName()==null){
 			LogUtils.log("no custom-hair geometry");
 		Geometry clothBox=HairGeometryCreator.merge(new HairGeometryCreator().bonesList(bones, enableList).horizontalThick(hairData.getThickRatio()).verticalThick(thick2).createGeometry(positions, w));
 		
@@ -1408,9 +1409,14 @@ public class HairCloth {
 			LogUtils.log("custom-hair geometry");
 			String basePath="/models/";
 			initializing=true;
+			
+			String name=hairData.getCustomGeometryName();
+			if(FileNames.hasNoExtension(name)){
+				name+=".json";
+			}
+			
 			//load geometry
-		
-			THREE.XHRLoader().load(basePath+hairData.getCustomGeometryName(), new XHRLoadHandler() {
+			THREE.XHRLoader().load(basePath+name, new XHRLoadHandler() {
 				
 				@Override
 				public void onLoad(String text) {
