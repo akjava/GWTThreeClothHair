@@ -111,7 +111,7 @@ public class HairPointUtils {
 		
 		for(int j=hairCloth.getW()+1;j<hairCloth.particles.size();j++){
 			int x=j%(hairCloth.getW()+1);
-			int y=j/(hairCloth.getW()+1);
+			int y=(j/(hairCloth.getW()+1) );
 			
 			Vector3 delta=corePositions.get(x).clone().sub(centerPoint).setY(0);
 			double length=delta.length();
@@ -128,7 +128,7 @@ public class HairPointUtils {
 			
 			
 			
-			Vector3 newPosition=delta.multiplyScalar(y);
+			Vector3 newPosition=delta.multiplyScalar(y* hairCloth.getHairData().getScaleOfU());
 			
 			
 			double angle=x*perAngle;
