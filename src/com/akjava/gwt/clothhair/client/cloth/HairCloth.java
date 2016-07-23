@@ -1414,6 +1414,7 @@ public class HairCloth {
 			if(FileNames.hasNoExtension(name)){
 				name+=".json";
 			}
+			name+="?t="+System.currentTimeMillis();//avoid cache
 			
 			//load geometry
 			THREE.XHRLoader().load(basePath+name, new XHRLoadHandler() {
