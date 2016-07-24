@@ -1388,8 +1388,14 @@ public class HairCloth {
 		double thick2=hairData.getAmmoBoneThickRatio2()==0?hairData.getThickRatio():hairData.getAmmoBoneThickRatio2();
 		
 		if(!hairData.isEnableCustomGeometry() || hairData.getCustomGeometryName()==null){
-			LogUtils.log("no custom-hair geometry");
-		Geometry clothBox=HairGeometryCreator.merge(new HairGeometryCreator().bonesList(bones, enableList).horizontalThick(hairData.getThickRatio()).verticalThick(thick2).createGeometry(positions, w));
+		//LogUtils.log("no custom-hair geometry");
+		Geometry clothBox=HairGeometryCreator.merge(
+				new HairGeometryCreator()
+				.bonesList(bones, enableList)
+				.horizontalThick(hairData.getThickRatio()).verticalThick(thick2)
+				.dummyHairCount(hairData.getAmmoCircleDummyHairCount()).dummyHairAngle(hairData.getAmmoCircleDummyHairAngle())
+				.mergeFirstCenter(hairData.isAmmoCircleHairMergeCenter()).mergeLastVertex(hairData.isAmmoCircleHairMergeLast())
+				.createGeometry(positions, w));
 		
 		clothBox.setBones(bones);
 		

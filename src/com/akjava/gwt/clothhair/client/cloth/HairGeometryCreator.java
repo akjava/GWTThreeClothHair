@@ -24,11 +24,29 @@ public class HairGeometryCreator {
 	private double horizontalThick=0.5;
 	private double verticalThick=0.5;
 	
+	private int dummyHairCount;
+	private double dummyHairAngle=1;
+	public HairGeometryCreator  dummyHairCount(int count){
+		dummyHairCount=count;
+		return this;
+	}
+	public HairGeometryCreator dummyHairAngle(double angle){
+		dummyHairAngle=angle;
+		return this;
+	}
 	/**
 	 * for remove hole when not start center
 	 */
 	private boolean mergeFirstCenter=false;
-	private boolean mergeLastEdge=true;
+	public HairGeometryCreator mergeFirstCenter(boolean value){
+		mergeFirstCenter=value;
+		return this;
+	}
+	private boolean mergeLastVertex=true;
+	public HairGeometryCreator mergeLastVertex(boolean value){
+		mergeLastVertex=value;
+		return this;
+	}
 	public HairGeometryCreator horizontalThick(double v){
 		horizontalThick=v;
 		return this;
@@ -73,12 +91,12 @@ public class HairGeometryCreator {
 		int lastVertexSize=shape.getPoints(12).length();//default curve
 		
 		Vector3 centerPos=THREE.Vector3();
-		if(mergeFirstCenter){
+		//if(mergeFirstCenter){
 		for(int i=0;i<horizontalVertexCount;i++){
 			centerPos.add(positions.get(i));
 		}
 		centerPos.divideScalar(horizontalVertexCount);
-		}
+		//}
 		
 		for(int i=0;i<horizontalVertexCount;i++){
 			JsArray<Vector3> poses=JavaScriptUtils.createJSArray();
@@ -98,7 +116,7 @@ public class HairGeometryCreator {
 			//merge last
 			//LogUtils.log("last-size:"+lastVertexSize+",total="+geometry.getVertices().length());
 			
-			if(mergeLastEdge){
+			if(mergeLastVertex){
 			Vector3 pos=THREE.Vector3();
 			for(int j=0;j<lastVertexSize;j++){
 				int at=geometry.getVertices().length()-1-j;
@@ -131,19 +149,18 @@ public class HairGeometryCreator {
 				result.insertToGeometry(geometry);	
 			}
 			
-			int dummyCount=1;
-			double dummyAngle=1.5;
+			
 			
 			Geometry dummyBase=geometry.clone();
 			geometry.gwtHardCopyToWeightsAndIndices(dummyBase);
 			
-			for(int j=1;j<=dummyCount;j++){
+			for(int j=1;j<=dummyHairCount;j++){
 				for(int l=-1;l<=1;l++){
 					if(l==0){
 						continue;
 					}
 				
-				double angleRad=Math.toRadians(dummyAngle*l*j);
+				double angleRad=Math.toRadians(dummyHairAngle*l*j);
 				Geometry dummy=dummyBase.clone();
 				//dummyBase.gwtHardCopyToWeightsAndIndices(dummy);
 				
@@ -151,12 +168,10 @@ public class HairGeometryCreator {
 					Vector3 vertex=dummy.getVertices().get(k);
 					vertex.sub(centerPos).applyMatrix4(THREE.Matrix4().makeRotationY(angleRad)).add(centerPos);
 					
-					
-					
 				}
 				
 				if(bonesEnableIndexList!=null && bonesEnableIndexList.size()==horizontalVertexCount){
-					WeightResult result=new SimpleAutoWeight(2).enableBones(bonesEnableIndexList.get(i)).autoWeight(dummy, bones);//ignore root
+					WeightResult result=new SimpleAutoWeight(1).enableBones(bonesEnableIndexList.get(i)).autoWeight(dummy, bones);//ignore root
 					result.insertToGeometry(dummy);	
 				}
 				

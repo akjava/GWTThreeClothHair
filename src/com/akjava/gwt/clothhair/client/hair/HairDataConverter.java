@@ -137,6 +137,15 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		ammoObjectWrapper.setObject("ammo-bone", ammoBoneObject);
 		ammoBoneObjectWrapper.setDouble("thick", hairData.getThickRatio());
 		ammoBoneObjectWrapper.setDouble("thick2", hairData.getAmmoBoneThickRatio2());
+		
+		//ammo-bone
+		JSONObject ammoHairObject=new JSONObject();
+		JSONObjectWrapper ammoHairObjectWrapper=new JSONObjectWrapper(ammoHairObject);
+		ammoObjectWrapper.setObject("ammo-hair", ammoHairObject);
+		ammoHairObjectWrapper.setInt("circleDummyHairCount", hairData.getAmmoCircleDummyHairCount());
+		ammoHairObjectWrapper.setDouble("circleDummyHairAngle", hairData.getAmmoCircleDummyHairAngle());
+		ammoHairObjectWrapper.setBoolean("circleHairMergeCenter", hairData.isAmmoCircleHairMergeCenter());
+		ammoHairObjectWrapper.setBoolean("circleHairMergeLast", hairData.isAmmoCircleHairMergeLast());
 		return object;
 	}
 
@@ -303,6 +312,16 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 			}else{
 				LogUtils.log("no ammoBoneObject on hairData");
 			}
+			JSONObjectWrapper ammoHairObjectWrapper=ammoObjectWrapper.getObject("ammo-hair");
+			if(ammoHairObjectWrapper!=null){
+				hairData.setAmmoCircleDummyHairCount(ammoHairObjectWrapper.getInt("circleDummyHairCount", hairData.getAmmoCircleDummyHairCount()));
+				hairData.setAmmoCircleDummyHairAngle(ammoHairObjectWrapper.getDouble("circleDummyHairAngle", hairData.getAmmoCircleDummyHairAngle()));	
+			
+				hairData.setAmmoCircleHairMergeCenter(ammoHairObjectWrapper.getBoolean("circleHairMergeCenter", hairData.isAmmoCircleHairMergeCenter()));
+				hairData.setAmmoCircleHairMergeLast(ammoHairObjectWrapper.getBoolean("circleHairMergeLast", hairData.isAmmoCircleHairMergeLast()));
+			}
+			
+			
 		}else{
 			LogUtils.log("no ammoObject on hairData");
 		}

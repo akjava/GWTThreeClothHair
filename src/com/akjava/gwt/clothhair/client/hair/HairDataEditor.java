@@ -26,6 +26,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DoubleBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
@@ -116,6 +117,10 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private TextBox cutstomGeometryEditor;
 		private CheckBox customGeometryUseAutoSkinningEditor;
 		private CheckBox enableCustomGeometryEditor;
+		private IntegerBox ammoCircleDummyHairCountEditor;
+		private DoubleBox ammoCircleDummyHairAngleEditor;
+		private CheckBox ammoCircleHairMergeLastEditor;
+		private CheckBox ammoCircleHairMergeZeroEditor;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -519,6 +524,24 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					GWTThreeClothHair.INSTANCE.updateGUI();
 				}
 			});
+			
+			HorizontalPanel ammoHairOption1=new HorizontalPanel();
+			ammoHairOption1.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+			ammoHairPanel.add(ammoHairOption1);
+			
+			ammoHairOption1.add(new Label("Dummy count"));
+			ammoCircleDummyHairCountEditor = new IntegerBox();
+			ammoCircleDummyHairCountEditor.setWidth("40px");
+			ammoHairOption1.add(ammoCircleDummyHairCountEditor);
+			ammoHairOption1.add(new Label("angle"));
+			ammoCircleDummyHairAngleEditor = new DoubleBox();
+			ammoHairOption1.add(ammoCircleDummyHairAngleEditor);
+			ammoCircleDummyHairAngleEditor.setWidth("40px");
+		
+			ammoCircleHairMergeLastEditor = new CheckBox("Merge last");
+			ammoHairOption1.add(ammoCircleHairMergeLastEditor);
+			ammoCircleHairMergeZeroEditor = new CheckBox("zero");
+			ammoHairOption1.add(ammoCircleHairMergeZeroEditor);
 		}
 		
 		private Panel createParticleBodyEditor(){
@@ -642,6 +665,13 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				}
 				value.setEnableCustomGeometry(enableCustomGeometryEditor.getValue());
 				value.setCustomGeometryUseAutoSkinning(customGeometryUseAutoSkinningEditor.getValue());
+			
+				
+				value.setAmmoCircleDummyHairCount(ammoCircleDummyHairCountEditor.getValue());
+				value.setAmmoCircleDummyHairAngle(ammoCircleDummyHairAngleEditor.getValue());
+				value.setAmmoCircleHairMergeCenter(ammoCircleHairMergeZeroEditor.getValue());
+				value.setAmmoCircleHairMergeLast(ammoCircleHairMergeLastEditor.getValue());
+				
 			}
 
 			@Override
@@ -739,5 +769,10 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					uSize.setEnabled(false);
 					vSize.setEnabled(false);
 				}
+				
+				ammoCircleDummyHairCountEditor.setValue(value.getAmmoCircleDummyHairCount());
+				ammoCircleDummyHairAngleEditor.setValue(value.getAmmoCircleDummyHairAngle());
+				ammoCircleHairMergeZeroEditor.setValue(value.isAmmoCircleHairMergeCenter());
+				ammoCircleHairMergeLastEditor.setValue(value.isAmmoCircleHairMergeLast());
 			}
 	}

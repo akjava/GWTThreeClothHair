@@ -739,4 +739,39 @@ public void setHairPins(List<HairPin> hairPins) {
 	public void setSemiAutoPins(JsArrayNumber semiAutoPins) {
 		this.semiAutoPins = semiAutoPins;
 	}
+	
+	private boolean ammoCircleHairMergeLast=true;
+	public boolean isAmmoCircleHairMergeLast() {
+		return ammoCircleHairMergeLast;
+	}
+
+	public void setAmmoCircleHairMergeLast(boolean ammoCircleHairMergeLast) {
+		this.ammoCircleHairMergeLast = ammoCircleHairMergeLast;
+	}
+	private boolean ammoCircleHairMergeCenter;
+	
+	public boolean isAmmoCircleHairMergeCenter() {
+		return ammoCircleHairMergeCenter;
+	}
+
+	public void setAmmoCircleHairMergeCenter(boolean ammoCircleHairMergeZero) {
+		this.ammoCircleHairMergeCenter = ammoCircleHairMergeZero;
+	}
+	private double ammoCircleDummyHairAngle=1;
+	public double getAmmoCircleDummyHairAngle() {
+		return ammoCircleDummyHairAngle;
+	}
+
+	public void setAmmoCircleDummyHairAngle(double ammoCircleDummyHairAngle) {
+		this.ammoCircleDummyHairAngle = ammoCircleDummyHairAngle;
+	}
+	private int ammoCircleDummyHairCount;
+
+	public int getAmmoCircleDummyHairCount() {
+		return ammoCircleDummyHairCount;
+	}
+
+	public void setAmmoCircleDummyHairCount(int ammoCircleDummyHairCount) {
+		this.ammoCircleDummyHairCount = ammoCircleDummyHairCount;
+	}
 }
