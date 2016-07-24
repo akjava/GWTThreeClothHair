@@ -5,7 +5,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.List;
 
 import com.akjava.gwt.lib.client.JavaScriptUtils;
-import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
 import com.akjava.gwt.three.client.gwt.boneanimation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.extras.geometries.ExtrudeGeometryParameter;
@@ -16,9 +15,9 @@ import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.extras.core.Shape;
 import com.akjava.gwt.three.client.js.extras.curves.CatmullRomCurve3;
 import com.akjava.gwt.three.client.js.extras.geometries.ExtrudeGeometry;
+import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Vector2;
 import com.akjava.gwt.three.client.js.math.Vector3;
-import com.google.common.collect.Lists;
 import com.google.gwt.core.client.JsArray;
 
 public class HairGeometryCreator {
@@ -129,8 +128,41 @@ public class HairGeometryCreator {
 				}
 			if(bonesEnableIndexList!=null && bonesEnableIndexList.size()==horizontalVertexCount){
 				WeightResult result=new SimpleAutoWeight(1).enableBones(bonesEnableIndexList.get(i)).autoWeight(geometry, bones);//ignore root
-				result.insertToGeometry(geometry);
+				result.insertToGeometry(geometry);	
+			}
+			
+			int dummyCount=1;
+			double dummyAngle=1.5;
+			
+			Geometry dummyBase=geometry.clone();
+			geometry.gwtHardCopyToWeightsAndIndices(dummyBase);
+			
+			for(int j=1;j<=dummyCount;j++){
+				for(int l=-1;l<=1;l++){
+					if(l==0){
+						continue;
+					}
 				
+				double angleRad=Math.toRadians(dummyAngle*l*j);
+				Geometry dummy=dummyBase.clone();
+				//dummyBase.gwtHardCopyToWeightsAndIndices(dummy);
+				
+				for(int k=0;k<dummy.getVertices().length();k++){
+					Vector3 vertex=dummy.getVertices().get(k);
+					vertex.sub(centerPos).applyMatrix4(THREE.Matrix4().makeRotationY(angleRad)).add(centerPos);
+					
+					
+					
+				}
+				
+				if(bonesEnableIndexList!=null && bonesEnableIndexList.size()==horizontalVertexCount){
+					WeightResult result=new SimpleAutoWeight(2).enableBones(bonesEnableIndexList.get(i)).autoWeight(dummy, bones);//ignore root
+					result.insertToGeometry(dummy);	
+				}
+				
+				
+				geometry.gwtMergeWithSkinIndicesAndWeights(dummy);
+			}
 			}
 			
 			geometries.push(geometry);
