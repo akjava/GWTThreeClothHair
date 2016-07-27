@@ -1084,7 +1084,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 		String lines=storageControler.getValue(GWTThreeClothHairStorageKeys.KEY_SPHERES, null);
 		if(lines!=null){
-			sphereDataPanel.loadSphereDatas(lines,false);
+			Iterable<SphereData> sphereDatas=sphereDataPanel.parseSphereDatas(lines,false);
+			if(sphereDatas!=null){
+				sphereDataPanel.loadSphereDatas(sphereDatas,false);
+			}
+			
 			/*
 			Iterable<SphereData> datas=new SphereDataCsvConverter().reverse().convertAll(CSVUtils.splitLinesWithGuava(lines));
 			for(SphereData data:datas){

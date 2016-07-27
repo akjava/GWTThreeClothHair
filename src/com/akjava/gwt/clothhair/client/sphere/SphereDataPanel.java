@@ -246,11 +246,22 @@ public class SphereDataPanel extends VerticalPanel{
 				
 				@Override
 				public void uploaded(File file, String text) {
-					if(uploadModeBox.getSelectedIndex()==0){
-						clearAllSphereData();
+					
+					boolean isCsv=file.getFileName().toLowerCase().endsWith(".csv");
+					Iterable<SphereData> sphereDatas=parseSphereDatas(text,isCsv);
+					
+					if(sphereDatas==null){
+						return;
 					}
 					
-					loadSphereDatas(text,file.getFileName().toLowerCase().endsWith(".csv"));
+					if(uploadModeBox.getSelectedIndex()==0){
+						beforeUploadText=toStoreText();
+						clearAllSphereData();
+					}else{
+						beforeUploadText=null;
+					}
+					
+					loadSphereDatas(sphereDatas,file.getFileName().toLowerCase().endsWith(".csv"));
 					
 				}
 			}, true, "UTF-8");
@@ -279,11 +290,13 @@ public class SphereDataPanel extends VerticalPanel{
 			 this.add(downloadPanels);
 			
 	 }
+	 private String beforeUploadText;
 	 
-	 public void loadSphereDatas(String text,boolean isCsv){
-		//todo check validate
-			Iterable<SphereData> newDatas=null;
+	 public Iterable<SphereData> parseSphereDatas(String text,boolean isCsv){
+		 Iterable<SphereData> newDatas=null;
 			if(isCsv){
+				//csv can't check 
+				LogUtils.log("load old csv format");
 				newDatas=sphereDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
 				 for(SphereData newData:newDatas){
 					// LogUtils.log("newData:"+newData.getWidth());
@@ -292,9 +305,19 @@ public class SphereDataPanel extends VerticalPanel{
 					 //strangely if set here,clear value when read-newData
 				 }
 			}else{
+				try{
 				newDatas=new SphereDataListConverter().reverse().convert(text);
 				
+				}catch (Exception e) {
+					Window.alert("invalid sphere data.skipped load");
+					return null;
+				}
+				
 			}
+			return newDatas;
+	 }
+	 public void loadSphereDatas(Iterable<SphereData> newDatas,boolean isCsv){
+		//todo check validate
 			
 			// Iterable<SphereData> newDatas=sphereDataConverter.reverse().convertAll(CSVUtils.splitLinesWithGuava(text));
 			
