@@ -52,7 +52,7 @@ public class HairPointUtils {
 		}
 		
 	}
-	public static void updateCircleStyle(HairCloth hairCloth,Vector3 centerPoint,Vector3 addPoint,boolean hairPinOnly){
+	public static void updateCircleStyle(HairCloth hairCloth,Vector3 firstPoint,Vector3 secondPoint,boolean hairPinOnly){
 		
 		
 		
@@ -62,12 +62,12 @@ public class HairPointUtils {
 		boolean useFirstPointY=hairCloth.isUseFirstPointY();
 		
 		
-		//TODO parameter,to keep extrude shape same direction
-		if(centerPoint.getX() == addPoint.getX()){
-			addPoint.gwtIncrementX(0.001);
+		//TODO parameter,to keep extrude shape same direction,not work correctly
+		if(firstPoint.getX() == secondPoint.getX()){
+			secondPoint.gwtIncrementX(0.001);
 		}
-		if(centerPoint.getZ() == addPoint.getZ()){
-			addPoint.gwtIncrementZ(0.001);
+		if(firstPoint.getZ() == secondPoint.getZ()){
+			secondPoint.gwtIncrementZ(0.001);
 		}
 		
 		
@@ -75,26 +75,31 @@ public class HairPointUtils {
 		
 		int angleSplit=startAndEndSame?sliceFaceCount:sliceFaceCount+1;
 		
-		Vector2 center=THREE.Vector2(centerPoint.getX(), centerPoint.getZ());
-		Vector2 point=THREE.Vector2(addPoint.getX(), addPoint.getZ());
+		Vector2 center=THREE.Vector2(firstPoint.getX(), firstPoint.getZ());
+		Vector2 point=THREE.Vector2(secondPoint.getX(), secondPoint.getZ());
 		List<Vector3> corePositions=Lists.newArrayList();
 		
 		double perAngle=360.0/(angleSplit); //not support connect-horizontal
 		
+		//make rounding position
 		for(int i=0;i<=sliceFaceCount;i++){//+1
 			Vector2 rotated=point.clone().rotateAround(center, Math.toRadians(perAngle*i));
 			//ThreeLog.log("angle:"+(perAngle*i),rotated);
 			
 			if(useFirstPointY){
-				corePositions.add(THREE.Vector3(rotated.getX(), centerPoint.getY(), rotated.getY()));
+				corePositions.add(THREE.Vector3(rotated.getX(), firstPoint.getY(), rotated.getY()));
 			}else{
-				corePositions.add(THREE.Vector3(rotated.getX(), addPoint.getY(), rotated.getY()));
+				corePositions.add(THREE.Vector3(rotated.getX(), secondPoint.getY(), rotated.getY()));
 			}
 			
 		}
 		
 		for(int i=0;i<=sliceFaceCount;i++){
+			//TODO support merge center option
+			Vector3 centerPoint=firstPoint.clone().add(corePositions.get(i).clone().sub(firstPoint).normalize());//avoid same pos
+		//	ThreeLog.log("center",centerPoint);
 			if(startCenter){//no hole,but unstable as physics
+				//LogUtils.log("center");
 				hairCloth.particles.get(i).setAllPosition(centerPoint);
 				}
 			else{//make hole
@@ -106,14 +111,14 @@ public class HairPointUtils {
 			return;
 		}
 		
-		ThreeLog.log("center",centerPoint);
-		ThreeLog.log("add",addPoint);
+	//	ThreeLog.log("center",firstPoint);
+	//	ThreeLog.log("add",secondPoint);
 		
 		for(int j=hairCloth.getW()+1;j<hairCloth.particles.size();j++){
 			int x=j%(hairCloth.getW()+1);
 			int y=(j/(hairCloth.getW()+1) );
 			
-			Vector3 delta=corePositions.get(x).clone().sub(centerPoint).setY(0);
+			Vector3 delta=corePositions.get(x).clone().sub(firstPoint).setY(0);
 			double length=delta.length();
 			//delta.normalize().multiplyScalar(length);
 			// trying merge normal but faild
@@ -138,7 +143,7 @@ public class HairPointUtils {
 			
 			
 			if(startCenter){
-				newPosition.add(centerPoint);
+				newPosition.add(firstPoint);
 				//no need
 			}else{
 				newPosition.add(corePositions.get(x));
