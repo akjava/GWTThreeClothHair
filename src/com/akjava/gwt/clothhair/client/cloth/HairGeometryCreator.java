@@ -18,6 +18,7 @@ import com.akjava.gwt.three.client.js.extras.geometries.ExtrudeGeometry;
 import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Vector2;
 import com.akjava.gwt.three.client.js.math.Vector3;
+import com.akjava.lib.common.graphics.Lerps;
 import com.google.gwt.core.client.JsArray;
 
 public class HairGeometryCreator {
@@ -88,7 +89,7 @@ public class HairGeometryCreator {
 		pts.push(THREE.Vector2(-distance*horizontalThick,-distance*verticalThick));
 		
 		Shape shape=THREE.Shape(pts);
-		int lastVertexSize=shape.getPoints(12).length();//default curve
+		int shapeVertexSize=shape.getPoints(12).length();//12 is  default curve(if not contain curve result is same as shape point)
 		
 		Vector3 centerPos=THREE.Vector3();
 		//if(mergeFirstCenter){
@@ -116,15 +117,36 @@ public class HairGeometryCreator {
 			//merge last
 			//LogUtils.log("last-size:"+lastVertexSize+",total="+geometry.getVertices().length());
 			
+			int depth=geometry.getVertices().length()/shapeVertexSize;
+			double last=0.1;//todo add thinner option
+			for(int j=0;j<depth;j++){
+				double alpha=(double)j/(depth-1);
+				double ratio=Lerps.lerp(1.0, last, alpha);
+				Vector3 center=THREE.Vector3();
+				for(int k=0;k<shapeVertexSize;k++){
+					//make center
+					int at=j*shapeVertexSize+k;
+					center.add(geometry.getVertices().get(at));
+				}
+				center.divideScalar(shapeVertexSize);
+				for(int k=0;k<shapeVertexSize;k++){
+					int at=j*shapeVertexSize+k;
+					Vector3 diff=geometry.getVertices().get(at).clone().sub(center);
+					diff.multiplyScalar(ratio);
+					geometry.getVertices().get(at).copy(diff.add(center));
+				}
+			}
+			
+			
 			if(mergeLastVertex){
 			Vector3 pos=THREE.Vector3();
-			for(int j=0;j<lastVertexSize;j++){
+			for(int j=0;j<shapeVertexSize;j++){
 				int at=geometry.getVertices().length()-1-j;
 				pos.add(geometry.getVertices().get(at));
 			}
-			pos.divideScalar(lastVertexSize);
+			pos.divideScalar(shapeVertexSize);
 			
-			for(int j=0;j<lastVertexSize;j++){
+			for(int j=0;j<shapeVertexSize;j++){
 				int at=geometry.getVertices().length()-1-j;
 				geometry.getVertices().get(at).copy(pos);
 			}
@@ -137,7 +159,7 @@ public class HairGeometryCreator {
 				
 				
 				
-				for(int j=0;j<lastVertexSize;j++){
+				for(int j=0;j<shapeVertexSize;j++){
 					geometry.getVertices().get(j).copy(centerPos);
 				}
 				
