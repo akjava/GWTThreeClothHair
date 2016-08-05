@@ -14,6 +14,7 @@ import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
 import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
 import com.akjava.gwt.clothhair.client.cloth.SphereDataControler;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
+import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
 import com.akjava.gwt.clothhair.client.hair.HairPinPanel;
@@ -46,7 +47,9 @@ import com.akjava.gwt.three.client.js.core.BufferGeometry;
 import com.akjava.gwt.three.client.js.core.Clock;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
+import com.akjava.gwt.three.client.js.core.Object3D;
 import com.akjava.gwt.three.client.js.core.Raycaster;
+import com.akjava.gwt.three.client.js.extras.geometries.BoxGeometry;
 import com.akjava.gwt.three.client.js.extras.geometries.SphereGeometry;
 import com.akjava.gwt.three.client.js.extras.helpers.DirectionalLightHelper;
 import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
@@ -65,6 +68,7 @@ import com.akjava.gwt.three.client.js.math.Color;
 import com.akjava.gwt.three.client.js.math.Matrix3;
 import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
+import com.akjava.gwt.three.client.js.objects.Group;
 import com.akjava.gwt.three.client.js.objects.LineSegments;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
@@ -131,6 +135,68 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		return clothSimulator;
 	}
 	
+	private int semiautoMeshDefaultColor=0x000088;
+	private int semiautoMeshSelectColor=0x880000;
+	private Mesh semiautoLastSelection;
+	private Group semiAutoPositionGroup;
+	public void updateSemiAutoPositions(int index,Vector3 position){
+		if(semiAutoPositionGroup!=null){
+			Object3D object=semiAutoPositionGroup.getObjectByName(String.valueOf(index));
+			if(object!=null){
+				object.getPosition().copy(position);
+			}
+		}
+	}
+	public void updateSemiAutoPositionSelectionColor(int index){
+		LogUtils.log("update:"+index);
+		if(semiAutoPositionGroup!=null){
+			Object3D object=semiAutoPositionGroup.getObjectByName(String.valueOf(index));
+			if(object!=null){
+				
+				Mesh mesh=object.cast();
+				mesh.getMaterial().gwtCastMeshPhongMaterial().getColor().setHex(semiautoMeshSelectColor);
+				mesh.getMaterial().gwtCastMeshPhongMaterial().setNeedsUpdate(true);
+				
+				if(semiautoLastSelection!=null){
+					semiautoLastSelection.getMaterial().gwtCastMeshPhongMaterial().getColor().setHex(semiautoMeshDefaultColor);
+					semiautoLastSelection.getMaterial().gwtCastMeshPhongMaterial().setNeedsUpdate(true);
+				}
+				
+				semiautoLastSelection=mesh;
+			}else{
+				if(semiautoLastSelection!=null){
+					semiautoLastSelection.getMaterial().gwtCastMeshPhongMaterial().getColor().setHex(semiautoMeshDefaultColor);
+					semiautoLastSelection.getMaterial().gwtCastMeshPhongMaterial().setNeedsUpdate(true);
+				}
+				semiautoLastSelection=null;
+			}
+			
+			
+		}
+	}
+	public void setSemiAutoPositions(HairData data){
+		JsArray<Vector3> positions=data.getSemiAutoPoints();
+		//make scene
+		if(semiAutoPositionGroup!=null){
+			scene.remove(semiAutoPositionGroup);
+		}
+		semiAutoPositionGroup=THREE.Group();
+		
+		BoxGeometry box=THREE.BoxGeometry(10, 10, 10);//todo fix size
+		
+		for(int i=0;i<positions.length();i++){
+			MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(semiautoMeshDefaultColor));
+			
+			Mesh mesh=THREE.Mesh(box, material);
+			mesh.getPosition().copy(positions.get(i));
+			semiAutoPositionGroup.add(mesh);
+			mesh.setName(String.valueOf(i));
+		}
+		scene.add(semiAutoPositionGroup);
+		semiAutoPositionGroup.setVisible(tabSelection==2);
+		
+		hairPinPanel.setSemiAutoPositions(data);
+	}
 	
 	
 	@Override
@@ -774,7 +840,18 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		screenPosition.unproject(camera);
 		Raycaster ray=THREE.Raycaster(camera.getPosition(), screenPosition.sub( camera.getPosition() ).normalize());
 	
+		if(tabSelection==2){
+			JsArray<Intersect> intersects=ray.intersectObjects(semiAutoPositionGroup.getChildren());
+			if(intersects.length()>0){
+				selectSemiAutoPosition(intersects.get(0).getObject());
+			}
+			return;
+		}
+		
+		
 		JsArray<Intersect> intersects=ray.intersectObject(characterMesh);
+		
+		
 		
 		//find nearlist vertex
 		
@@ -822,6 +899,14 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 		
 	
+	private void selectSemiAutoPosition(Object3D object) {
+		String name=object.getName();
+		int index=Integer.parseInt(name);
+		Vector3 pos=hairPinPanel.getSemiAutoPinObjects().getDatas().get(index);
+		hairPinPanel.getSemiAutoPinObjects().setSelected(pos, true);
+		
+		//updateSemiAutoPositionSelectionColor(index);
+	}
 	public void unselectVertex(){
 		hairDataPanel.setNewLine(null);
 		hairDataPanel.setCurrentSelection(null);
@@ -887,6 +972,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	
 	
+	private int tabSelection;
 	public void onTabSelected(int index){
 		
 		if(index!=0){
@@ -895,12 +981,22 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			updateSphereVisible(true);
 		}
 		
-		if(index!=3 && index!=2){
+		if(index!=3){
 			updateVertexVisible(false);
 		}else{
 			updateVertexVisible(true);
 		}
+		
+		if(semiAutoPositionGroup!=null){
+		if(index==2){
+			semiAutoPositionGroup.setVisible(true);
+		}else{
+			semiAutoPositionGroup.setVisible(false);
+		}
+		}
+		
 		GWTThreeClothHair.INSTANCE.updateGUI();
+		tabSelection=index;
 	}
 	
 

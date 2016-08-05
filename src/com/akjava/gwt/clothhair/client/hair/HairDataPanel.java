@@ -465,7 +465,10 @@ public class HairDataPanel extends VerticalPanel{
 				
 				if(selection==null){
 					hairDataEditor.getHairTextureDataEditor().setValue(null);
+					GWTThreeClothHair.INSTANCE.setSemiAutoPositions(null);
 					return;
+				}else{
+					GWTThreeClothHair.INSTANCE.setSemiAutoPositions(selection.getHairData());
 				}
 				// TODO Auto-generated method stub
 				//editor edit

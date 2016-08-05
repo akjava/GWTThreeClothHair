@@ -726,6 +726,15 @@ public void setHairPins(List<HairPin> hairPins) {
 	public JsArray<Vector3> getSemiAutoPoints() {
 		return semiAutoPoints;
 	}
+	
+	public  int indexInSemiAutoPins(int index){
+		for(int i=0;i<semiAutoPins.length();i++){
+			if(index==semiAutoPins.get(i)){
+				return i;
+			}
+		}
+		return -1;
+	}
 
 	public void setSemiAutoPoints(JsArray<Vector3> semiAutoPoints) {
 		this.semiAutoPoints = semiAutoPoints;
