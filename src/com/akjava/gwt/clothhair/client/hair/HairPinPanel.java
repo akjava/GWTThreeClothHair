@@ -2,6 +2,8 @@ package com.akjava.gwt.clothhair.client.hair;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.cloth.HairCloth;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
@@ -153,12 +155,13 @@ public class HairPinPanel extends VerticalPanel{
 						Optional<Integer> value=semiAutoPinObjects.getSelectedIndex(object);
 						if(value.isPresent()){
 							int index=value.get();
-							
+							if(hairData.getSemiAutoPins()!=null){
 							for(int i=0;i<hairData.getSemiAutoPins().length();i++){
 								double v=hairData.getSemiAutoPins().get(i);
 								if(v==index){
 									return "true";
 								}
+							}
 							}
 							
 							return "";
@@ -262,8 +265,9 @@ public class HairPinPanel extends VerticalPanel{
 	
 	
 	private HairData hairData;
-	public void setSemiAutoPositions(HairData data){
+	public void setSemiAutoPositions(@Nullable HairData data){
 		hairData=data;
+		if(data!=null){
 		JsArray<Vector3> pos=data.getSemiAutoPoints();
 		if(pos==null){
 			semiAutoPinObjects.setDatas(Lists.<Vector3>newArrayList());
@@ -271,9 +275,14 @@ public class HairPinPanel extends VerticalPanel{
 			return;
 		}
 		List<Vector3> positions=JavaScriptUtils.toList(pos);
-		LogUtils.log("set semiauto:"+pos.length());
+		
 		semiAutoPinObjects.setDatas(positions);
 		semiAutoPinObjects.update();
+		}else{
+			List<Vector3> positions=Lists.newArrayList();
+			semiAutoPinObjects.setDatas(positions);
+			semiAutoPinObjects.update();
+		}
 	}
 
 	private void updatePinText() {

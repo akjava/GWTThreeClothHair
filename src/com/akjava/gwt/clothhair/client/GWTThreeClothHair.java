@@ -174,16 +174,24 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			
 		}
 	}
-	public void setSemiAutoPositions(HairData data){
-		JsArray<Vector3> positions=data.getSemiAutoPoints();
+	public void setSemiAutoPositions(@Nullable HairData data){
 		//make scene
 		if(semiAutoPositionGroup!=null){
 			scene.remove(semiAutoPositionGroup);
 		}
+		
+		if(data==null){
+			hairPinPanel.setSemiAutoPositions(null);
+			return;
+		}
+		
+		JsArray<Vector3> positions=data.getSemiAutoPoints();
+		
+		
 		semiAutoPositionGroup=THREE.Group();
 		
 		BoxGeometry box=THREE.BoxGeometry(10, 10, 10);//todo fix size
-		
+		if(positions!=null){
 		for(int i=0;i<positions.length();i++){
 			MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(semiautoMeshDefaultColor));
 			
@@ -191,6 +199,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			mesh.getPosition().copy(positions.get(i));
 			semiAutoPositionGroup.add(mesh);
 			mesh.setName(String.valueOf(i));
+		}
 		}
 		scene.add(semiAutoPositionGroup);
 		semiAutoPositionGroup.setVisible(tabSelection==2);
@@ -513,6 +522,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//String url="models/mbl3d/model8-hair-color-expand-bone.json"; //no-morph over 40fps
 		Mbl3dLoader loader=new Mbl3dLoader();
+		loader.forceApplyAxisAngle(true);
 		//loader.needFix=false;//for test,TODO autodetect
 		//JSONLoader loader=	THREE.JSONLoader();
 		
