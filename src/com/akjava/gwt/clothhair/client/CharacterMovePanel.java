@@ -291,6 +291,13 @@ public class CharacterMovePanel extends VerticalPanel{
 			}
 		});
 		a2.add(test5);
+		Button test6=new Button("test6",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				testAnimation("animation/anime_test6.json");
+			}
+		});
+		a2.add(test6);
 		
 		
 		HorizontalPanel animationPanel=new HorizontalPanel();
