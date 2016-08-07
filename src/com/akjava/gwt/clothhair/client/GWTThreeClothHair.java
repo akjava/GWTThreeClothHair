@@ -34,6 +34,7 @@ import com.akjava.gwt.three.client.gwt.core.BoundingBox;
 import com.akjava.gwt.three.client.gwt.core.Intersect;
 import com.akjava.gwt.three.client.gwt.math.HSL;
 import com.akjava.gwt.three.client.gwt.renderers.WebGLRendererParameter;
+import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
 import com.akjava.gwt.three.client.java.utils.Mbl3dLoader;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.animation.AnimationClip;
@@ -525,6 +526,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		loader.forceApplyAxisAngle(true);
 		//loader.needFix=false;//for test,TODO autodetect
 		//JSONLoader loader=	THREE.JSONLoader();
+		
+		
 		
 		loader.load(modelUrl,new JSONLoadHandler() {
 			
