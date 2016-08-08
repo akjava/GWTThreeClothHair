@@ -540,7 +540,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			public void loaded(Geometry geometry,JsArray<Material> m) {
 				
 				int result=geometry.mergeVertices();//or seam line showing on texture
-				LogUtils.log("merge-vertex:"+result);
+				LogUtils.log("mergeVertices: result="+result);
 				
 				
 				//materials=fixMaterial(materials);
@@ -624,20 +624,28 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				if(aoUrl!=null){
 					bodyMaterial.setAoMap(THREE.TextureLoader().load(aoUrl));
 					bodyMaterial.setAoMapIntensity(paramDouble("aoMapIntensity",1));
+				}else{
+					LogUtils.log("no ao-map:");
 				}
 				
 				String bumpUrl=parameterFile("bump");
+				
 				if(bumpUrl!=null){
 					Texture texture=THREE.TextureLoader().load(bumpUrl);
 					texture.setMinFilter(THREE.NearestFilter);//make problem
 					bodyMaterial.setBumpMap(texture);
 					bodyMaterial.setBumpScale(paramDouble("bumpScale",1));
+				}else{
+					LogUtils.log("no bump:");
 				}
 				
 				String displacementUrl=parameterFile("displacement");
+				
 				if(displacementUrl!=null){
 					bodyMaterial.setDisplacementMap(THREE.TextureLoader().load(displacementUrl));
 					bodyMaterial.setDisplacementScale(paramDouble("displacementScale", 0.1));
+				}else{
+					LogUtils.log("no displacement:");
 				}
 				
 				characterMesh = THREE.SkinnedMesh( geometry, bodyMaterial );
@@ -761,7 +769,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	public String parameterFile(String id){
 		double t=System.currentTimeMillis();
-		return GWTHTMLUtils.getInputValueById(id, null)+"?t="+t;
+		String url=GWTHTMLUtils.getInputValueById(id, null);
+		if(url==null){
+			return null;
+		}
+		return url+"?t="+t;
 	}
 	public static double paramDouble(String id,double defaultValue){
 		return ValuesUtils.toDouble(GWTHTMLUtils.getInputValueById(id,null),defaultValue);
