@@ -783,4 +783,15 @@ public void setHairPins(List<HairPin> hairPins) {
 	public void setAmmoCircleDummyHairCount(int ammoCircleDummyHairCount) {
 		this.ammoCircleDummyHairCount = ammoCircleDummyHairCount;
 	}
+	private double ammoHairThinLast=0.1;
+
+	public double getAmmoHairThinLast() {
+		return ammoHairThinLast;
+	}
+
+	public void setAmmoHairThinLast(double ammoHairThinLast) {
+		this.ammoHairThinLast = ammoHairThinLast;
+	}
+
+	
 }

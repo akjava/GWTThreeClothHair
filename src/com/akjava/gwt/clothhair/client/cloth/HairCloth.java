@@ -1394,6 +1394,7 @@ public class HairCloth {
 				.bonesList(bones, enableList)
 				.horizontalThick(hairData.getThickRatio()).verticalThick(thick2)
 				.dummyHairCount(hairData.getAmmoCircleDummyHairCount()).dummyHairAngle(hairData.getAmmoCircleDummyHairAngle())
+				.thinLast(hairData.getAmmoHairThinLast())
 				.mergeFirstCenter(hairData.isAmmoCircleHairMergeCenter()).mergeLastVertex(hairData.isAmmoCircleHairMergeLast())
 				.createGeometry(positions, w));
 		

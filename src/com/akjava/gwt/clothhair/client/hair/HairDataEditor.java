@@ -121,6 +121,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private DoubleBox ammoCircleDummyHairAngleEditor;
 		private CheckBox ammoCircleHairMergeLastEditor;
 		private CheckBox ammoCircleHairMergeZeroEditor;
+		
+		private DoubleBox ammoHairThinLastEditor;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -542,6 +544,14 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			ammoHairOption1.add(ammoCircleHairMergeLastEditor);
 			ammoCircleHairMergeZeroEditor = new CheckBox("zero");
 			ammoHairOption1.add(ammoCircleHairMergeZeroEditor);
+			
+			HorizontalPanel ammoHairOption2=new HorizontalPanel();
+			ammoHairOption2.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+			ammoHairPanel.add(ammoHairOption2);
+			ammoHairOption2.add(new Label("Thin Last"));
+			ammoHairThinLastEditor=new DoubleBox();
+			ammoHairThinLastEditor.setWidth("40px");
+			ammoHairOption2.add(ammoHairThinLastEditor);
 		}
 		
 		private Panel createParticleBodyEditor(){
@@ -671,7 +681,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setAmmoCircleDummyHairAngle(ammoCircleDummyHairAngleEditor.getValue());
 				value.setAmmoCircleHairMergeCenter(ammoCircleHairMergeZeroEditor.getValue());
 				value.setAmmoCircleHairMergeLast(ammoCircleHairMergeLastEditor.getValue());
-				
+				value.setAmmoHairThinLast(ammoHairThinLastEditor.getValue());
 			}
 
 			@Override
@@ -774,5 +784,6 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				ammoCircleDummyHairAngleEditor.setValue(value.getAmmoCircleDummyHairAngle());
 				ammoCircleHairMergeZeroEditor.setValue(value.isAmmoCircleHairMergeCenter());
 				ammoCircleHairMergeLastEditor.setValue(value.isAmmoCircleHairMergeLast());
+				ammoHairThinLastEditor.setValue(value.getAmmoHairThinLast());
 			}
 	}

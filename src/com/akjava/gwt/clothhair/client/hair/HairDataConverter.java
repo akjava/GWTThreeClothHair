@@ -146,6 +146,7 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		ammoHairObjectWrapper.setDouble("circleDummyHairAngle", hairData.getAmmoCircleDummyHairAngle());
 		ammoHairObjectWrapper.setBoolean("circleHairMergeCenter", hairData.isAmmoCircleHairMergeCenter());
 		ammoHairObjectWrapper.setBoolean("circleHairMergeLast", hairData.isAmmoCircleHairMergeLast());
+		ammoHairObjectWrapper.setDouble("thinLast", hairData.getAmmoHairThinLast());
 		return object;
 	}
 
@@ -319,6 +320,8 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 			
 				hairData.setAmmoCircleHairMergeCenter(ammoHairObjectWrapper.getBoolean("circleHairMergeCenter", hairData.isAmmoCircleHairMergeCenter()));
 				hairData.setAmmoCircleHairMergeLast(ammoHairObjectWrapper.getBoolean("circleHairMergeLast", hairData.isAmmoCircleHairMergeLast()));
+				hairData.setAmmoHairThinLast(ammoHairObjectWrapper.getDouble("thinLast", hairData.getAmmoHairThinLast()));
+				
 			}
 			
 			

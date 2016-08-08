@@ -35,6 +35,10 @@ public class HairGeometryCreator {
 		dummyHairAngle=angle;
 		return this;
 	}
+	public HairGeometryCreator  thinLast(double thinLast){
+		this.thinLast=thinLast;
+		return this;
+	}
 	/**
 	 * for remove hole when not start center
 	 */
@@ -59,6 +63,7 @@ public class HairGeometryCreator {
 	
 	private List<List<Integer>> bonesEnableIndexList;
 	private JsArray<AnimationBone> bones;
+	private double thinLast;
 	public HairGeometryCreator bonesList(JsArray<AnimationBone> bones,List<List<Integer>> bonesEnableIndexList){
 		this.bones=bones;
 		this.bonesEnableIndexList=bonesEnableIndexList;
@@ -117,11 +122,14 @@ public class HairGeometryCreator {
 			//merge last
 			//LogUtils.log("last-size:"+lastVertexSize+",total="+geometry.getVertices().length());
 			
+			if(thinLast!=0&&thinLast!=1){
 			int depth=geometry.getVertices().length()/shapeVertexSize;
-			double last=0.1;//todo add thinner option
+			
+			
+			
 			for(int j=0;j<depth;j++){
 				double alpha=(double)j/(depth-1);
-				double ratio=Lerps.lerp(1.0, last, alpha);
+				double ratio=Lerps.lerp(1.0, thinLast, alpha);
 				Vector3 center=THREE.Vector3();
 				for(int k=0;k<shapeVertexSize;k++){
 					//make center
@@ -136,7 +144,7 @@ public class HairGeometryCreator {
 					geometry.getVertices().get(at).copy(diff.add(center));
 				}
 			}
-			
+			}
 			
 			if(mergeLastVertex){
 			Vector3 pos=THREE.Vector3();
