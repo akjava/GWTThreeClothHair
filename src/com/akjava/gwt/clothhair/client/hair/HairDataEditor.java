@@ -9,6 +9,9 @@ import com.akjava.gwt.clothhair.client.ammo.ConstraintDataEditor;
 import com.akjava.gwt.clothhair.client.texture.HairTextureDataEditor;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.ui.LabeledInputRangeWidget2;
+import com.akjava.gwt.three.client.java.ui.experiments.SimpleVector3Editor;
+import com.akjava.gwt.three.client.java.ui.experiments.SimpleVector3Editor.SimpleVector3EditorListener;
+import com.akjava.gwt.three.client.js.math.Vector3;
 import com.google.common.collect.Lists;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorDelegate;
@@ -85,7 +88,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private CheckBox connectHorizontalCheck;
 		
 		private CheckBox execAverageNormalEditor;
-		
+		private SimpleVector3Editor customNormalEditor;
 		private HairDataPanel hairDataPanel;
 		private LabeledInputRangeWidget2 mass;
 		private LabeledInputRangeWidget2 damping;
@@ -310,7 +313,15 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			execAverageNormalEditor=new CheckBox("average normals");
 			option1Panel.add(execAverageNormalEditor);
 			
-			
+			customNormalEditor=new SimpleVector3Editor(new SimpleVector3EditorListener() {
+				@Override
+				public void onValueChanged(Vector3 value) {
+					// do nothing
+					
+				}
+			});
+			option1Panel.add(customNormalEditor);
+			customNormalEditor.setTextBoxWidth(40);
 			
 			
 			HorizontalPanel option1Panel2=new HorizontalPanel();
@@ -682,6 +693,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setAmmoCircleHairMergeCenter(ammoCircleHairMergeZeroEditor.getValue());
 				value.setAmmoCircleHairMergeLast(ammoCircleHairMergeLastEditor.getValue());
 				value.setAmmoHairThinLast(ammoHairThinLastEditor.getValue());
+				
+				value.setCustomNormal(customNormalEditor.getValue());
 			}
 
 			@Override
@@ -785,5 +798,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				ammoCircleHairMergeZeroEditor.setValue(value.isAmmoCircleHairMergeCenter());
 				ammoCircleHairMergeLastEditor.setValue(value.isAmmoCircleHairMergeLast());
 				ammoHairThinLastEditor.setValue(value.getAmmoHairThinLast());
+				
+				customNormalEditor.setValue(value.getCustomNormal());
 			}
 	}

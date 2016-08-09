@@ -8,6 +8,7 @@ import com.akjava.gwt.clothhair.client.texture.HairTextureDataConverter;
 import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
+import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.google.common.base.Converter;
 import com.google.common.base.Strings;
@@ -53,6 +54,10 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		wrapper.setDouble("extendOutsideRatio", hairData.getExtendOutsideRatio());
 		wrapper.setBoolean("averagingNormal", hairData.isExecAverageNormal());
 		wrapper.setBoolean("useCustomNormal", hairData.isUseCustomNormal());
+		Vector3 customNormal=hairData.getCustomNormal();
+		if(customNormal!=null){
+			wrapper.setArrayNumber("customNormal", customNormal.toArray());
+		}
 		wrapper.setDouble("originalNormalRatio", hairData.getOriginalNormalRatio());
 		
 		if(hairData.getHairTextureData()!=null){
@@ -203,6 +208,14 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		
 		hairData.setExecAverageNormal(object.getBoolean("averagingNormal", hairData.isExecAverageNormal()));
 		hairData.setUseCustomNormal(object.getBoolean("useCustomNormal", hairData.isUseCustomNormal()));
+		
+		
+		JsArrayNumber customNormalNumber= object.getArrayNumber("customNormal");
+		if(customNormalNumber!=null){
+			Vector3 customNormal=THREE.Vector3().fromArray(customNormalNumber);
+			hairData.setCustomNormal(customNormal);
+		}
+		
 		//TODO add customNormal
 		hairData.setOriginalNormalRatio(object.getDouble("originalNormalRatio", hairData.getOriginalNormalRatio()));
 		

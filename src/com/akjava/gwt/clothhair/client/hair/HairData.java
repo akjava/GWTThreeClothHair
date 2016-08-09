@@ -652,6 +652,10 @@ public void setHairPins(List<HairPin> hairPins) {
 	}
 
 	private Vector3 customNormal=THREE.Vector3(0, -1, 0);//TODO modify
+	public void setCustomNormal(Vector3 customNormal) {
+		this.customNormal = customNormal;
+	}
+
 	public Vector3 getCustomNormal() {
 		// TODO Auto-generated method stub
 		return customNormal;
