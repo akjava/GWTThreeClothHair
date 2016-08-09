@@ -176,7 +176,7 @@ public class HairPinPanel extends VerticalPanel{
 				//TODO add vector3 and etc
 			}
 		};
-		final Vector3Editor semiAutoEditor=new Vector3Editor("pos", -200, 1800, 0.1, 0);
+		final Vector3Editor semiAutoEditor=new Vector3Editor("pos", -300, 1900, 0.1, 0);
 		semiAutoEditor.addValueChangeHandler(new ValueChangeHandler<Vector3>() {
 			
 			@Override
