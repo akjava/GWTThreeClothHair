@@ -84,6 +84,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		
 		
 		private ListBox channelBox;
+		private DoubleBox particleMassEditor;
 		private CheckBox syncCheck;
 		private CheckBox connectHorizontalCheck;
 		
@@ -264,6 +265,11 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					//flush();
 				}
 			});
+			
+			channelPanel.add(new Label("Mass:"));
+			particleMassEditor=new DoubleBox();
+			particleMassEditor.setWidth("40px");
+			channelPanel.add(particleMassEditor);
 			
 			Button resetGrvities=new Button("Reset mass&damping",new ClickHandler() {
 				
@@ -695,6 +701,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				value.setAmmoHairThinLast(ammoHairThinLastEditor.getValue());
 				
 				value.setCustomNormal(customNormalEditor.getValue());
+				value.setParticleMass(particleMassEditor.getValue());
 			}
 
 			@Override
@@ -800,5 +807,6 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				ammoHairThinLastEditor.setValue(value.getAmmoHairThinLast());
 				
 				customNormalEditor.setValue(value.getCustomNormal());
+				particleMassEditor.setValue(value.getParticleMass());
 			}
 	}

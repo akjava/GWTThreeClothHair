@@ -1131,7 +1131,7 @@ public class HairCloth {
 			
 			List<BodyAndMesh> ammoParticles=Lists.newArrayList();
 			
-			double baseMass=1;//not so effect
+			double baseMass=hairData.getParticleMass();//not so effect
 			for(int i=0;i<particles.size();i++){
 				Particle particle=particles.get(i);
 				int v=i/(w+1);

@@ -28,6 +28,17 @@ public int getParticleType() {
 	return particleType;
 }
 
+//PLAIN NOT SUPPORT YET
+private double particleMass=1;
+
+public double getParticleMass() {
+	return particleMass;
+}
+
+public void setParticleMass(double particleMass) {
+	this.particleMass = particleMass;
+}
+
 public void setParticleType(int particleType) {
 	this.particleType = particleType;
 }

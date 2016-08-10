@@ -47,6 +47,7 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		wrapper.setBoolean("cutHorizontal", hairData.isCutU());
 		wrapper.setInt("cutHorizontalStartIndex", hairData.getStartCutUIndexV());
 		wrapper.setInt("channel", hairData.getChannel());
+		wrapper.setDouble("particleMass", hairData.getParticleMass());
 		wrapper.setBoolean("syncPosition", hairData.isSyncMove());
 		wrapper.setBoolean("connectHorizontal", hairData.isConnectHorizontal());
 		wrapper.setInt("physicsType", hairData.getHairPhysicsType());
@@ -199,6 +200,8 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		hairData.setStartCutUIndexV(object.getInt("cutHorizontalStartIndex", hairData.getStartCutUIndexV()));
 		//TODO add end
 		
+		
+		hairData.setParticleMass(object.getDouble("particleMass", hairData.getParticleMass()));
 		hairData.setChannel(object.getInt("channel", hairData.getChannel()));//TODO support bit-channel
 		hairData.setSyncMove(object.getBoolean("syncPosition", hairData.isSyncMove()));
 		
