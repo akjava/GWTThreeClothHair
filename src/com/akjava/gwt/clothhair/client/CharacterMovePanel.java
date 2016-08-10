@@ -473,6 +473,7 @@ public class CharacterMovePanel extends VerticalPanel{
 	
 	public void setSkelton(Skeleton skeleton) {
 		List<BoneData> boneDatas=SkeletonUtils.skeltonToBoneData(skeleton);
+		
 		int defaultTarget=60;
 		if(boneDatas.size()<defaultTarget){
 			LogUtils.log("differect bone.change default index");

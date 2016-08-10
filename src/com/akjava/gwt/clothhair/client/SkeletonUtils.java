@@ -3,11 +3,19 @@ package com.akjava.gwt.clothhair.client;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.google.common.collect.Lists;
+import com.google.gwt.text.shared.Renderer;
+import com.google.gwt.user.client.ui.ValueListBox;
 
+/**
+ * @deprecated maybe in threetest
+ * @author aki
+ *
+ */
 public class SkeletonUtils {
 
 	public static class BoneData {
@@ -31,6 +39,7 @@ public class SkeletonUtils {
 		}
 		private int index;
 	}
+	
 	
 	
 	public static List<BoneData> skeltonToBoneData(Skeleton skeleton){
