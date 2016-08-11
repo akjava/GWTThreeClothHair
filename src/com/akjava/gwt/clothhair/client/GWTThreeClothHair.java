@@ -13,8 +13,8 @@ import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
 import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
 import com.akjava.gwt.clothhair.client.cloth.SphereDataControler;
-import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairData;
+import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel;
 import com.akjava.gwt.clothhair.client.hair.HairDataPanel.HairMixedData;
 import com.akjava.gwt.clothhair.client.hair.HairPinPanel;
@@ -34,7 +34,6 @@ import com.akjava.gwt.three.client.gwt.core.BoundingBox;
 import com.akjava.gwt.three.client.gwt.core.Intersect;
 import com.akjava.gwt.three.client.gwt.math.HSL;
 import com.akjava.gwt.three.client.gwt.renderers.WebGLRendererParameter;
-import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
 import com.akjava.gwt.three.client.java.utils.Mbl3dLoader;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.animation.AnimationClip;
@@ -523,7 +522,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//String url="models/mbl3d/model8-hair-color-expand-bone.json"; //no-morph over 40fps
 		Mbl3dLoader loader=new Mbl3dLoader();
-		loader.forceApplyAxisAngle(true);
+		loader.forceApplyAxisAngle(GWTHTMLUtils.parameterBoolean("forceFixMorphtargets",false));
 		//loader.needFix=false;//for test,TODO autodetect
 		//JSONLoader loader=	THREE.JSONLoader();
 		
