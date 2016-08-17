@@ -933,11 +933,11 @@ public class HairCloth {
 	
 	
 	public boolean isBoneType(int type){
-		return type==HairData.TYPE_AMMO_BONE_CLOTH || type==HairData.TYPE_AMMO_BONE_HAIR;
+		return type==HairData.TYPE_AMMO_BONE_CLOTH || type==HairData.TYPE_AMMO_BONE_HAIR || type==HairData.TYPE_AMMO_BONE_BODY;
 		
 	}
 	public boolean isAmmoType(int type){
-		return type==HairData.TYPE_AMMO_CLOTH || type==HairData.TYPE_AMMO_BONE_CLOTH || type==HairData.TYPE_AMMO_BONE_HAIR;
+		return type==HairData.TYPE_AMMO_CLOTH || type==HairData.TYPE_AMMO_BONE_CLOTH || type==HairData.TYPE_AMMO_BONE_HAIR || type==HairData.TYPE_AMMO_BONE_BODY;
 	}
 	
 	//call after simulate
@@ -1187,12 +1187,28 @@ public class HairCloth {
 				//position keep same
 				createAmmoBoneHair(simulator,data,ammoParticles);
 				
+			}else if(hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_BODY){
+					String suffix="breast-";//TODO
+					//extream special
+					SkinnedMesh characterMesh=simulator.getCharacterMesh();
+					String rootName=suffix+"root";
+					for(int i=0;i<characterMesh.getGeometry().getBones().length();i++){
+						if(characterMesh.getGeometry().getBones().get(i).getName().equals(rootName)){
+							ammoBoneBodyOffset=i;
+							break;
+						}
+					}
+					ammoBoneBodyLength=PlainBoneCreator.calcurateBoneCount(ammoParticles.size(), w);
+					
+					LogUtils.log("ammoBoneBodyOffset:"+ammoBoneBodyOffset+" ammoBoneBodyLength="+ammoBoneBodyLength);
 				}
 			
 			LogUtils.log("buttlet-object-size:"+restDistance*ammoMultipleScalar);
 			
 			if(!initializing){
 				simulator.getAmmoHairControler().setParticleData(this,data );
+			}else{
+				LogUtils.log("not initialized");
 			}
 			skipSync=true;
 		}else{
@@ -1289,24 +1305,45 @@ public class HairCloth {
 		
 		//hair is handled as bone
 		if(isBoneType(hairData.getHairPhysicsType())){
+		if(hairData.getHairPhysicsType() == HairData.TYPE_AMMO_BONE_BODY){
+			
+			if(ammoBoneBodyOffset==-1){
+				return;
+			}
+			
+			SkinnedMesh mesh=simulator.getCharacterMesh();
+			String suffix="breast-";//TODO
+			double characterScale=mesh.getScale().getX();
+			
+			
+			
+			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), mesh, w, ammoParticles,ammoMultipleScalar,suffix,ammoBoneBodyOffset,ammoBoneBodyLength);
+				
+			//ammoBoneBodyOffset=-1;
+			
+		}else{
+		
 		PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles,ammoMultipleScalar);
 		
 		if(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone()){
 			data.getSkeltonHelper().update();
 		}
 		
-		//Updateing bounding sphere
-		Stopwatch watch3=LogUtils.stopwatch();
+		//Updating bounding sphere
+	//	Stopwatch watch3=LogUtils.stopwatch();
 		JsArray<Vector3> pos=JavaScriptUtils.createJSArray();
 		for(int i=0;i<ammoParticles.size();i+=10){ //omit points for speed 
 			pos.push(ammoParticles.get(i).getMesh().getPosition());
 		}
 		data.getSkinnedMesh().getGeometry().getBoundingSphere().setFromPoints(pos);
+		}
 		//LogUtils.microsecond("computeSphere",watch3);
 			
 			//data.getSkinnedMesh().getGeometry().computeBoundingSphere();//for camera
 		}
 	}
+	private int ammoBoneBodyOffset=-1;//not initialized or not found
+	private int ammoBoneBodyLength;
 	
 	private void createAmmoBoneCloth(ClothSimulator simulator,AmmoHairControler.ParticleBodyDatas data,List<BodyAndMesh> ammoParticles) {
 		//create bone mesh

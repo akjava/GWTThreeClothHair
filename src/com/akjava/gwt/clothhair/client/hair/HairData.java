@@ -494,7 +494,7 @@ public void setHairPins(List<HairPin> hairPins) {
 	public static final int TYPE_AMMO_CLOTH=1;
 	public static final int TYPE_AMMO_BONE_CLOTH=2;
 	public static final int TYPE_AMMO_BONE_HAIR=3;
-	
+	public static final int TYPE_AMMO_BONE_BODY=4;
 	/**
 	 * what kind physics using
 	 * 

@@ -351,7 +351,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 					new HairType("Simple Cloth",HairData.TYPE_SIMPLE_CLOTH),
 					new HairType("Ammo Plain Cloth",HairData.TYPE_AMMO_CLOTH),
 					new HairType("Ammo Bone Cloth",HairData.TYPE_AMMO_BONE_CLOTH),
-					new HairType("Ammo Bone Hair",HairData.TYPE_AMMO_BONE_HAIR)
+					new HairType("Ammo Bone Hair",HairData.TYPE_AMMO_BONE_HAIR),
+					new HairType("Ammo Bone Body",HairData.TYPE_AMMO_BONE_BODY)
 					);
 			
 			

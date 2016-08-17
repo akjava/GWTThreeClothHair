@@ -85,7 +85,35 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 			int index=(int)hairData.getSemiAutoPins().get(i);
 			Vector3 pos=hairData.getSemiAutoPoints().get(index).clone();
 			pos.divideScalar(characterScale);
+			
+			
+			if(hairData.getHairPhysicsType() == HairData.TYPE_AMMO_BONE_BODY){
+				String suffix="breast-";//TODO add hairData
+				//extream special
+				
+				String rootName=suffix+"root";
+				int ammoBoneBodyOffset=-1;
+				//TODO make method
+				for(int j=0;j<mesh.getGeometry().getBones().length();j++){
+					if(mesh.getGeometry().getBones().get(j).getName().equals(rootName)){
+						ammoBoneBodyOffset=j;
+						break;
+					}
+				}
+				if(ammoBoneBodyOffset==-1){
+					LogUtils.log("invalid-bone-index");
+					return;
+				}
+				Vector4 skinIndices =THREE.Vector4(ammoBoneBodyOffset, 0, 0, 0);
+				Vector4 skinWeights =THREE.Vector4(1,0,0,0);
+				
+				SkinningVertex svertex=new SkinningVertex(pos, skinIndices, skinWeights);
+				calculator.add(svertex);
+			}else{
+			
 			int closed=getClosedVertex(mesh.getGeometry(),pos);
+			
+			
 			
 			Vector4 skinIndices =mesh.getGeometry().getSkinIndices().get(closed);
 			Vector4 skinWeights =mesh.getGeometry().getSkinWeights().get(closed);
@@ -95,6 +123,7 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 			calculator.add(
 					svertex
 			);
+			}
 		}
 		
 		
