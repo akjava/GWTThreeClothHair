@@ -402,6 +402,11 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 						ammoPanel.setVisible(true);
 						ammoBonePanel.setVisible(true);
 						ammoHairPanel.setVisible(true);
+					}else if(type==HairData.TYPE_AMMO_BONE_BODY){
+						plainClothPanel.setVisible(false);
+						ammoPanel.setVisible(true);
+						ammoBonePanel.setVisible(true);
+						ammoHairPanel.setVisible(true);
 					}
 				}
 				

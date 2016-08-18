@@ -104,7 +104,10 @@ public ClothData(HairData hairData,SkinnedMesh mesh){
 					LogUtils.log("invalid-bone-index");
 					return;
 				}
-				Vector4 skinIndices =THREE.Vector4(ammoBoneBodyOffset, 0, 0, 0);
+				//ammoBoneBodyOffset possible move
+				int parent=mesh.getGeometry().getBones().get(ammoBoneBodyOffset).getParent();
+				
+				Vector4 skinIndices =THREE.Vector4(parent, 0, 0, 0);
 				Vector4 skinWeights =THREE.Vector4(1,0,0,0);
 				
 				SkinningVertex svertex=new SkinningVertex(pos, skinIndices, skinWeights);

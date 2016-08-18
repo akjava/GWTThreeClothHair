@@ -118,7 +118,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 	private SkinnedMesh characterMesh;
 	private VertexNormalsHelper vertexHelper;
-	
+
+
 	private Stats stats;
 	//private Mesh sphere;
 	
@@ -294,6 +295,10 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	private Mesh tmpSphere;
 	
 	private SkeletonHelper skeltonHelper;
+
+	public SkeletonHelper getSkeltonHelper() {
+		return skeltonHelper;
+	}
 
 	private double GROUND=0;
 	private double characterScale;
@@ -552,7 +557,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				//double x=-20, y=-1270,z= -300,s= 800;
 
 				double x=-0, y=-0,z= -0;
-				characterScale = 1000;
+				characterScale = 1000;//1000
 				//y=-bb.getMax().getY()/2*s;
 				y=bb.getMin().getY()*characterScale;
 				

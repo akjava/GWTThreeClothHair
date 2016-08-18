@@ -17,6 +17,7 @@ import com.akjava.gwt.lib.client.JavaScriptUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
 import com.akjava.gwt.three.client.gwt.boneanimation.AnimationBone;
+import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.java.bone.SimpleAutoWeight;
 import com.akjava.gwt.three.client.java.bone.WeightResult;
 import com.akjava.gwt.three.client.java.geometry.PointsToGeometry;
@@ -25,12 +26,11 @@ import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
-import com.akjava.gwt.three.client.js.loaders.JSONLoader.JSONLoadHandler;
 import com.akjava.gwt.three.client.js.loaders.XHRLoader.XHRLoadHandler;
-import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
+import com.akjava.gwt.three.client.js.objects.Bone;
 import com.akjava.gwt.three.client.js.objects.Mesh;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
@@ -1283,6 +1283,7 @@ public class HairCloth {
 	}
 
 
+	private boolean debugdBody;
 	
 	private void updateParticles(ClothSimulator simulator){
 		AmmoHairControler.ParticleBodyDatas data=simulator.getAmmoHairControler().getAmmoData(this);
@@ -1314,13 +1315,29 @@ public class HairCloth {
 			SkinnedMesh mesh=simulator.getCharacterMesh();
 			String suffix="breast-";//TODO
 			double characterScale=mesh.getScale().getX();
+			//need scale?
 			
+			if(!debugdBody){
+				LogUtils.log("before-scale");
+				for(int i=0;i<mesh.getSkeleton().getBones().length();i++){
+					Bone bone=mesh.getSkeleton().getBones().get(i);
+					ThreeLog.log(bone.getName(),bone.getScale());
+				}
+			}
 			
 			
 			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), mesh, w, ammoParticles,ammoMultipleScalar,suffix,ammoBoneBodyOffset,ammoBoneBodyLength);
 				
+			if(!debugdBody){
+				LogUtils.log("after-scale");
+				for(int i=ammoBoneBodyOffset;i<ammoBoneBodyOffset+ammoBoneBodyLength;i++){
+					Bone bone=mesh.getSkeleton().getBones().get(i);
+					ThreeLog.log(bone.getName(),bone.getScale());
+				}
+			}
 			//ammoBoneBodyOffset=-1;
 			
+			debugdBody=true;
 		}else{
 		
 		PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles,ammoMultipleScalar);

@@ -72,6 +72,21 @@ public class BasicPanel extends VerticalPanel{
 		h1.add(groundCheck);
 		groundCheck.setValue(false,true);
 		
+		
+CheckBox characterBoneCheck=new CheckBox("Bone");
+		
+characterBoneCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				
+				GWTThreeClothHair.INSTANCE.getSkeltonHelper().setVisible(event.getValue());
+				}
+		});
+characterBoneCheck.setValue(false);
+h1.add(characterBoneCheck);
+		
+		
 		CheckBox shadowCheck=new CheckBox("Shadow");
 		shadowCheck.setValue(true);
 		shadowCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
