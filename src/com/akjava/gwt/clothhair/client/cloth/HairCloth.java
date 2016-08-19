@@ -1326,7 +1326,7 @@ public class HairCloth {
 			}
 			
 			
-			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), mesh, w, ammoParticles,ammoMultipleScalar,suffix,ammoBoneBodyOffset,ammoBoneBodyLength);
+			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), mesh, w, ammoParticles,ammoMultipleScalar*characterScale,suffix,ammoBoneBodyOffset,ammoBoneBodyLength);
 				
 			if(!debugdBody){
 				LogUtils.log("after-scale");

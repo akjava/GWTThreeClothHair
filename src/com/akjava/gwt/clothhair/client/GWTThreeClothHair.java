@@ -250,6 +250,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			}
 		}
 		
+
+		
 		Stopwatch watch=Stopwatch.createStarted();
 		if(clothSimulator!=null){
 			clothSimulator.update(timestamp);
@@ -272,16 +274,16 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//render last,very important
 		
 		//mixer first,this make animation
-				if(mixer!=null){
-					if(useFixedFrame){
-						mixer.update(1.0/mixerFrixedFrameNumber);
-					}else{
-						double delta=clock.getDelta();
-						mixer.update(delta);
-					}
-					 //fixed dt //TODO make option
-					//mixer.update(clock.getDelta());
-				}
+		if(mixer!=null){
+			if(useFixedFrame){
+				mixer.update(1.0/mixerFrixedFrameNumber);
+			}else{
+				double delta=clock.getDelta();
+				mixer.update(delta);
+			}
+			 //fixed dt //TODO make option
+			//mixer.update(clock.getDelta());
+		}
 				renderer.render(scene, camera);
 		
 		if(stats!=null){
