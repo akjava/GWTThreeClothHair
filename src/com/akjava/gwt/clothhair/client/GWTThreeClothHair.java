@@ -76,6 +76,7 @@ import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
+import com.akjava.gwt.threeammo.client.bones.PlainBoneCreator;
 import com.akjava.lib.common.utils.ValuesUtils;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
@@ -252,12 +253,27 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 
 		
+		//reset here,make sphere broken
+		//PlainBoneCreator.pose(getCharacterMesh().getSkeleton());
+		
+		
+		
 		Stopwatch watch=Stopwatch.createStarted();
 		if(clothSimulator!=null){
 			clothSimulator.update(timestamp);
 		}
 		double sim=watch.elapsed(TimeUnit.MILLISECONDS);//10ms
 		
+		if(mixer!=null){
+			if(useFixedFrame){
+				mixer.update(1.0/mixerFrixedFrameNumber);
+			}else{
+				double delta=clock.getDelta();
+				mixer.update(delta);
+			}
+			 //fixed dt //TODO make option
+			//mixer.update(clock.getDelta());
+		}
 		
 		/*
 		 stop manual skinning.
@@ -274,16 +290,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//render last,very important
 		
 		//mixer first,this make animation
-		if(mixer!=null){
-			if(useFixedFrame){
-				mixer.update(1.0/mixerFrixedFrameNumber);
-			}else{
-				double delta=clock.getDelta();
-				mixer.update(delta);
-			}
-			 //fixed dt //TODO make option
-			//mixer.update(clock.getDelta());
-		}
+		
 				renderer.render(scene, camera);
 		
 		if(stats!=null){

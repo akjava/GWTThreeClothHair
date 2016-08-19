@@ -1201,6 +1201,7 @@ public class HairCloth {
 					ammoBoneBodyLength=PlainBoneCreator.calcurateBoneCount(ammoParticles.size(), w);
 					
 					LogUtils.log("ammoBoneBodyOffset:"+ammoBoneBodyOffset+" ammoBoneBodyLength="+ammoBoneBodyLength);
+					//PlainBoneCreator.pose(characterMesh.getSkeleton());//try only initial?but faild
 				}
 			
 			LogUtils.log("buttlet-object-size:"+restDistance*ammoMultipleScalar);
@@ -1330,7 +1331,8 @@ public class HairCloth {
 				
 			if(!debugdBody){
 				LogUtils.log("after-scale");
-				for(int i=ammoBoneBodyOffset;i<ammoBoneBodyOffset+ammoBoneBodyLength;i++){
+				for(int i=0;i<mesh.getSkeleton().getBones().length();i++){
+				//for(int i=ammoBoneBodyOffset;i<ammoBoneBodyOffset+ammoBoneBodyLength;i++){
 					Bone bone=mesh.getSkeleton().getBones().get(i);
 					ThreeLog.log(bone.getName(),bone.getScale());
 				}
