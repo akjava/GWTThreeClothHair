@@ -1331,6 +1331,7 @@ public class HairCloth {
 			String suffix="breast-";//TODO
 			double characterScale=mesh.getScale().getX();
 			//need scale?
+			debugdBody=true;//no need
 			
 			if(!debugdBody){
 				LogUtils.log("before-scale");

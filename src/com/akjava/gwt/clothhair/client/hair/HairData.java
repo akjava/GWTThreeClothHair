@@ -673,9 +673,9 @@ public void setHairPins(List<HairPin> hairPins) {
 	}
 	
 	/*
-	 * sometime without contact stable,however not become completely stable 
+	 * sometime without contact stable,however not become completely stable .what mean?
 	 */
-	private boolean ammoContactParticle=false;
+	private boolean ammoContactParticle=true;
 
 	public boolean isAmmoContactParticle() {
 		return ammoContactParticle;
