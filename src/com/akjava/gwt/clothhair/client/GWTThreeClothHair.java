@@ -71,6 +71,7 @@ import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Group;
 import com.akjava.gwt.three.client.js.objects.LineSegments;
 import com.akjava.gwt.three.client.js.objects.Mesh;
+import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.three.client.js.textures.Texture;
@@ -257,6 +258,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//PlainBoneCreator.pose(getCharacterMesh().getSkeleton());
 		
 		
+	
 		
 		Stopwatch watch=Stopwatch.createStarted();
 		if(clothSimulator!=null){
@@ -274,6 +276,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 			 //fixed dt //TODO make option
 			//mixer.update(clock.getDelta());
 		}
+		
 		
 		/*
 		 stop manual skinning.
