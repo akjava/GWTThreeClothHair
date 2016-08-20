@@ -28,6 +28,7 @@ import com.akjava.gwt.three.client.js.core.Geometry;
 import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
 import com.akjava.gwt.three.client.js.loaders.XHRLoader.XHRLoadHandler;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
+import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Bone;
@@ -1200,6 +1201,15 @@ public class HairCloth {
 					}
 					ammoBoneBodyLength=PlainBoneCreator.calcurateBoneCount(ammoParticles.size(), w);
 					
+					PlainBoneCreator.pose(characterMesh.getSkeleton());//pose here
+					skeletonMatrixList=Lists.newArrayList();
+					skeletonMatrixWorldList=Lists.newArrayList();
+					for(int i=0;i<characterMesh.getSkeleton().getBones().length();i++){
+						Bone bone=characterMesh.getSkeleton().getBones().get(i);
+						skeletonMatrixList.add(bone.getMatrix().clone());
+						skeletonMatrixWorldList.add(bone.getMatrixWorld().clone());
+					}
+					
 					LogUtils.log("ammoBoneBodyOffset:"+ammoBoneBodyOffset+" ammoBoneBodyLength="+ammoBoneBodyLength);
 					//PlainBoneCreator.pose(characterMesh.getSkeleton());//try only initial?but faild
 				}
@@ -1218,6 +1228,10 @@ public class HairCloth {
 		
 		//LogUtils.millisecond("total", watch);
 	}
+	
+	private List<Matrix4> skeletonMatrixWorldList;
+	private List<Matrix4> skeletonMatrixList;
+	
 	private JsArray<btGeneric6DofSpringConstraint> createAmmoConstraints(ClothSimulator simulator, List<BodyAndMesh> ammoParticles) {
 		JsArray<btGeneric6DofSpringConstraint> ammoConstraints=JavaScriptUtils.createJSArray();
 		
@@ -1324,8 +1338,21 @@ public class HairCloth {
 					Bone bone=mesh.getSkeleton().getBones().get(i);
 					ThreeLog.log(bone.getName(),bone.getScale());
 				}
+				LogUtils.log("before-pos");
+				for(int i=0;i<mesh.getSkeleton().getBones().length();i++){
+					Bone bone=mesh.getSkeleton().getBones().get(i);
+					ThreeLog.log(bone.getName(),bone.getPosition());
+				}
 			}
-			
+			//reset bone
+			//mesh.getSkeleton(),offset+1,boneLength-1
+			//for reset pose
+			for(int i=ammoBoneBodyOffset;i<ammoBoneBodyOffset+ammoBoneBodyLength;i++){
+				Bone bone=mesh.getSkeleton().getBones().get(i);
+				bone.getMatrixWorld().copy(skeletonMatrixWorldList.get(i));
+				bone.getMatrix().copy(skeletonMatrixList.get(i));
+				skeletonMatrixList.get(i).decompose(bone.getPosition(), bone.getQuaternion(), bone.getScale());
+			}
 			
 			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), mesh, w, ammoParticles,ammoMultipleScalar*characterScale,suffix,ammoBoneBodyOffset,ammoBoneBodyLength);
 				
@@ -1335,6 +1362,11 @@ public class HairCloth {
 				//for(int i=ammoBoneBodyOffset;i<ammoBoneBodyOffset+ammoBoneBodyLength;i++){
 					Bone bone=mesh.getSkeleton().getBones().get(i);
 					ThreeLog.log(bone.getName(),bone.getScale());
+				}
+				LogUtils.log("after-pos");
+				for(int i=0;i<mesh.getSkeleton().getBones().length();i++){
+					Bone bone=mesh.getSkeleton().getBones().get(i);
+					ThreeLog.log(bone.getName(),bone.getPosition());
 				}
 			}
 			//ammoBoneBodyOffset=-1;
