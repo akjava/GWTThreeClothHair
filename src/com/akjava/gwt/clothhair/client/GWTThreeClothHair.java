@@ -119,7 +119,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 
 	private SkinnedMesh characterMesh;
-	private VertexNormalsHelper vertexHelper;
+	private VertexNormalsHelper vertexNormalHelper;
 
 
 	private Stats stats;
@@ -236,9 +236,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		
 		//not support skinning
-		if(vertexHelper!=null){
-			if(vertexHelper.isVisible()){
-			vertexHelper.update();//for moving
+		if(vertexNormalHelper!=null){
+			if(vertexNormalHelper.isVisible()){
+			vertexNormalHelper.update();//for moving
 			}
 			//i guess vertexHelper update almost hand as hand animation
 		}
@@ -694,8 +694,8 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				scene.add( characterMesh );
 				
 				
-				vertexHelper = THREE.VertexNormalsHelper(characterMesh, 1.6, 0x008800, 2);
-				scene.add(vertexHelper);
+				vertexNormalHelper = THREE.VertexNormalsHelper(characterMesh, 3.2, 0x008800, 2);
+				scene.add(vertexNormalHelper);
 				//scene.add(THREE.VertexNormalsHelper(mesh, 0.2, 0x0000ff, 3));//can overwrite
 			
 				
@@ -1171,7 +1171,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	
 	protected void updateVertexVisible(boolean value) {
 		vertexVisible=value;
-		vertexHelper.setVisible(value);
+		vertexNormalHelper.setVisible(value);
 		
 		hairDataPanel.setVertexVisible(value);
 	}
