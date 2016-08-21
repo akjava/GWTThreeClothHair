@@ -12,12 +12,15 @@ import com.akjava.gwt.three.client.js.core.Object3D;
 import com.akjava.gwt.three.client.js.lights.DirectionalLight;
 import com.akjava.gwt.three.client.js.loaders.ImageLoader.ImageLoadHandler;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
+import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.lib.common.utils.ColorUtils;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.ImageData;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -28,6 +31,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -126,6 +130,43 @@ h1.add(characterBoneCheck);
 		});
 		//h1.add(receiveShadowCheck);
 		receiveShadowCheck.setTitle("receive shadow self");
+		
+		
+		
+		HorizontalPanel h2=new HorizontalPanel();
+		h2.setVerticalAlignment(ALIGN_MIDDLE);
+		generalPanel.add(h2);
+		h2.add(new Label("Character-Material"));
+		
+		//conflict bgcolor change,TODO has mode or something on GWTClothHair
+		final ListBox characterMaterialBox=new ListBox();
+		h2.add(characterMaterialBox);
+		characterMaterialBox.addItem("normal");
+		characterMaterialBox.addItem("transparent");
+		characterMaterialBox.addItem("wireframe");
+		characterMaterialBox.setSelectedIndex(0);
+		characterMaterialBox.addChangeHandler(new ChangeHandler() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				SkinnedMesh mesh=GWTThreeClothHair.INSTANCE.getCharacterMesh();
+				MeshPhongMaterial material=mesh.getMaterial().gwtCastMeshPhongMaterial();
+				int selection=characterMaterialBox.getSelectedIndex();
+				if(selection==0){
+					material.setWireframe(false);
+					material.setOpacity(1);
+					material.setTransparent(false);
+				}else if(selection==1){
+					material.setWireframe(false);
+					material.setOpacity(0.5);
+					material.setTransparent(true);
+				}else if(selection==2){
+					material.setWireframe(true);
+					material.setOpacity(1);
+					material.setTransparent(false);
+				}
+				material.setNeedsUpdate(true);
+			}
+		});
 		
 		generalPanel.add(new HTML("<h4>Camera</h4>"));
 		LabeledInputRangeWidget2 near=new LabeledInputRangeWidget2("near", 0.1, 100, 0.1);
