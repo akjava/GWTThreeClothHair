@@ -489,7 +489,7 @@ public void setHairPins(List<HairPin> hairPins) {
 		this.ammoParticleRadiusRatio = particleRadius;
 	}
 
-
+//TODO comment
 	public static final int TYPE_SIMPLE_CLOTH=0;
 	public static final int TYPE_AMMO_CLOTH=1;
 	public static final int TYPE_AMMO_BONE_CLOTH=2;

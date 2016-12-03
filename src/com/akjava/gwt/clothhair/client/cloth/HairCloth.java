@@ -1201,6 +1201,9 @@ public class HairCloth {
 					}
 					ammoBoneBodyLength=PlainBoneCreator.calcurateBoneCount(ammoParticles.size(), w);
 					
+					/**
+					 * store initial matrixs
+					 */
 					PlainBoneCreator.pose(characterMesh.getSkeleton());//pose here
 					skeletonMatrixList=Lists.newArrayList();
 					skeletonMatrixWorldList=Lists.newArrayList();
@@ -1331,7 +1334,7 @@ public class HairCloth {
 			String suffix="breast-";//TODO
 			double characterScale=mesh.getScale().getX();
 			//need scale?
-			debugdBody=true;//no need
+			debugdBody=false;//no need
 			
 			if(!debugdBody){
 				LogUtils.log("before-scale");

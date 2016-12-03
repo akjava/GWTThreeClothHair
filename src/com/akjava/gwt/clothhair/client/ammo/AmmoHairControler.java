@@ -276,6 +276,8 @@ public class AmmoHairControler {
 	}
 
 
+
+
 	public void updateVisibleParticle(Boolean value) {
 		visibleParticl=value;
 		for(ParticleBodyDatas bodyDatas:particleMap.values()){
@@ -287,6 +289,17 @@ public class AmmoHairControler {
 			}
 		}
 		
+		
+		
+	}
+	private boolean visibleCollision;
+
+
+	public boolean isVisibleCollision() {
+		return visibleCollision;
+	}
+	public void updateVisibleCollision(Boolean value) {
+		visibleCollision=value;
 		for(SphereBodyData sphereData:sphereMap.values()){
 			for(BodyAndMesh bm:sphereData.getAmmoSpheres()){
 				Mesh mesh=bm.getMesh();
@@ -295,6 +308,5 @@ public class AmmoHairControler {
 				}
 			}
 		}
-		
 	}
 }

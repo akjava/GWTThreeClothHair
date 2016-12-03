@@ -79,6 +79,18 @@ public AmmoPreferencePanel(){
 	});
 	ha.add(particleBoneCheck);
 	
+CheckBox collisionCheck=new CheckBox("collision");//sphere datas
+	
+collisionCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+		@Override
+		public void onValueChange(ValueChangeEvent<Boolean> event) {
+			GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().updateVisibleCollision(event.getValue());
+		}
+		
+	});
+	ha.add(collisionCheck);
+	
 	this.add(new Label("gravity"));
 	gravityEditor = new DoubleBox();
 	gravityEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoGravity());

@@ -71,13 +71,11 @@ import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Group;
 import com.akjava.gwt.three.client.js.objects.LineSegments;
 import com.akjava.gwt.three.client.js.objects.Mesh;
-import com.akjava.gwt.three.client.js.objects.Skeleton;
 import com.akjava.gwt.three.client.js.objects.SkinnedMesh;
 import com.akjava.gwt.three.client.js.scenes.Scene;
 import com.akjava.gwt.three.client.js.textures.Texture;
 import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
-import com.akjava.gwt.threeammo.client.bones.PlainBoneCreator;
 import com.akjava.lib.common.utils.ValuesUtils;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
@@ -540,6 +538,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//String url="models/mbl3d/model8-hair-color-expand-bone.json"; //no-morph over 40fps
 		Mbl3dLoader loader=new Mbl3dLoader();
 		loader.forceApplyAxisAngle(GWTHTMLUtils.parameterBoolean("forceFixMorphtargets",false));
+		
 		//loader.needFix=false;//for test,TODO autodetect
 		//JSONLoader loader=	THREE.JSONLoader();
 		
@@ -554,9 +553,11 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 
 			@Override
 			public void loaded(Geometry geometry,JsArray<Material> m) {
-				
-				int result=geometry.mergeVertices();//or seam line showing on texture
-				LogUtils.log("mergeVertices: result="+result);
+				/**
+				 * Don't merge vertex,this broke skinnning & morph
+				 */
+				//int result=geometry.mergeVertices();//or seam line showing on texture?
+				//LogUtils.log("mergeVertices: result="+result);
 				
 				
 				//materials=fixMaterial(materials);
@@ -663,6 +664,12 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 				}else{
 					LogUtils.log("no displacement:");
 				}
+				
+				/* test material
+				MeshBasicMaterial temp=THREE.MeshBasicMaterial();
+				temp.setSkinning(true);
+				characterMesh = THREE.SkinnedMesh( geometry,temp  );//debug
+				*/
 				
 				characterMesh = THREE.SkinnedMesh( geometry, bodyMaterial );
 				//aomap need second uvs,but what kind difference need?
