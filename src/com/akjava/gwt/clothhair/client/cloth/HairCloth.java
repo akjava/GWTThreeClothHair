@@ -1494,6 +1494,7 @@ public class HairCloth {
 		
 
 		SkinnedMesh clothBoxMesh = THREE.SkinnedMesh(clothBox,boxhMaterial);
+		clothBoxMesh.setCastShadow(true);
 		data.setSkinnedMesh(clothBoxMesh);
 		simulator.getAmmoHairControler().getAmmoControler().getScene().add(clothBoxMesh);
 		clothBoxMesh.getGeometry().computeBoundingSphere();//for camera
@@ -1532,6 +1533,7 @@ public class HairCloth {
 					}
 					
 					SkinnedMesh clothBoxMesh = THREE.SkinnedMesh(geometry,boxhMaterial);
+					clothBoxMesh.setCastShadow(true);
 					data.setSkinnedMesh(clothBoxMesh);
 					simulator.getAmmoHairControler().getAmmoControler().getScene().add(clothBoxMesh);
 					clothBoxMesh.getGeometry().computeBoundingSphere();//for camera
