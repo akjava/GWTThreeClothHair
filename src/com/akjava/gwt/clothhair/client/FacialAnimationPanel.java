@@ -106,7 +106,7 @@ public class FacialAnimationPanel extends VerticalPanel{
 			public void uploaded(File file, String text) {
 				fileNameLabel.setText(file.getFileName());
 				
-				
+				setFacialAnimation(text);
 				
 			}
 		}, true);
@@ -116,6 +116,7 @@ public class FacialAnimationPanel extends VerticalPanel{
 		HorizontalPanel h1=new HorizontalPanel();
 		this.add(h1);
 		
+		//TODO add clear button,reset can't clear face animation
 		Button test1=new Button("Smile",new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -130,6 +131,21 @@ public class FacialAnimationPanel extends VerticalPanel{
 			}
 		});
 		h1.add(test1);
+		
+		Button test2=new Button("Pero",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				THREE.XHRLoader().load("animation/clip-peropero.json", new XHRLoadHandler() {
+					
+					@Override
+					public void onLoad(String text) {
+						setFacialAnimation(text);
+					}
+				});
+				
+			}
+		});
+		h1.add(test2);
 	}
 	
 	public void setFacialAnimation(String text){

@@ -6,7 +6,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.List;
 import java.util.Map;
 
-import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
+
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair.SphereCalculatorAndMesh;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator;
 import com.akjava.gwt.clothhair.client.SkinningVertexCalculator.SkinningVertex;
@@ -28,7 +28,6 @@ import com.akjava.gwt.lib.client.ImageElementLoader;
 import com.akjava.gwt.lib.client.ImageElementUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.GWTParamUtils;
-import com.akjava.gwt.three.client.java.ThreeLog;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Face3;
 import com.akjava.gwt.three.client.js.core.Geometry;
@@ -37,9 +36,7 @@ import com.akjava.gwt.three.client.js.extras.geometries.SphereGeometry;
 import com.akjava.gwt.three.client.js.materials.Material;
 import com.akjava.gwt.three.client.js.materials.MeshPhongMaterial;
 import com.akjava.gwt.three.client.js.math.Euler;
-import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Quaternion;
-import com.akjava.gwt.three.client.js.math.Vector2;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.akjava.gwt.three.client.js.objects.Bone;
 import com.akjava.gwt.three.client.js.objects.Mesh;
@@ -78,11 +75,16 @@ public class ClothSimulator  {
 	private SphereGeometry sphereGeometry;
 	private BoxGeometry boxGeometry;
 	public ClothSimulator(Scene scene,SkinnedMesh characterMesh){
+		this(scene,characterMesh,new SimpleHaveClothSimulatorSettings());
+	}
+	private HaveClothSimulatorSettings haveClothSimulatorSettings;
+	public ClothSimulator(Scene scene,SkinnedMesh characterMesh,HaveClothSimulatorSettings haveClothSimulatorSettings){
 		this.scene=scene;
 		this.characterMesh=characterMesh;
+		this.haveClothSimulatorSettings=haveClothSimulatorSettings;
 		clothControler=new ClothControler();
 		
-		ammoHairControler=new AmmoHairControler(scene);
+		ammoHairControler=new AmmoHairControler(scene,haveClothSimulatorSettings.getAmmoGravity(),haveClothSimulatorSettings.getAmmoSubsteps());
 		
 		updateAmmoProperties();
 		
@@ -96,6 +98,9 @@ public class ClothSimulator  {
 		
 		canvas.setStyleName("transparent_bg");
 	}
+	public double getAmmoWorldScale(){
+		return haveClothSimulatorSettings.getAmmoWorldScale();
+	}
 	
 	private void updateAmmoProperties() {
 		
@@ -103,21 +108,21 @@ public class ClothSimulator  {
 		 * setting 1
 		 */
 		//this is easy recover
-		AmmoBodyPropertyData collisionBodyData=GWTThreeClothHair.INSTANCE.getAmmoCollisionBodyData();
+		AmmoBodyPropertyData collisionBodyData=haveClothSimulatorSettings.getAmmoCollisionBodyData();
 		ammoHairControler.setCollisionProperties(collisionBodyData);
 		
 		//ammoHairControler.getCollisionProperties().setFriction(1);
 		//ammoHairControler.getCollisionProperties().setRestitution(1);
 		
 		//init setting
-		AmmoBodyPropertyData particleBodyData=GWTThreeClothHair.INSTANCE.getAmmoParticleBodyData();
+		AmmoBodyPropertyData particleBodyData=haveClothSimulatorSettings.getAmmoParticleBodyData();
 		ammoHairControler.setParticleBodyPropertyData(particleBodyData);
 		
 		//ammoHairControler.getParticleBodyData().setFriction(particleBodyData.getFriction());
 		//ammoHairControler.getParticleBodyData().setRestitution(particleBodyData.getRestitution());
 		//ammoHairControler.getParticleBodyData().setDamping(particleBodyData.getDamping().getX(),particleBodyData.getDamping().getY());
 		
-		AmmoConstraintPropertyData constraintCata=GWTThreeClothHair.INSTANCE.getAmmoParticleConstraintData();
+		AmmoConstraintPropertyData constraintCata=haveClothSimulatorSettings.getAmmoParticleConstraintData();
 		ammoHairControler.setParticleConstraintData(constraintCata);
 		
 		//ammoHairControler.getParticleConstraintData().setEnableSpringsAll(true);
@@ -232,7 +237,7 @@ public class ClothSimulator  {
 	/*
 	 * called when flushed from SphereDataEditor via SphereDataPanel
 	 */
-	public void syncSphereDataAndSkinningVertexCalculator(SphereData data){
+	public void syncSphereDataAndSkinningVertexCalculator(SphereData data,HaveReselectSphere hasReselectSphere){
 		if(data==null){
 			return;
 		}
@@ -260,7 +265,7 @@ public class ClothSimulator  {
 			//LogUtils.log("cloth-simulator:sphere need re-create");
 			removeSphereData(data);
 			addSphereData(data);
-			GWTThreeClothHair.INSTANCE.reselectSphere(data);//how to know
+			hasReselectSphere.reselectSphere(data);//how to know
 			return;
 		}
 		
@@ -559,13 +564,14 @@ public class ClothSimulator  {
 		}
 	}
 	
-	
+
+
 	public HairMixedData addCloth(HairData hairData) {
 		if(isUpdatingHairTextureMap()){
 			LogUtils.log("addCloth:Warning - maybe broken texture added.still texture making");
 		}
 		
-		ClothData data=new ClothData(hairData,characterMesh);
+		ClothData data=new ClothData(hairData,characterMesh,this);
 		
 		
 		data.getHairCloth().setPinAll();//force pin all

@@ -12,6 +12,8 @@ import com.akjava.gwt.clothhair.client.ammo.ConstraintDataConverter;
 import com.akjava.gwt.clothhair.client.cloth.ClothControler;
 import com.akjava.gwt.clothhair.client.cloth.ClothSimulator;
 import com.akjava.gwt.clothhair.client.cloth.GroundYFloor;
+import com.akjava.gwt.clothhair.client.cloth.HaveClothSimulatorSettings;
+import com.akjava.gwt.clothhair.client.cloth.HaveReselectSphere;
 import com.akjava.gwt.clothhair.client.cloth.SphereDataControler;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
@@ -108,7 +110,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements SphereDataControler{
+public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements SphereDataControler, HaveReselectSphere,HaveClothSimulatorSettings{
 
 
 	
@@ -428,7 +430,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		INSTANCE=this;//must be first
 		clock=THREE.Clock();
-		clothSimulator=new ClothSimulator(scene,null);
+		clothSimulator=new ClothSimulator(scene,null,this);
 		
 		//LogUtils.log("clear-color:"+getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR, 0));
 		
@@ -1714,4 +1716,6 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		
 	}
+	
+	
 }

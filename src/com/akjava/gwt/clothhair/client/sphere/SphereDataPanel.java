@@ -2,6 +2,7 @@ package com.akjava.gwt.clothhair.client.sphere;
 
 import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
 import com.akjava.gwt.clothhair.client.GWTThreeClothHairStorageKeys;
+import com.akjava.gwt.clothhair.client.cloth.HaveReselectSphere;
 import com.akjava.gwt.clothhair.client.cloth.SphereDataControler;
 import com.akjava.gwt.html5.client.download.HTML5Download;
 import com.akjava.gwt.html5.client.file.File;
@@ -34,7 +35,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class SphereDataPanel extends VerticalPanel{
+public class SphereDataPanel extends VerticalPanel {
 	 interface Driver extends SimpleBeanEditorDriver< SphereData,  SphereDataEditor> {}
 	 Driver driver = GWT.create(Driver.class);
 	private EasyCellTableObjects<SphereData> cellObjects;
@@ -373,7 +374,7 @@ public class SphereDataPanel extends VerticalPanel{
 	private SphereDataEditor sphereDataEditor;
 	 public void onFlushed(){
 		//
-		 GWTThreeClothHair.INSTANCE.getClothSimulator().syncSphereDataAndSkinningVertexCalculator(sphereDataEditor.getValue());
+		 GWTThreeClothHair.INSTANCE.getClothSimulator().syncSphereDataAndSkinningVertexCalculator(sphereDataEditor.getValue(), GWTThreeClothHair.INSTANCE);
 		 
 		 //store data
 		 String lines=toStoreText();
@@ -416,4 +417,5 @@ public class SphereDataPanel extends VerticalPanel{
 			sphereDataEditor.setSkelton(skeleton);
 			
 		}
+
 }

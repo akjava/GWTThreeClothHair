@@ -53,8 +53,8 @@ public SkinningVertexCalculator getCalculator() {
 
 
 
-public ClothData(HairData hairData,SkinnedMesh mesh){
-	cloth=new HairCloth(hairData,mesh);
+public ClothData(HairData hairData,SkinnedMesh mesh,ClothSimulator clothSimulator){
+	cloth=new HairCloth(hairData,mesh,clothSimulator);
 	cloth.wind=false;
 	cloth.setPinAll();
 	

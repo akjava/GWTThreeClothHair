@@ -3,7 +3,7 @@ package com.akjava.gwt.clothhair.client.ammo;
 import java.util.List;
 import java.util.Map;
 
-import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
+
 import com.akjava.gwt.clothhair.client.cloth.HairCloth;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.js.extras.helpers.SkeletonHelper;
@@ -59,9 +59,9 @@ public class AmmoHairControler {
 	}
 
 	
-	public AmmoHairControler(Scene scene){
-		ammoControler = new AmmoControler(scene,Ammo.initWorld(0,GWTThreeClothHair.INSTANCE.getAmmoGravity(),0));
-		ammoControler.setSubsteps(GWTThreeClothHair.INSTANCE.getAmmoSubsteps());
+	public AmmoHairControler(Scene scene,double ammoGravity,int substeps){
+		ammoControler = new AmmoControler(scene,Ammo.initWorld(0,ammoGravity,0));
+		ammoControler.setSubsteps(substeps);
 	}
 	
 	Map<HairCloth,ParticleBodyDatas> particleMap=Maps.newHashMap();

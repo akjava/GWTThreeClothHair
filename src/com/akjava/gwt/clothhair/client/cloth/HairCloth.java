@@ -6,7 +6,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.akjava.gwt.clothhair.client.GWTThreeClothHair;
+
 import com.akjava.gwt.clothhair.client.ammo.AmmoHairControler;
 import com.akjava.gwt.clothhair.client.hair.HairData;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;
@@ -502,12 +502,14 @@ public class HairCloth {
 		return !ignoreConnectionIndexs.contains(index);
 	}
 	
-	public HairCloth(HairData hairData,Mesh mesh){
+	private ClothSimulator clothSimulator;
+	public HairCloth(HairData hairData,Mesh mesh,ClothSimulator clothSimulator){
 		checkArgument(hairData.getSliceFaceCount()!=0,"HairCloth:invalid u-size 0");
 		checkNotNull(mesh,"HairCloth:mesh is null");
+		this.clothSimulator=clothSimulator;
 		this.hairData=hairData.clone();
 		
-		ammoMultipleScalar=GWTThreeClothHair.INSTANCE.getAmmoWorldScale();
+		ammoMultipleScalar=clothSimulator.getAmmoWorldScale();
 		LogUtils.log("ammoMultipleScalar:"+ammoMultipleScalar);
 		
 		
@@ -989,7 +991,7 @@ public class HairCloth {
 
 		int channel=hairData.getChannel();
 		
-		visibleDummy=GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleParticl();
+		visibleDummy=clothSimulator.getAmmoHairControler().isVisibleParticl();
 		
 		
 		Stopwatch watch=Stopwatch.createStarted();
@@ -1380,7 +1382,7 @@ public class HairCloth {
 		
 		PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), data.getSkinnedMesh(), w, ammoParticles,ammoMultipleScalar);
 		
-		if(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone()){
+		if(clothSimulator.getAmmoHairControler().isVisibleBone()){
 			data.getSkeltonHelper().update();
 		}
 		
@@ -1439,7 +1441,7 @@ public class HairCloth {
 		data.setSkeltonHelper(helper);
 		
 		
-		helper.setVisible(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone());//TODO get visible from setting
+		helper.setVisible(clothSimulator.getAmmoHairControler().isVisibleBone());//TODO get visible from setting
 		
 	}
 	private void createAmmoBoneHair(final ClothSimulator simulator,final AmmoHairControler.ParticleBodyDatas data,List<BodyAndMesh> ammoParticles) {
@@ -1503,7 +1505,7 @@ public class HairCloth {
 		SkeletonHelper helper=THREE.SkeletonHelper(clothBoxMesh);
 		simulator.getAmmoHairControler().getAmmoControler().getScene().add(helper);
 		data.setSkeltonHelper(helper);
-		helper.setVisible(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone());//TODO get visible from setting
+		helper.setVisible(clothSimulator.getAmmoHairControler().isVisibleBone());//TODO get visible from setting
 		
 		}else{
 			LogUtils.log("custom-hair geometry");
@@ -1522,7 +1524,7 @@ public class HairCloth {
 				@Override
 				public void onLoad(String text) {
 					Geometry geometry=GWTThreeUtils.parseJSONGeometry(text).getGeometry();
-					geometry.applyMatrix(GWTThreeClothHair.INSTANCE.getCharacterMesh().getMatrixWorld());
+					geometry.applyMatrix(clothSimulator.getCharacterMesh().getMatrixWorld());
 					geometry.setBones(bones);
 					
 					//TODO auto weight setting
@@ -1542,7 +1544,7 @@ public class HairCloth {
 					SkeletonHelper helper=THREE.SkeletonHelper(clothBoxMesh);
 					simulator.getAmmoHairControler().getAmmoControler().getScene().add(helper);
 					data.setSkeltonHelper(helper);
-					helper.setVisible(GWTThreeClothHair.INSTANCE.getClothSimulator().getAmmoHairControler().isVisibleBone());//TODO get visible from setting
+					helper.setVisible(clothSimulator.getAmmoHairControler().isVisibleBone());//TODO get visible from setting
 					
 					
 					simulator.getAmmoHairControler().setParticleData(HairCloth.this,data );
@@ -1581,7 +1583,7 @@ public class HairCloth {
 
 	
 	protected BodyAndMesh createAmmoCollisionBody(ClothSimulator simulator,Vector3 position,JsSphereData sphereData) {
-		double characterScale=GWTThreeClothHair.INSTANCE.getCharacterMesh().getScale().getX();
+		double characterScale=simulator.getCharacterMesh().getScale().getX();
 		MeshPhongMaterial material=THREE.MeshPhongMaterial(GWTParamUtils.MeshPhongMaterial().color(0xff0000)
 				.visible(visibleDummy)); //controld by panel basci/ammo
 				//.wireframe(true))
