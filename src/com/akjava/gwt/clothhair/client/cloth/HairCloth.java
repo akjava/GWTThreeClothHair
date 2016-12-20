@@ -1336,9 +1336,9 @@ public class HairCloth {
 			String suffix="breast-";//TODO
 			double characterScale=mesh.getScale().getX();
 			//need scale?
-			debugdBody=false;//no need
+			//debugdBody=false;//no need
 			
-			if(!debugdBody){
+		/*	if(!debugdBody){
 				LogUtils.log("before-scale");
 				for(int i=0;i<mesh.getSkeleton().getBones().length();i++){
 					Bone bone=mesh.getSkeleton().getBones().get(i);
@@ -1349,7 +1349,7 @@ public class HairCloth {
 					Bone bone=mesh.getSkeleton().getBones().get(i);
 					ThreeLog.log(bone.getName(),bone.getPosition());
 				}
-			}
+			}*/
 			//reset bone
 			//mesh.getSkeleton(),offset+1,boneLength-1
 			//for reset pose
@@ -1362,7 +1362,7 @@ public class HairCloth {
 			
 			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), mesh, w, ammoParticles,ammoMultipleScalar*characterScale,suffix,ammoBoneBodyOffset,ammoBoneBodyLength);
 				
-			if(!debugdBody){
+		/*	if(!debugdBody){
 				LogUtils.log("after-scale");
 				for(int i=0;i<mesh.getSkeleton().getBones().length();i++){
 				//for(int i=ammoBoneBodyOffset;i<ammoBoneBodyOffset+ammoBoneBodyLength;i++){
@@ -1374,7 +1374,7 @@ public class HairCloth {
 					Bone bone=mesh.getSkeleton().getBones().get(i);
 					ThreeLog.log(bone.getName(),bone.getPosition());
 				}
-			}
+			}*/
 			//ammoBoneBodyOffset=-1;
 			
 			debugdBody=true;

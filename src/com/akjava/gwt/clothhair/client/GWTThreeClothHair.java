@@ -430,7 +430,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		INSTANCE=this;//must be first
 		clock=THREE.Clock();
-		clothSimulator=new ClothSimulator(scene,null,this);
+		clothSimulator=new ClothSimulator(scene,null);
 		
 		//LogUtils.log("clear-color:"+getStorageControler().getValue(GWTThreeClothHairStorageKeys.THREEJS_CLEAR_COLOR, 0));
 		

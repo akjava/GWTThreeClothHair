@@ -79,7 +79,7 @@ public class HairDataCsvConverter extends Converter<HairData,String> {
 		if(version.equals("1")){
 			return parseVersion1(csv);
 		}
-		LogUtils.log("invalid version:"+version);
+		LogUtils.log("invalid version:"+version+",or parsing new-json format");
 		//invalid
 		return null;
 	}

@@ -592,8 +592,8 @@ public class ClothSimulator  {
 		texture.setFlipY(false);
 		texture.setNeedsUpdate(true);
 		
-		Texture disp=THREE.TextureLoader().load("models/mbl3d/hairdisp.png");
-		disp.setFlipY(false);
+		//Texture disp=THREE.TextureLoader().load("models/mbl3d/hairdisp.png");
+		//disp.setFlipY(false);
 		
 		//displacementMap not good at plain when row-poly
 		
