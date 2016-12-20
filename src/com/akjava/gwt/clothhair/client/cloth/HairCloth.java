@@ -1226,6 +1226,9 @@ public class HairCloth {
 			}else{
 				LogUtils.log("not initialized");
 			}
+			
+			LogUtils.log("bone-info");
+			LogUtils.log(simulator.getCharacterMesh().getSkeleton().getBones().get(0));
 			skipSync=true;
 		}else{
 			updateParticles(simulator);
@@ -1309,11 +1312,28 @@ public class HairCloth {
 		AmmoHairControler.ParticleBodyDatas data=simulator.getAmmoHairControler().getAmmoData(this);
 		List<BodyAndMesh> ammoParticles=data.getAmmoParticles();
 		Vector3 threePos=THREE.Vector3();//share and improve fps
+		
+		//I guess need here
+		String targetName="head";
+		Bone targetBone=simulator.getCharacterMesh().getSkeleton().gwtGetBoneByName(targetName);
+		
+		targetBone.updateMatrixWorld(true);
+		Quaternion q2=THREE.Quaternion().setFromRotationMatrix(targetBone.getMatrixWorld());
+		//q2.conjugate();
+		//q2.multiply(targetBone.getQuaternion());
+		//Quaternion q3=THREE.Quaternion().setFromRotationMatrix(targetBone.getMatrix());
+		//q2.multiply(q3);
+		
 		//basically never changed length
 		for(int i=0;i<ammoParticles.size();i++){
 			if(isPinned(i)){//both plain & hair type need sync
 				threePos.copy(particles.get(i).getOriginal()).multiplyScalar(ammoMultipleScalar);
 				ammoParticles.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
+				
+				
+				//really need that?,this keep safe ammo conflict
+				ammoParticles.get(i).getBody().setRotation(targetBone.getQuaternion());
+				//ammoParticles.get(i).getBody().setRotation(q2);
 			}else{
 				//only plain-cloth need sync position here
 				if(!isBoneType(hairData.getHairPhysicsType())){
