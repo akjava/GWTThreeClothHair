@@ -1316,15 +1316,17 @@ public class HairCloth {
 		//I guess need here
 		
 		Bone targetBone=null;
+		
 		if(!hairData.getAmmoTargetBone().isEmpty()){
 			targetBone=simulator.getCharacterMesh().getSkeleton().gwtGetBoneByName(hairData.getAmmoTargetBone());
 			if(targetBone==null){
-			LogUtils.log("not found target-bone name:"+hairData.getAmmoTargetBone().isEmpty());
+			LogUtils.log("not found target-bone name:"+hairData.getAmmoTargetBone());
 			}
 		}
+		
 		if(targetBone==null){
 			targetBone=simulator.getCharacterMesh().getSkeleton().getBones().get(0);
-			LogUtils.log("no target bone exist,use default root as follow rotation");
+			LogUtils.log("no target bone exist,use default root as follow rotation.see HairData.class");
 		}
 		
 		targetBone.updateMatrixWorld(true);
