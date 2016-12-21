@@ -515,6 +515,22 @@ public void setHairPins(List<HairPin> hairPins) {
 	public void setHairPhysicsType(int hairType) {
 		this.hairType = hairType;
 	}
+	
+	public String getHairPhysicsTypeName(){
+		switch (hairType){
+		case TYPE_SIMPLE_CLOTH:
+			return "SimpleCloth";
+		case TYPE_AMMO_CLOTH:
+			return "AmmoCloth";
+		case TYPE_AMMO_BONE_CLOTH:
+			return "BoneCloth";
+		case TYPE_AMMO_BONE_HAIR:
+			return "BoneHair";
+		case TYPE_AMMO_BONE_BODY:
+			return "BoneBody";
+		}
+		return "Unknowntype:"+hairType;
+	}
 
 
 	/**

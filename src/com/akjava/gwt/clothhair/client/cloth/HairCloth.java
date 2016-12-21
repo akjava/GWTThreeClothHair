@@ -1576,14 +1576,15 @@ public class HairCloth {
 					
 					//TODO auto weight setting
 					if(hairData.isCustomGeometryUseAutoSkinning()){
-					int influence=1;
-					WeightResult result=new SimpleAutoWeight(influence).autoWeight(geometry, bones,Lists.newArrayList(0));//ignore root
-					result.insertToGeometry(geometry);
+						int influence=1;
+						WeightResult result=new SimpleAutoWeight(influence).autoWeight(geometry, bones,Lists.newArrayList(0));//ignore root
+						result.insertToGeometry(geometry);
 					}
 					
 					SkinnedMesh clothBoxMesh = THREE.SkinnedMesh(geometry,boxhMaterial);
 					clothBoxMesh.setCastShadow(true);
 					data.setSkinnedMesh(clothBoxMesh);
+					//LogUtils.log("set:clothBoxMesh:"+data.hashCode());
 					
 					//adding to scene
 					simulator.getAmmoHairControler().getAmmoControler().getScene().add(clothBoxMesh);
@@ -1600,6 +1601,7 @@ public class HairCloth {
 					
 					simulator.getAmmoHairControler().setParticleData(HairCloth.this,data );
 					
+					simulator.updateHairTextureData(null,HairCloth.this, false);//update hair-color
 					initializing=false;
 				}
 			});
