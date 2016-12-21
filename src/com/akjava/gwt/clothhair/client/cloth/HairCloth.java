@@ -1314,16 +1314,31 @@ public class HairCloth {
 		Vector3 threePos=THREE.Vector3();//share and improve fps
 		
 		//I guess need here
-		String targetName="head";
-		Bone targetBone=simulator.getCharacterMesh().getSkeleton().gwtGetBoneByName(targetName);
+		
+		Bone targetBone=null;
+		if(!hairData.getAmmoTargetBone().isEmpty()){
+			targetBone=simulator.getCharacterMesh().getSkeleton().gwtGetBoneByName(hairData.getAmmoTargetBone());
+			if(targetBone==null){
+			LogUtils.log("not found target-bone name:"+hairData.getAmmoTargetBone().isEmpty());
+			}
+		}
+		if(targetBone==null){
+			targetBone=simulator.getCharacterMesh().getSkeleton().getBones().get(0);
+			LogUtils.log("no target bone exist,use default root as follow rotation");
+		}
 		
 		targetBone.updateMatrixWorld(true);
 		Quaternion q2=THREE.Quaternion().setFromRotationMatrix(targetBone.getMatrixWorld());
+		//character matrix
+		Quaternion q3=THREE.Quaternion().setFromRotationMatrix(simulator.getCharacterMesh().getMatrix());
 		//q2.conjugate();
-		//q2.multiply(targetBone.getQuaternion());
-		//Quaternion q3=THREE.Quaternion().setFromRotationMatrix(targetBone.getMatrix());
 		//q2.multiply(q3);
+		/*
 		
+		q2.multiply(targetBone.getQuaternion());
+		Quaternion q3=THREE.Quaternion().setFromRotationMatrix(targetBone.getMatrix());
+		q2.multiply(q3);
+		*/
 		//basically never changed length
 		for(int i=0;i<ammoParticles.size();i++){
 			if(isPinned(i)){//both plain & hair type need sync
@@ -1331,9 +1346,13 @@ public class HairCloth {
 				ammoParticles.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
 				
 				
+				//for working ammo fine need this.
 				//really need that?,this keep safe ammo conflict
-				ammoParticles.get(i).getBody().setRotation(targetBone.getQuaternion());
-				//ammoParticles.get(i).getBody().setRotation(q2);
+				//ammoParticles.get(i).getBody().setRotation(targetBone.getQuaternion());
+				//if(hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_HAIR){
+					ammoParticles.get(i).getBody().setRotation(q2);//only need this case?
+				//}
+				
 			}else{
 				//only plain-cloth need sync position here
 				if(!isBoneType(hairData.getHairPhysicsType())){
@@ -1372,15 +1391,21 @@ public class HairCloth {
 			}*/
 			//reset bone
 			//mesh.getSkeleton(),offset+1,boneLength-1
-			//for reset pose
-			for(int i=ammoBoneBodyOffset;i<ammoBoneBodyOffset+ammoBoneBodyLength;i++){
+			//for reset pose,i forgot how this work
+			for(int i=ammoBoneBodyOffset;i<ammoBoneBodyOffset+ammoBoneBodyLength;i++){//skip root?
 				Bone bone=mesh.getSkeleton().getBones().get(i);
 				bone.getMatrixWorld().copy(skeletonMatrixWorldList.get(i));
 				bone.getMatrix().copy(skeletonMatrixList.get(i));
 				skeletonMatrixList.get(i).decompose(bone.getPosition(), bone.getQuaternion(), bone.getScale());
 			}
 			
-			PlainBoneCreator.syncBones(simulator.getAmmoHairControler().getAmmoControler(), mesh, w, ammoParticles,ammoMultipleScalar*characterScale,suffix,ammoBoneBodyOffset,ammoBoneBodyLength);
+			//mesh.getSkeleton().getBones().get(ammoBoneBodyOffset).setRotationFromQuaternion(q2.inverse());
+			
+			//root is?
+			//simulator.getAmmoHairControler().getAmmoControler().updateBone(mesh.getSkeleton().getBones().get(ammoBoneBodyOffset), null,q2,ammoMultipleScalar*characterScale);
+			
+			//trying working.
+			PlainBoneCreator.testsyncBones(q2,simulator.getAmmoHairControler().getAmmoControler(), mesh, w, ammoParticles,ammoMultipleScalar*characterScale,suffix,ammoBoneBodyOffset,ammoBoneBodyLength);
 				
 		/*	if(!debugdBody){
 				LogUtils.log("after-scale");

@@ -2,6 +2,7 @@ package com.akjava.gwt.clothhair.client.hair;
 
 import java.util.List;
 
+import com.akjava.gwt.clothhair.client.cloth.HairCloth;
 import com.akjava.gwt.clothhair.client.texture.HairTextureData;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Geometry;
@@ -808,5 +809,19 @@ public void setHairPins(List<HairPin> hairPins) {
 		this.ammoHairThinLast = ammoHairThinLast;
 	}
 
+	
+	/**
+	 * @see HairCloth#updateParticles
+	 * used as base rotation
+	 */
+	private String ammoTargetBone="";
+
+	public String getAmmoTargetBone() {
+		return ammoTargetBone;
+	}
+
+	public void setAmmoTargetBone(String ammoTargetBone) {
+		this.ammoTargetBone = ammoTargetBone;
+	}
 	
 }

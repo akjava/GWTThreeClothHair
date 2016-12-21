@@ -132,7 +132,7 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 		ammoObjectWrapper.setDouble("circleRangeMax", hairData.getAmmoCircleRangeMax());
 		ammoObjectWrapper.setDouble("circleInRangeRatio", hairData.getAmmoCircleInRangeRatio());
 		
-		
+		ammoObjectWrapper.setString("targetBone", hairData.getAmmoTargetBone());
 		
 		
 		//ammo-cloth
@@ -317,6 +317,8 @@ public class HairDataConverter extends Converter<HairData,JSONObject> {
 			hairData.setAmmoCircleRangeMin(ammoObjectWrapper.getDouble("circleRangeMin", hairData.getAmmoCircleRangeMin()));
 			hairData.setAmmoCircleRangeMax(ammoObjectWrapper.getDouble("circleRangeMax", hairData.getAmmoCircleRangeMax()));
 			hairData.setAmmoCircleInRangeRatio(ammoObjectWrapper.getDouble("circleInRangeRatio", hairData.getAmmoCircleInRangeRatio()));
+			
+			hairData.setAmmoTargetBone(ammoObjectWrapper.getString("targetBone", hairData.getAmmoTargetBone()));
 			
 			JSONObjectWrapper ammoClothObject=ammoObjectWrapper.getObject("ammo-cloth");
 			if(ammoClothObject!=null){

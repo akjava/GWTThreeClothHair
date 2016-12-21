@@ -127,6 +127,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 		private CheckBox ammoCircleHairMergeZeroEditor;
 		
 		private DoubleBox ammoHairThinLastEditor;
+		private TextBox ammoTargetBoneEditor;
 		public double getScaleOfU(){
 			return scaleOfU.getValue();
 		}
@@ -575,6 +576,11 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			ammoHairThinLastEditor=new DoubleBox();
 			ammoHairThinLastEditor.setWidth("40px");
 			ammoHairOption2.add(ammoHairThinLastEditor);
+			
+			ammoHairOption2.add(new Label("Target bone"));
+			ammoTargetBoneEditor = new TextBox();
+			ammoTargetBoneEditor.setWidth("80px");
+			ammoHairOption2.add(ammoTargetBoneEditor);
 		}
 		
 		private Panel createParticleBodyEditor(){
@@ -708,6 +714,8 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				
 				value.setCustomNormal(customNormalEditor.getValue());
 				value.setParticleMass(particleMassEditor.getValue());
+				
+				value.setAmmoTargetBone(ammoTargetBoneEditor.getValue());
 			}
 
 			@Override
@@ -814,5 +822,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 				
 				customNormalEditor.setValue(value.getCustomNormal());
 				particleMassEditor.setValue(value.getParticleMass());
+				
+				ammoTargetBoneEditor.setValue(value.getAmmoTargetBone());
 			}
 	}
