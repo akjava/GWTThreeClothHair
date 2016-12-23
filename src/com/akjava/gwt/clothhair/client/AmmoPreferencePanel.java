@@ -110,7 +110,8 @@ collisionCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 	});
 	this.add(gravityEditor);
 	
-	this.add(new Label("substeps"));
+	//because substeps not working correctly yet,todo study more.
+/*	this.add(new Label("substeps"));
 	substepsEditor = new IntegerBox();
 	substepsEditor.setValue(GWTThreeClothHair.INSTANCE.getAmmoSubsteps());
 	substepsEditor.addValueChangeHandler(new ValueChangeHandler<Integer>() {
@@ -127,7 +128,7 @@ collisionCheck.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 			
 		}
 	});
-	this.add(substepsEditor);
+	this.add(substepsEditor);*/
 	
 	LabeledInputRangeWidget2 worldScale=new LabeledInputRangeWidget2("WorldScale", 0.001, 1, 0.001);
 	worldScale.getLabel().setWidth("90px");
