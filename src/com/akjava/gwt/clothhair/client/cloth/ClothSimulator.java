@@ -177,6 +177,21 @@ public class ClothSimulator  {
 
 
 
+	private double fps=1.0/120;
+	
+	public double getFps() {
+		return fps;
+	}
+
+	public void setFps(double fps) {
+		this.fps = fps;
+		
+	}
+
+	/**
+	 * right now current time.TODO change delta,right now old-cloth simulator use this as last-time
+	 * @param timestamp
+	 */
 	public void update(double timestamp){
 		updateSphereMeshs();//sphere first
 		getClothControler().beforeSimulate(this);
@@ -186,7 +201,9 @@ public class ClothSimulator  {
 		
 		if(ammoHairControler.isEnabled()){
 			//LogUtils.log("ammo-update");
-			ammoHairControler.getAmmoControler().update();
+			//ammoHairControler.getAmmoControler().setSubsteps(480);
+			ammoHairControler.getAmmoControler().setFixedTimeStep(fps);//TODO set other location
+			ammoHairControler.getAmmoControler().update(fps);
 		}
 		
 		

@@ -294,7 +294,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		
 		//mixer first,this make animation
 		
-				renderer.render(scene, camera);
+		renderer.render(scene, camera);
 		
 		if(stats!=null){
 			stats.update();
@@ -1065,6 +1065,9 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	}
 	public void setMixerFrixedFrameNumber(int mixerFrixedFrameNumber) {
 		this.mixerFrixedFrameNumber = mixerFrixedFrameNumber;
+		if(clothSimulator!=null){
+			clothSimulator.setFps(1.0/mixerFrixedFrameNumber);
+		}
 	}
 
 	private boolean useFixedFrame=true;
