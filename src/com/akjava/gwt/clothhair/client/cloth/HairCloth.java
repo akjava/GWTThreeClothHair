@@ -1143,6 +1143,7 @@ public class HairCloth {
 				
 				
 				if(v>h/2){
+					//baseMass=10;//try change mass size
 					//baseMass=0.5;
 					//baseMass*=100;// 
 				}
@@ -1347,6 +1348,9 @@ public class HairCloth {
 				threePos.copy(particles.get(i).getOriginal()).multiplyScalar(ammoMultipleScalar);
 				ammoParticles.get(i).getBody().setPosition(threePos.getX(),threePos.getY(),threePos.getZ());
 				
+				
+				
+				//Vector3 normal=THREE.Vector3(0, -1, 0);
 				
 				//for working ammo fine need this.
 				//really need that?,this keep safe ammo conflict
