@@ -428,6 +428,11 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			particleTypeBox.setSelectedIndex(1);
 			option1Pane0.add(particleTypeBox);
 			
+			option1Pane0.add(new Label("Target bone"));
+			ammoTargetBoneEditor = new TextBox();
+			ammoTargetBoneEditor.setWidth("80px");
+			option1Pane0.add(ammoTargetBoneEditor);
+			
 			
 			HorizontalPanel option1Pane2=new HorizontalPanel();
 			option1Pane2.setVerticalAlignment(ALIGN_MIDDLE);
@@ -577,10 +582,7 @@ public class HairDataEditor extends VerticalPanel implements Editor<HairData>,Va
 			ammoHairThinLastEditor.setWidth("40px");
 			ammoHairOption2.add(ammoHairThinLastEditor);
 			
-			ammoHairOption2.add(new Label("Target bone"));
-			ammoTargetBoneEditor = new TextBox();
-			ammoTargetBoneEditor.setWidth("80px");
-			ammoHairOption2.add(ammoTargetBoneEditor);
+			
 		}
 		
 		private Panel createParticleBodyEditor(){
