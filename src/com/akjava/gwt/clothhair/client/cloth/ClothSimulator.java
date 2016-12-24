@@ -49,6 +49,7 @@ import com.akjava.gwt.threeammo.client.AmmoBodyPropertyData;
 import com.akjava.gwt.threeammo.client.AmmoConstraintPropertyData;
 import com.akjava.gwt.threeammo.client.BodyAndMesh;
 import com.akjava.lib.common.utils.CSVUtils;
+import com.akjava.lib.common.utils.ColorUtils;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -1074,9 +1075,11 @@ public class ClothSimulator  {
 			LogUtils.log("updateHairTextureData:null selection");
 			return;
 		}
-		updateHairTextureData(selection.getMesh(),selection.getClothData().getHairCloth(),updateHairTextureMap);
 		
-		HairTextureData textureData=selection.getClothData().getHairCloth().getHairData().getHairTextureData();
+		updateHairTextureData(selection.getMesh(),selection.getClothData().getHairCloth(),selection.getEditingHairData().getHairTextureData(),updateHairTextureMap);
+		
+		HairTextureData textureData=selection.getEditingHairData().getHairTextureData();
+		
 		MeshPhongMaterial material=selection.getMesh().getMaterial().gwtCastMeshPhongMaterial();
 		
 		if(textureData.isEnablePatternImage()){
@@ -1087,6 +1090,7 @@ public class ClothSimulator  {
 			material.setMap(null);
 		}
 		material.setNeedsUpdate(true);
+		
 	}
 	/**
 	 * direct call not support isEnablePatternImage so far
@@ -1094,7 +1098,7 @@ public class ClothSimulator  {
 	 * @param hairCloth
 	 * @param updateHairTextureMap
 	 */
-	public void updateHairTextureData(@Nullable Mesh mesh,HairCloth hairCloth,boolean updateHairTextureMap){
+	public void updateHairTextureData(@Nullable Mesh mesh,HairCloth hairCloth,HairTextureData hairTextureData,boolean updateHairTextureMap){
 	
 	
 	
@@ -1107,13 +1111,13 @@ public class ClothSimulator  {
 	}
 	
 	//replace if ammo data exist
-	if(getAmmoHairControler().getAmmoData(hairCloth)!=null){
+	if(getAmmoHairControler().getAmmoData(hairCloth)!=null && hairCloth.getHairData().getHairPhysicsType()!=HairData.TYPE_AMMO_CLOTH){
 		
 		ParticleBodyDatas datas=getAmmoHairControler().getAmmoData(hairCloth);
-		LogUtils.log("has:ammo-data:"+datas.hashCode());
+		//LogUtils.log("debug:has:ammo-data:hash="+datas.hashCode());
 		if(datas.getSkinnedMesh()!=null){//AMMO_BONE mode
 			material=datas.getSkinnedMesh().getMaterial().gwtCastMeshPhongMaterial();
-			LogUtils.log("material replaced to ammo-particle");
+			LogUtils.log("debug:material replaced to ammo-particle");
 		}else{
 			LogUtils.log("ParticleBodyDatas has no skinnedMesh:"+hairCloth.getHairData().getHairPhysicsTypeName()+". BoneBody has no skinned mesh.");
 		}
@@ -1122,21 +1126,23 @@ public class ClothSimulator  {
 	}
 	
 	
-	HairTextureData textureData=hairCloth.getHairData().getHairTextureData();
+	//HairTextureData hairTextureData=hairCloth.getHairData().getHairTextureData();
 	//TODO support local or global
 	
-	int color=textureData.isUseLocalColor()?textureData.getColor():globalHairColor;
+	int color=hairTextureData.isUseLocalColor()?hairTextureData.getColor():globalHairColor;
 	
 	//LogUtils.log("updateHairTextureData:"+color);
 	if(material!=null){
+	
 	material.setColor(THREE.Color(color));
 	
 	
-	material.setOpacity(textureData.getOpacity());
-	material.setAlphaTest(textureData.getAlphaTest());
+	material.setOpacity(hairTextureData.getOpacity());
+	material.setAlphaTest(hairTextureData.getAlphaTest());
 	
 	//TODO copy from patterns if enabled
 	material.setNeedsUpdate(true);
+	
 	}else{
 	LogUtils.log("updateHairTextureData:material is null");	
 	}
@@ -1200,7 +1206,7 @@ public class ClothSimulator  {
 		//canvas=HairPatternDataEditor.canvas;
 		
 		//selection.getHairData().getHairTextureData().getHairPatternData().setSlices(4);//for debug
-		HairPatternDataUtils.paint(canvas, selection.getHairData().getHairTextureData().getHairPatternData());
+		HairPatternDataUtils.paint(canvas, selection.getEditingHairData().getHairTextureData().getHairPatternData());
 		
 		//String pattern="hairpattern/hairpattern1.png";
 		String pattern="img/transparent.png";//do nothing

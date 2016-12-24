@@ -160,7 +160,7 @@ public class HairDataPanel extends VerticalPanel{
 						//extremly slow
 						for(HairMixedData cellData:cellObjects.getDatas()){
 							//TODO check use local or not
-							if(!cellData.getHairData().getHairTextureData().isUseLocalColor()){
+							if(!cellData.getEditingHairData().getHairTextureData().isUseLocalColor()){
 							GWTThreeClothHair.INSTANCE.updateHairTextureColor(cellData,colorValue);
 							}
 						}
@@ -249,7 +249,7 @@ public class HairDataPanel extends VerticalPanel{
 				TextColumn<HairMixedData> channelColumn=new TextColumn<HairMixedData>() {
 					@Override
 					public String getValue(HairMixedData object) {
-						return String.valueOf(object.getHairData().getChannel());
+						return String.valueOf(object.getEditingHairData().getChannel());
 						//return hairDataConverter.convert(object.getHairData());
 					}
 				};
@@ -259,7 +259,7 @@ public class HairDataPanel extends VerticalPanel{
 					@Override
 					public String getValue(HairMixedData object) {
 						
-						return String.valueOf(object.getHairData().getHairPins().size());
+						return String.valueOf(object.getEditingHairData().getHairPins().size());
 						//return hairDataConverter.convert(object.getHairData());
 					}
 				};
@@ -269,7 +269,7 @@ public class HairDataPanel extends VerticalPanel{
 				TextColumn<HairMixedData> distanceColumn=new TextColumn<HairMixedData>() {
 					@Override
 					public String getValue(HairMixedData object) {
-						double width=HairDataUtils.getTotalPinDistance(object.getHairData(), characterMesh,false);
+						double width=HairDataUtils.getTotalPinDistance(object.getEditingHairData(), characterMesh,false);
 						String text=String.valueOf(width);
 						
 						return text.substring(0,Math.min(7, text.length()));
@@ -280,7 +280,7 @@ public class HairDataPanel extends VerticalPanel{
 				TextColumn<HairMixedData> nameColumn=new TextColumn<HairMixedData>() {
 					@Override
 					public String getValue(HairMixedData object) {
-						return object.getHairData().getHairPhysicsTypeName();
+						return object.getEditingHairData().getHairPhysicsTypeName();
 						/* ol uvs
 						 * return Strings.padStart(String.valueOf(object.getHairData().getSliceFaceCount()),2,'0')+","+
 								Strings.padStart(String.valueOf(object.getHairData().getSizeOfV()),2,'0')+","+
@@ -294,7 +294,7 @@ public class HairDataPanel extends VerticalPanel{
 					@Override
 					public String getValue(HairMixedData object) {
 						
-						return String.valueOf(object.getHairData().isSyncMove());
+						return String.valueOf(object.getEditingHairData().isSyncMove());
 						//return hairDataConverter.convert(object.getHairData());
 					}
 				};
@@ -330,19 +330,19 @@ public class HairDataPanel extends VerticalPanel{
 				if(data!=null){
 					removeHairData(data);
 					
-					driver.edit(data.getHairData());
-					if(data.getHairData().getHairPins().size()<=3){
-					firstSelection=data.getHairData().getHairPins().get(0);
-					secondSelection=data.getHairData().getHairPins().get(1);
-					if(data.getHairData().getHairPins().size()>2){
-						thirdSelection=data.getHairData().getHairPins().get(2);
+					driver.edit(data.getEditingHairData());
+					if(data.getEditingHairData().getHairPins().size()<=3){
+					firstSelection=data.getEditingHairData().getHairPins().get(0);
+					secondSelection=data.getEditingHairData().getHairPins().get(1);
+					if(data.getEditingHairData().getHairPins().size()>2){
+						thirdSelection=data.getEditingHairData().getHairPins().get(2);
 					}else{
 						thirdSelection=null;
 					}
 					updateHairPinsByThreePoints();
 					}else{
 						hairPins.clear();
-						for(HairPin pin:data.getHairData().getHairPins()){
+						for(HairPin pin:data.getEditingHairData().getHairPins()){
 							hairPins.add(pin);
 						}
 					}
@@ -362,7 +362,7 @@ public class HairDataPanel extends VerticalPanel{
 			public void onClick(ClickEvent event) {
 				HairMixedData data=cellObjects.getSelection();
 				if(data!=null){
-					HairData copied=data.getHairData().clone();
+					HairData copied=data.getEditingHairData().clone();
 					driver.edit(copied);
 					updateDistanceLabel();
 					cellObjects.unselect();
@@ -400,7 +400,7 @@ public class HairDataPanel extends VerticalPanel{
 				GWTThreeClothHair.INSTANCE.resetAnimation();//without reset usually bad
 				List<HairData> oldData=Lists.newArrayList();
 				for(HairMixedData data:ImmutableList.copyOf(cellObjects.getDatas())){
-					oldData.add(data.getHairData());
+					oldData.add(data.getEditingHairData());
 				}
 				clearAllHairData();
 				loadHairDataSync(oldData);
@@ -419,7 +419,7 @@ public class HairDataPanel extends VerticalPanel{
 					
 					removeHairData(data);
 					
-					data.getHairData().setPointMode(HairData.POINT_MODE_SEMI_AUTO);
+					data.getEditingHairData().setPointMode(HairData.POINT_MODE_SEMI_AUTO);
 					JsArray<Vector3> pos=JavaScriptUtils.createJSArray();
 					for(int i=0;i<data.getClothData().getHairCloth().getParticles().size();i++){
 						pos.push(data.getClothData().getHairCloth().getParticles().get(i).getPosition().clone());
@@ -428,10 +428,10 @@ public class HairDataPanel extends VerticalPanel{
 					for(int i=0;i<data.getClothData().getHairCloth().getPins().length;i++){
 						pins.push(data.getClothData().getHairCloth().getPins()[i]);
 					}
-					data.getHairData().setSemiAutoPoints(pos);
-					data.getHairData().setSemiAutoPins(pins);
+					data.getEditingHairData().setSemiAutoPoints(pos);
+					data.getEditingHairData().setSemiAutoPins(pins);
 					
-					loadHairDataSync(Lists.newArrayList(data.getHairData()));
+					loadHairDataSync(Lists.newArrayList(data.getEditingHairData()));
 				}
 			}
 		});
@@ -443,11 +443,11 @@ public class HairDataPanel extends VerticalPanel{
 				HairMixedData data=cellObjects.getSelection();
 				if(data!=null){
 					removeHairData(data);
-					data.getHairData().setPointMode(HairData.POINT_MODE_AUTO);
-					data.getHairData().setSemiAutoPoints(null);
-					data.getHairData().setSemiAutoPins(null);
+					data.getEditingHairData().setPointMode(HairData.POINT_MODE_AUTO);
+					data.getEditingHairData().setSemiAutoPoints(null);
+					data.getEditingHairData().setSemiAutoPins(null);
 					
-					loadHairDataSync(Lists.newArrayList(data.getHairData()));
+					loadHairDataSync(Lists.newArrayList(data.getEditingHairData()));
 				}
 			}
 		});
@@ -469,13 +469,13 @@ public class HairDataPanel extends VerticalPanel{
 					GWTThreeClothHair.INSTANCE.setSemiAutoPositions(null);
 					return;
 				}else{
-					GWTThreeClothHair.INSTANCE.setSemiAutoPositions(selection.getHairData());
+					GWTThreeClothHair.INSTANCE.setSemiAutoPositions(selection.getEditingHairData());
 				}
 				// TODO Auto-generated method stub
 				//editor edit
-				hairDataEditor.getHairTextureDataEditor().setValue(selection.getHairData().getHairTextureData());
+				hairDataEditor.getHairTextureDataEditor().setValue(selection.getEditingHairData().getHairTextureData());
 				
-				if(selection.getHairData().getPointMode()==HairData.POINT_MODE_AUTO){
+				if(selection.getEditingHairData().getPointMode()==HairData.POINT_MODE_AUTO){
 					semiAutoButton.setVisible(true);
 					fullAutoButton.setVisible(false);
 				}else{
@@ -550,14 +550,14 @@ public class HairDataPanel extends VerticalPanel{
 						return;
 					}
 					String type="simple";
-					if(cellObjects.getSelection().getHairData().getHairPhysicsType()==HairData.TYPE_AMMO_BONE_CLOTH){
+					if(cellObjects.getSelection().getEditingHairData().getHairPhysicsType()==HairData.TYPE_AMMO_BONE_CLOTH){
 						type="ammo_bone_cloth";
-					}else if(cellObjects.getSelection().getHairData().getHairPhysicsType()==HairData.TYPE_AMMO_CLOTH){
+					}else if(cellObjects.getSelection().getEditingHairData().getHairPhysicsType()==HairData.TYPE_AMMO_CLOTH){
 						type="ammo_cloth";
-					}else if(cellObjects.getSelection().getHairData().getHairPhysicsType()==HairData.TYPE_AMMO_BONE_HAIR){
+					}else if(cellObjects.getSelection().getEditingHairData().getHairPhysicsType()==HairData.TYPE_AMMO_BONE_HAIR){
 						type="ammo_bone_hair";
 					}
-					JSONObject selection=hairDataConverter.convert(cellObjects.getSelection().getHairData());
+					JSONObject selection=hairDataConverter.convert(cellObjects.getSelection().getEditingHairData());
 					
 					String text=toJsonText(Lists.newArrayList(selection));
 					Anchor a=HTML5Download.get().generateTextDownloadLink(text, "hair-"+type+".json", "selection to download",true);
@@ -1010,10 +1010,10 @@ public class HairDataPanel extends VerticalPanel{
 			this.clothData = clothData;
 			this.mesh = mesh;
 		}
-		public HairData getHairData() {
+		public HairData getEditingHairData() {
 			return hairData;
 		}
-		public void setHairData(HairData hairData) {
+		public void setEditingHairData(HairData hairData) {
 			this.hairData = hairData;
 		}
 		public ClothData getClothData() {
@@ -1500,7 +1500,7 @@ public void updateHairDataLine(){
 				Lists.newArrayList(hairDataConverter.convertAll(FluentIterable.from(cellObjects.getDatas()).transform(new Function<HairMixedData, HairData>() {
 					@Override
 					public HairData apply(HairMixedData input) {
-						return input.getHairData();
+						return input.getEditingHairData();
 					}
 				})));
 		

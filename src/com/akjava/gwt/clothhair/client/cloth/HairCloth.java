@@ -446,6 +446,10 @@ public class HairCloth {
 	
 	//private int hairPhysicsType;
 	private HairData hairData;
+	/**
+	 * initial hair data
+	 * @return
+	 */
 	public HairData getHairData() {
 		return hairData;
 	}
@@ -1619,7 +1623,7 @@ public class HairCloth {
 					
 					simulator.getAmmoHairControler().setParticleData(HairCloth.this,data );
 					
-					simulator.updateHairTextureData(null,HairCloth.this, false);//update hair-color
+					simulator.updateHairTextureData(null,HairCloth.this,HairCloth.this.getHairData().getHairTextureData(), false);//update hair-color
 					initializing=false;
 				}
 			});

@@ -1387,7 +1387,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//store hair datas 
 		//sync textures
 		MeshPhongMaterial material=selection.getMesh().getMaterial().gwtCastMeshPhongMaterial();
-		HairTextureData textureData=selection.getHairData().getHairTextureData();
+		HairTextureData textureData=selection.getEditingHairData().getHairTextureData();
 		//TODO support local or global
 		material.setMap(texture);
 	}
@@ -1400,7 +1400,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		//store hair datas 
 		//sync textures
 		MeshPhongMaterial material=selection.getMesh().getMaterial().gwtCastMeshPhongMaterial();
-		HairTextureData textureData=selection.getHairData().getHairTextureData();
+		HairTextureData textureData=selection.getEditingHairData().getHairTextureData();
 		//TODO support local or global
 		material.setColor(THREE.Color(colorValue));
 	}

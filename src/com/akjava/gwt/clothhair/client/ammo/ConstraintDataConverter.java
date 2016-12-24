@@ -40,8 +40,6 @@ public class ConstraintDataConverter extends Converter<AmmoConstraintPropertyDat
 		wrapper.setArrayNumber("linearLowerLimit",data.getLinearLowerLimit().toArray());
 		wrapper.setArrayNumber("linearUpperLimit",data.getLinearUpperLimit().toArray());
 		
-		LogUtils.log(object.getJavaScriptObject());
-		
 		return object;
 	}
 
