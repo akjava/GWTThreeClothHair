@@ -150,6 +150,15 @@ public class FacialAnimationPanel extends VerticalPanel{
 	
 	public void setFacialAnimation(String text){
 		JSONValue value=JSONParser.parseStrict(text);
+		
+		/*
+		 * TODO check if morphtarget not exist this mesh or not
+		 */
+		
+		/**
+		 * TODO check eye-filter value modify.
+		 */
+		
 		AnimationClip clip=AnimationClip.parse(value.isObject().getJavaScriptObject());
 		animationClip=clip;
 		
