@@ -280,14 +280,15 @@ public class HairDataPanel extends VerticalPanel{
 				TextColumn<HairMixedData> nameColumn=new TextColumn<HairMixedData>() {
 					@Override
 					public String getValue(HairMixedData object) {
-						
-						return Strings.padStart(String.valueOf(object.getHairData().getSliceFaceCount()),2,'0')+","+
+						return object.getHairData().getHairPhysicsTypeName();
+						/* ol uvs
+						 * return Strings.padStart(String.valueOf(object.getHairData().getSliceFaceCount()),2,'0')+","+
 								Strings.padStart(String.valueOf(object.getHairData().getSizeOfV()),2,'0')+","+
-						object.getHairData().getScaleOfU();
+						object.getHairData().getScaleOfU();*/
 						//return hairDataConverter.convert(object.getHairData());
 					}
 				};
-				table.addColumn(nameColumn,"UVS");
+				table.addColumn(nameColumn,"Type");
 				
 				TextColumn<HairMixedData> syncColumn=new TextColumn<HairMixedData>() {
 					@Override

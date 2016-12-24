@@ -124,9 +124,11 @@ public class CharacterMovePanel extends VerticalPanel{
 				mesh.getPosition().setZ(event.getValue().doubleValue());
 			}
 		});
-		
-		this.add(new Label("Rotation"));
-		LabeledInputRangeWidget2 xRot=new LabeledInputRangeWidget2("x", -180, 180, 1);
+		HorizontalPanel rotationPanel=new HorizontalPanel();
+		rotationPanel.setVerticalAlignment(ALIGN_MIDDLE);
+		this.add(rotationPanel);
+		rotationPanel.add(new Label("Rotation"));
+		final LabeledInputRangeWidget2 xRot=new LabeledInputRangeWidget2("x", -180, 180, 1);
 		xRot.getLabel().setWidth("20px");
 		xRot.getRange().setWidth("240px");
 		this.add(xRot);
@@ -136,7 +138,7 @@ public class CharacterMovePanel extends VerticalPanel{
 				mesh.getRotation().setX(Math.toRadians(event.getValue().doubleValue()));
 			}
 		});
-		LabeledInputRangeWidget2 yRot=new LabeledInputRangeWidget2("y", -180, 180, 1);
+		final LabeledInputRangeWidget2 yRot=new LabeledInputRangeWidget2("y", -180, 180, 1);
 		yRot.getLabel().setWidth("20px");
 		yRot.getRange().setWidth("240px");
 		this.add(yRot);
@@ -146,7 +148,7 @@ public class CharacterMovePanel extends VerticalPanel{
 				mesh.getRotation().setY(Math.toRadians(event.getValue().doubleValue()));
 			}
 		});
-		LabeledInputRangeWidget2 zRot=new LabeledInputRangeWidget2("z", -180, 180, 1);
+		final LabeledInputRangeWidget2 zRot=new LabeledInputRangeWidget2("z", -180, 180, 1);
 		zRot.getLabel().setWidth("20px");
 		zRot.getRange().setWidth("240px");
 		this.add(zRot);
@@ -156,6 +158,17 @@ public class CharacterMovePanel extends VerticalPanel{
 				mesh.getRotation().setZ(Math.toRadians(event.getValue().doubleValue()));
 			}
 		});
+		
+		Button resetRotation=new Button("Rest",new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				xRot.setValue(0, true);
+				yRot.setValue(0, true);
+				zRot.setValue(0, true);
+			}
+		});
+		rotationPanel.add(resetRotation);
 		
 		this.add(new Label("Scale"));
 		LabeledInputRangeWidget2 scaleXYZ=new LabeledInputRangeWidget2("xyz", 800,1200, 1);
