@@ -602,14 +602,17 @@ public class ClothSimulator  {
 		//indivisual haiar material
 		
 		//TODO extract
-		Texture texture=THREE.TextureLoader().load(
+		/*
+		 * 
+		 */
+		Texture specularMapTexture=THREE.TextureLoader().load(
 				//"models/mbl3d/bump2c.png"
 				"/hairpattern/hairpattern1.png"
 				);
 		
 		
-		texture.setFlipY(false);
-		texture.setNeedsUpdate(true);
+		specularMapTexture.setFlipY(false);
+		specularMapTexture.setNeedsUpdate(true);
 		
 		//Texture disp=THREE.TextureLoader().load("models/mbl3d/hairdisp.png");
 		//disp.setFlipY(false);
@@ -634,7 +637,9 @@ public class ClothSimulator  {
 				.shininess(5) //switch default same as texture otherwise not good at connection
 				//.wireframe(true)
 				.specular(0x888888)//TODO move editor
-				.specularMap(texture)
+				
+				//.specularMap(texture)
+				
 				//.shininess(15)
 				.visible(!isNoNeedPlainCloth)
 				

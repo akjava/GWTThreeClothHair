@@ -1228,8 +1228,22 @@ public class HairCloth {
 				LogUtils.log("not initialized");
 			}
 			
-			LogUtils.log("bone-info");
-			LogUtils.log(simulator.getCharacterMesh().getSkeleton().getBones().get(0));
+			/**
+			 * Check target bone
+			 */
+			if(!hairData.getAmmoTargetBone().isEmpty()){
+				Bone targetBone=simulator.getCharacterMesh().getSkeleton().gwtGetBoneByName(hairData.getAmmoTargetBone());
+				if(targetBone==null){
+					LogUtils.log("warning:Ammmo target bone is setted.but not found.missspell or miss bone structure.targetBone="+targetBone);
+				}
+			}else{
+				LogUtils.log("confirm:Ammmo target bone is empty.especially hair need this.");
+			}
+			
+			/*LogUtils.log("bone-info");
+			LogUtils.log(simulator.getCharacterMesh().getSkeleton().getBones().get(0));*/
+			
+			
 			skipSync=true;
 		}else{
 			updateParticles(simulator);
@@ -1321,13 +1335,13 @@ public class HairCloth {
 		if(!hairData.getAmmoTargetBone().isEmpty()){
 			targetBone=simulator.getCharacterMesh().getSkeleton().gwtGetBoneByName(hairData.getAmmoTargetBone());
 			if(targetBone==null){
-			LogUtils.log("not found target-bone name:"+hairData.getAmmoTargetBone());
+				//LogUtils.log("not found target-bone name:"+hairData.getAmmoTargetBone());
 			}
 		}
 		
 		if(targetBone==null){
 			targetBone=simulator.getCharacterMesh().getSkeleton().getBones().get(0);
-			LogUtils.log("no target bone exist,use default root as follow rotation.see HairData.class");
+			//LogUtils.log("no target bone exist,use default root as follow rotation.see HairData.class");
 		}
 		
 		targetBone.updateMatrixWorld(true);
