@@ -26,6 +26,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.text.shared.Renderer;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
@@ -169,6 +170,32 @@ public class CharacterMovePanel extends VerticalPanel{
 			}
 		});
 		rotationPanel.add(resetRotation);
+		
+		/**
+		 * step by step move seems not bad.
+		 */
+		Button testRotation=new Button("Test",new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				final int yR=90;
+				Timer timer=new Timer(){
+					int current=0;
+					@Override
+					public void run() {
+						current++;
+						yRot.setValue(current,true);
+						
+						if(current==yR){
+							cancel();
+						}
+					}
+					
+				};
+				timer.scheduleRepeating(100);
+			}
+		});
+		rotationPanel.add(testRotation);
+		
 		
 		this.add(new Label("Scale"));
 		LabeledInputRangeWidget2 scaleXYZ=new LabeledInputRangeWidget2("xyz", 800,1200, 1);

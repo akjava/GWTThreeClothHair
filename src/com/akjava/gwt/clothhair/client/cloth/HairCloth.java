@@ -1188,40 +1188,13 @@ public class HairCloth {
 			
 			
 			if(hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_CLOTH){
-			createAmmoBoneCloth(simulator, data, ammoParticles);
-			skipSync=true;
+				createAmmoBoneCloth(simulator, data, ammoParticles);
 			}else  if(hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_HAIR){
 				//create bone mesh
-				//position keep same
+				//position keep same?
 				createAmmoBoneHair(simulator,data,ammoParticles);
-				
 			}else if(hairData.getHairPhysicsType()==HairData.TYPE_AMMO_BONE_BODY){
-					String suffix="breast-";//TODO
-					//extream special
-					SkinnedMesh characterMesh=simulator.getCharacterMesh();
-					String rootName=suffix+"root";
-					for(int i=0;i<characterMesh.getGeometry().getBones().length();i++){
-						if(characterMesh.getGeometry().getBones().get(i).getName().equals(rootName)){
-							ammoBoneBodyOffset=i;
-							break;
-						}
-					}
-					ammoBoneBodyLength=PlainBoneCreator.calcurateBoneCount(ammoParticles.size(), w);
-					
-					/**
-					 * store initial matrixs
-					 */
-					PlainBoneCreator.pose(characterMesh.getSkeleton());//pose here
-					skeletonMatrixList=Lists.newArrayList();
-					skeletonMatrixWorldList=Lists.newArrayList();
-					for(int i=0;i<characterMesh.getSkeleton().getBones().length();i++){
-						Bone bone=characterMesh.getSkeleton().getBones().get(i);
-						skeletonMatrixList.add(bone.getMatrix().clone());
-						skeletonMatrixWorldList.add(bone.getMatrixWorld().clone());
-					}
-					
-					LogUtils.log("ammoBoneBodyOffset:"+ammoBoneBodyOffset+" ammoBoneBodyLength="+ammoBoneBodyLength);
-					//PlainBoneCreator.pose(characterMesh.getSkeleton());//try only initial?but faild
+				createAmmoBoneBody(simulator,data,ammoParticles);
 				}
 			
 			LogUtils.log("buttlet-object-size:"+restDistance*ammoMultipleScalar);
@@ -1247,7 +1220,7 @@ public class HairCloth {
 			/*LogUtils.log("bone-info");
 			LogUtils.log(simulator.getCharacterMesh().getSkeleton().getBones().get(0));*/
 			
-			
+			//updateParticles(simulator);//tested sync-pos on reload,but faild
 			skipSync=true;
 		}else{
 			updateParticles(simulator);
@@ -1471,6 +1444,34 @@ public class HairCloth {
 	private int ammoBoneBodyOffset=-1;//not initialized or not found
 	private int ammoBoneBodyLength;
 	
+	private void createAmmoBoneBody(ClothSimulator simulator,AmmoHairControler.ParticleBodyDatas data,List<BodyAndMesh> ammoParticles) {
+		String suffix="breast-";//TODO
+		//extream special
+		SkinnedMesh characterMesh=simulator.getCharacterMesh();
+		String rootName=suffix+"root";
+		for(int i=0;i<characterMesh.getGeometry().getBones().length();i++){
+			if(characterMesh.getGeometry().getBones().get(i).getName().equals(rootName)){
+				ammoBoneBodyOffset=i;
+				break;
+			}
+		}
+		ammoBoneBodyLength=PlainBoneCreator.calcurateBoneCount(ammoParticles.size(), w);
+		
+		/**
+		 * store initial matrixs
+		 */
+		PlainBoneCreator.pose(characterMesh.getSkeleton());//pose here
+		skeletonMatrixList=Lists.newArrayList();
+		skeletonMatrixWorldList=Lists.newArrayList();
+		for(int i=0;i<characterMesh.getSkeleton().getBones().length();i++){
+			Bone bone=characterMesh.getSkeleton().getBones().get(i);
+			skeletonMatrixList.add(bone.getMatrix().clone());
+			skeletonMatrixWorldList.add(bone.getMatrixWorld().clone());
+		}
+		
+		LogUtils.log("ammoBoneBodyOffset:"+ammoBoneBodyOffset+" ammoBoneBodyLength="+ammoBoneBodyLength);
+		//PlainBoneCreator.pose(characterMesh.getSkeleton());//try only initial?but faild
+	}
 	private void createAmmoBoneCloth(ClothSimulator simulator,AmmoHairControler.ParticleBodyDatas data,List<BodyAndMesh> ammoParticles) {
 		//create bone mesh
 		//position keep same
@@ -1645,7 +1646,7 @@ public class HairCloth {
 		
 		
 		//updateParticles(simulator);//for sync need update here
-		skipSync=true;
+		
 	}
 
 	private boolean initializing;
