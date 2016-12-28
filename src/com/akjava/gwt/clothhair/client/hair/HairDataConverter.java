@@ -1,6 +1,6 @@
 package com.akjava.gwt.clothhair.client.hair;
 
-import com.akjava.gwt.clothhair.client.JSONObjectWrapper;
+import com.akjava.gwt.lib.client.json.JSONObjectWrapper;
 import com.akjava.gwt.clothhair.client.ammo.BodyDataConverter;
 import com.akjava.gwt.clothhair.client.ammo.ConstraintDataConverter;
 import com.akjava.gwt.clothhair.client.hair.HairData.HairPin;

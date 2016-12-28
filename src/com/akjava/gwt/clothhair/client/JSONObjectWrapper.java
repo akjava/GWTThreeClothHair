@@ -11,6 +11,11 @@ import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 
+/**
+ * @deprecated moved to @see com.akjava.gwt.lib.client.JSONObjectWrapper
+ * @author aki
+ *
+ */
 public  class JSONObjectWrapper{
 	private JSONObject jsonObject;
 
