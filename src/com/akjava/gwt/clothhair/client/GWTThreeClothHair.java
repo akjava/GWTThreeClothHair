@@ -1426,6 +1426,22 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 		private void playFacialAnimation(boolean facialAnimation) {
 			if(facialAnimation && facialAnimationClip!=null){
 				mixer.uncacheClip(facialAnimationClip);//same name cache that.
+				
+				facialAnimationClip.resetDuration();
+				
+				if(facialAnimationTime==-1){
+					//auto
+					facialAnimationTime=facialAnimationClip.getDuration();
+					/*native set duration doing these, to set timeScale 1
+					 * setDuration: function( duration ) {
+
+						this.timeScale = this._clip.duration / duration;
+
+						return this.stopWarping();
+
+					},*/
+				}
+				
 				mixer.clipAction(facialAnimationClip).setDuration(facialAnimationTime).play();
 			}
 		}

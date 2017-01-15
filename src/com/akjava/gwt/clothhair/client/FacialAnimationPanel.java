@@ -75,7 +75,7 @@ public class FacialAnimationPanel extends VerticalPanel{
 				if(time==-1){
 					return "Use animation-clip time";
 				}else{
-					return time+" ms";
+					return time+" second";
 				}
 			}
 
@@ -85,7 +85,7 @@ public class FacialAnimationPanel extends VerticalPanel{
 				
 			}
 		});
-		List<Double> values=Lists.newArrayList(-1.0,0.1,0.25,0.5,1.0,2.0);
+		List<Double> values=Lists.newArrayList(-1.0,0.1,0.25,0.5,1.0,2.0,5.0,10.0,25.0);
 		timeValueListBox.setValue(-1.0);
 		timeValueListBox.setAcceptableValues(values);
 		h0.add(new Label("PlayTime:"));
