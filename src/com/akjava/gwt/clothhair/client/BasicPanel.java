@@ -1,6 +1,7 @@
 package com.akjava.gwt.clothhair.client;
 
 import com.akjava.gwt.clothhair.client.lights.LightDataPanel;
+import com.akjava.gwt.clothhair.client.scene.ScenePanel;
 import com.akjava.gwt.html5.client.input.ColorBox;
 import com.akjava.gwt.lib.client.CanvasUtils;
 import com.akjava.gwt.lib.client.StorageException;
@@ -335,6 +336,11 @@ h1.add(characterBoneCheck);
 		
 		lightPanel.add(new LightDataPanel(GWTThreeClothHairStorageKeys.KEY_LIGHTS,GWTThreeClothHair.INSTANCE.getStorageControler()));
 		
-		tab.selectTab(1);//for debug
+		
+		
+		ScenePanel scenePanel=new ScenePanel();
+		tab.add(scenePanel,"Scene");
+		
+		tab.selectTab(3);//for debug
 	}
 }

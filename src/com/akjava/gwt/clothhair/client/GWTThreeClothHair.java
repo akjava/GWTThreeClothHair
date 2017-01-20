@@ -849,7 +849,7 @@ public class GWTThreeClothHair  extends HalfSizeThreeAppWithControler implements
 	@Override
 	public PerspectiveCamera createCamera(){
 		
-		PerspectiveCamera camera=THREE.PerspectiveCamera(45, getWindowInnerWidth()/getWindowInnerHeight(), 10, 20000);
+		PerspectiveCamera camera=THREE.PerspectiveCamera(45, getWindowInnerWidth()/getWindowInnerHeight(), 1, 20000);
 		camera.getPosition().set(0, cameraY, 1000);
 		return camera;
 	}
